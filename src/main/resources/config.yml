@@ -1,0 +1,5 @@
+lang: 'en'
+debug:
+  enable: true
+  start: true
+  stop: true
