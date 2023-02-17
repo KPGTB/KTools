@@ -1,4 +1,7 @@
 lang: 'en'
+cache:
+  player: metadata # file or metadata
+  entity: metadata # file or metadata
 debug:
   enable: true
   start: true
