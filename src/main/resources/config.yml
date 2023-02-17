@@ -3,3 +3,5 @@ debug:
   enable: true
   start: true
   stop: true
+  language: true
+  cache: true

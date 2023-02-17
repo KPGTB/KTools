@@ -1,5 +1,6 @@
 package com.github.kpgtb.ktools.manager;
 
+import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.manager.language.LanguageLevel;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 public class LanguageManager {
     private final File dataFolder;
     private final String lang;
+    private final DebugManager debug;
     private final LanguageManager globalManager;
     private final HashMap<String, String> pluginMessages;
     private final HashMap<String, ArrayList<String>> pluginMessagesLong;
@@ -31,10 +33,12 @@ public class LanguageManager {
      * Constructor of Global LanguageManager. Use only in Ktools!
      * @param dataFolder Folder with plugin's data. Use JavaPlugin#getDataFolder() to get this
      * @param lang Language of messages. Get this from plugin's config
+     * @param debug Instance of {@link com.github.kpgtb.ktools.manager.DebugManager}
      */
-    public LanguageManager(File dataFolder, String lang) {
+    public LanguageManager(File dataFolder, String lang, DebugManager debug) {
         this.dataFolder = dataFolder;
         this.lang = lang;
+        this.debug = debug;
         this.globalManager = this;
         this.pluginMessages = new HashMap<>();
         this.pluginMessagesLong = new HashMap<>();
@@ -44,11 +48,13 @@ public class LanguageManager {
      * Constructor of Plugin's LanguageManager. Use in other plugins!
      * @param dataFolder Folder with plugin's data. Use JavaPlugin#getDataFolder() to get this
      * @param lang Language of messages. Get this from plugin's config
+     * @param debug Instance of {@link com.github.kpgtb.ktools.manager.DebugManager}
      * @param globalManager Instance of Global LanguageManager. Take it from {@link com.github.kpgtb.ktools.Ktools}
      */
-    public LanguageManager(File dataFolder, String lang, LanguageManager globalManager) {
+    public LanguageManager(File dataFolder, String lang, DebugManager debug, LanguageManager globalManager) {
         this.dataFolder = dataFolder;
         this.lang = lang;
+        this.debug = debug;
         this.globalManager = globalManager;
         this.pluginMessages = new HashMap<>();
         this.pluginMessagesLong = new HashMap<>();
@@ -56,50 +62,61 @@ public class LanguageManager {
 
     /**
      * Save default language file
-     * @param path Path to file in resources folder
+     * @param path Path to file in resources folder (lang/{lang_code}.yml)
      * @param plugin Instance of plugin
      */
     public void saveDefaultLanguage(String path, JavaPlugin plugin) {
         plugin.saveResource(path,false);
+        debug.sendInfo(DebugType.LANGUAGE, "Saved default language file ["+path+"].");
     }
 
     /**
      * Refresh messages from this plugin
      */
     public void refreshMessages() {
+        debug.sendInfo(DebugType.LANGUAGE, "Refreshing messages...");
         this.pluginMessages.clear();
         this.pluginMessagesLong.clear();
 
         File langFile = new File(dataFolder, "lang/"+lang+".yml");
         if(!langFile.exists()) {
+            debug.sendWarning(DebugType.LANGUAGE, "Language file doesn't exists! ["+langFile.getAbsolutePath()+"].");
             return;
         }
 
         FileConfiguration configuration = YamlConfiguration.loadConfiguration(langFile);
-        ConfigurationSection messagesSection = configuration.getConfigurationSection("messages");
+        ConfigurationSection messagesSection = configuration.getConfigurationSection("message");
 
         if(messagesSection == null) {
+            debug.sendWarning(DebugType.LANGUAGE, "Language dile doesn't have message section ["+langFile.getAbsolutePath()+"].");
             return;
         }
 
         messagesSection
                 .getKeys(false)
                 .forEach(msgCode -> {
+                    debug.sendInfo(DebugType.LANGUAGE, "Loading "+msgCode+"...");
                     Object msg = messagesSection.get(msgCode);
 
                     if(msg instanceof String) {
                         this.pluginMessages.put(msgCode, (String) msg);
+                        debug.sendInfo(DebugType.LANGUAGE, "Loaded "+msgCode+" as single line.");
                         return;
                     }
                     if(msg instanceof ArrayList<?>) {
                         ArrayList<?> msgList = (ArrayList<?>) msg;
                         if(msgList.isEmpty() || !(msgList.get(0) instanceof String)) {
+                            debug.sendWarning(DebugType.LANGUAGE, "Message "+msgCode+" is an empty list!");
                             return;
                         }
                         ArrayList<String> msgStringList = (ArrayList<String>) msgList;
                         this.pluginMessagesLong.put(msgCode, msgStringList);
+                        debug.sendInfo(DebugType.LANGUAGE, "Loaded "+msgCode+" as multiple lines.");
+                        return;
                     }
+                    debug.sendWarning(DebugType.LANGUAGE, "Could not load "+msgCode+"!");
                 });
+        debug.sendInfo(DebugType.LANGUAGE, "Refreshed messages.");
     }
 
     /**

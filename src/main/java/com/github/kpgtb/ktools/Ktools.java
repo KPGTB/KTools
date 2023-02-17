@@ -16,6 +16,8 @@ public final class Ktools extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
         this.debug = new DebugManager(getConfig(),getLogger());
+
+        long startMillis = System.currentTimeMillis();
         debug.sendInfo(DebugType.START, "Enabling plugin...");
 
         debug.sendInfo(DebugType.START, "Loading audience...");
@@ -25,8 +27,12 @@ public final class Ktools extends JavaPlugin {
         debug.sendInfo(DebugType.START, "Loading language...");
         String lang = getConfig().getString("lang");
         if(lang == null) lang = "en";
-        this.globalLanguageManager = new LanguageManager(getDataFolder(), lang);
+        this.globalLanguageManager = new LanguageManager(getDataFolder(), lang, debug);
+        this.globalLanguageManager.saveDefaultLanguage("lang/en.yml", this);
+        this.globalLanguageManager.refreshMessages();
         debug.sendInfo(DebugType.START, "Loaded "+lang+" language.");
+
+        debug.sendInfo(DebugType.START, "Enabled plugin in " + (System.currentTimeMillis() - startMillis) + "ms.");
     }
 
     @Override
