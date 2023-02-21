@@ -18,6 +18,7 @@ package com.github.kpgtb.ktools.manager.command;
 
 import com.github.kpgtb.ktools.manager.DebugManager;
 import com.github.kpgtb.ktools.manager.LanguageManager;
+import com.github.kpgtb.ktools.manager.ParamParserManager;
 import com.github.kpgtb.ktools.manager.command.annotation.*;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.manager.language.LanguageLevel;
@@ -38,6 +39,7 @@ import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public abstract class KCommand extends Command {
     private final String cmdName;
@@ -45,6 +47,7 @@ public abstract class KCommand extends Command {
     private final DebugManager debug;
     private final LanguageManager language;
     private final BukkitAudiences adventure;
+    private final ParamParserManager parser;
 
     private final ArrayList<Subcommand> mainCommands;
     private final HashMap<String, Subcommand> subcommands;
@@ -55,6 +58,7 @@ public abstract class KCommand extends Command {
         this.debug = toolsObjectWrapper.getDebugManager();
         this.language = toolsObjectWrapper.getLanguageManager();
         this.adventure = toolsObjectWrapper.getAdventure();
+        this.parser = toolsObjectWrapper.getParamParserManager();
 
         cmdName = getClass().getSimpleName()
                 .toLowerCase()
@@ -132,7 +136,17 @@ public abstract class KCommand extends Command {
                 parameters.put(parametersRaw[i].getName(), parametersRaw[i].getType());
             }
 
-            Subcommand subcommand = new Subcommand(subName, subDescription, permissions,playerRequired,parameters,method);
+            boolean endless = false;
+
+            if(!parameters.isEmpty()) {
+                Parameter lastParameter = parametersRaw[parametersRaw.length - 1];
+                if(lastParameter.getType().equals(String.class) &&
+                        lastParameter.getDeclaredAnnotation(LongString.class) != null) {
+                    endless = true;
+                }
+            }
+
+            Subcommand subcommand = new Subcommand(subName, subDescription, permissions,playerRequired,parameters,method, endless);
             if(method.getDeclaredAnnotation(MainCommand.class) != null) {
                 this.mainCommands.add(subcommand);
                 continue;
@@ -143,6 +157,7 @@ public abstract class KCommand extends Command {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
+        Audience audience = adventure.sender(sender);
         if(args.length == 0) {
             boolean found = false;
             for (Subcommand mainCommand : mainCommands) {
@@ -162,9 +177,8 @@ public abstract class KCommand extends Command {
                 }
             }
 
-            Audience audience = adventure.sender(sender);
             if(found) {
-                language.getComponent(LanguageLevel.GLOBAL, "onlyPlayer", (Player) sender).forEach(audience::sendMessage);
+                language.getComponent(LanguageLevel.GLOBAL, "onlyPlayer").forEach(audience::sendMessage);
                 return false;
             }
 
@@ -172,9 +186,84 @@ public abstract class KCommand extends Command {
             return false;
         }
 
+        ArrayList<Subcommand> possibleSubcommands = new ArrayList<>(mainCommands);
+        subcommands.forEach((name, subcommand) -> {
+            if(args[0].equalsIgnoreCase(name)) {
+                possibleSubcommands.add(subcommand);
+            }
+        });
 
+        boolean found = false;
+        for(Subcommand subcommand : possibleSubcommands) {
 
-        return true;
+            ArrayList<Class<?>> subCommandArgs = new ArrayList<>(subcommand.getArgsType().values());
+            List<String> fixedArgs = Arrays.asList(args);
+            if(subcommands.keySet().contains(args[0])) {
+                fixedArgs.remove(0);
+            }
+
+            if(!subcommand.isEndless() && fixedArgs.size() != subCommandArgs.size()) {
+                continue;
+            }
+
+            boolean isIt = true;
+            int i = 0;
+            for(String arg : fixedArgs) {
+                if(subcommand.isEndless()) {
+                    if(subCommandArgs.size() == (i+1)) {
+                        if (subCommandArgs.get(i).equals(String.class)) {
+                            break;
+                        }
+                    }
+                }
+                if(!parser.canConvert(arg, subCommandArgs.get(i))) {
+                    isIt = false;
+                    break;
+                }
+                i++;
+            }
+
+            if(!isIt) {
+                continue;
+            }
+
+            if(subcommand.isPlayerRequired() && (!(sender instanceof Player))) {
+                found = true;
+                continue;
+            }
+
+            Object[] commandArgs = new Object[fixedArgs.size() + 1];
+            commandArgs[0] = sender;
+            for (int j = 1; j < commandArgs.length; j++) {
+                int fixedJ = j - 1;
+                if(subcommand.isEndless()) {
+                    if(commandArgs.length == (j+1)) {
+                        StringBuilder stringBuilder = new StringBuilder(fixedArgs.get(fixedJ));
+                        for (int k = j; k < fixedArgs.size(); k++) {
+                            stringBuilder
+                                .append(" ")
+                                .append(fixedArgs.get(k));
+                        }
+                        commandArgs[j] = stringBuilder.toString();
+                        break;
+                    }
+                }
+                commandArgs[j] = parser.convert(fixedArgs.get(fixedJ), subCommandArgs.get(fixedJ));
+            }
+            try {
+                subcommand.getMethod().invoke(this, commandArgs);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+            break;
+        }
+
+        if(found) {
+            language.getComponent(LanguageLevel.GLOBAL, "onlyPlayer").forEach(audience::sendMessage);
+            return false;
+        }
+        sendHelp(audience);
+        return false;
     }
 
     private void sendHelp(Audience audience) {

@@ -19,7 +19,7 @@ package com.github.kpgtb.ktools.util;
 import com.github.kpgtb.ktools.manager.CacheManager;
 import com.github.kpgtb.ktools.manager.DebugManager;
 import com.github.kpgtb.ktools.manager.LanguageManager;
-import net.kyori.adventure.Adventure;
+import com.github.kpgtb.ktools.manager.ParamParserManager;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -29,13 +29,15 @@ public class ToolsObjectWrapper {
     private final LanguageManager languageManager;
     private final FileConfiguration config;
     private final BukkitAudiences adventure;
+    private final ParamParserManager paramParserManager;
 
-    public ToolsObjectWrapper(CacheManager cacheManager, DebugManager debugManager, LanguageManager languageManager, FileConfiguration config, BukkitAudiences adventure) {
+    public ToolsObjectWrapper(CacheManager cacheManager, DebugManager debugManager, LanguageManager languageManager, FileConfiguration config, BukkitAudiences adventure, ParamParserManager paramParserManager) {
         this.cacheManager = cacheManager;
         this.debugManager = debugManager;
         this.languageManager = languageManager;
         this.config = config;
         this.adventure = adventure;
+        this.paramParserManager = paramParserManager;
     }
 
     public CacheManager getCacheManager() {
@@ -56,5 +58,9 @@ public class ToolsObjectWrapper {
 
     public BukkitAudiences getAdventure() {
         return adventure;
+    }
+
+    public ParamParserManager getParamParserManager() {
+        return paramParserManager;
     }
 }

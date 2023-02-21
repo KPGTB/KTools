@@ -14,14 +14,32 @@
  *    limitations under the License.
  */
 
-package com.github.kpgtb.ktools.manager.command;
+package com.github.kpgtb.ktools.manager.command.parser.java;
 
+import com.github.kpgtb.ktools.manager.command.IParamParser;
 import org.bukkit.command.CommandSender;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public interface IParamParser<T> {
-    T convert(String param);
-    boolean canConvert(String param);
-    List<String> complete(String arg, CommandSender sender);
+public class LongParser implements IParamParser<Long> {
+    @Override
+    public Long convert(String param) {
+        return Long.parseLong(param);
+    }
+
+    @Override
+    public boolean canConvert(String param) {
+        try {
+            convert(param);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public List<String> complete(String arg, CommandSender sender) {
+        return new ArrayList<>();
+    }
 }

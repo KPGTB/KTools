@@ -14,14 +14,25 @@
  *    limitations under the License.
  */
 
-package com.github.kpgtb.ktools.manager.command;
+import com.github.kpgtb.ktools.manager.command.parser.java.ShortParser;
+import org.junit.Assert;
+import org.junit.Test;
 
-import org.bukkit.command.CommandSender;
+public class T {
+    @Test
+    public void a() {
+        Assert.assertTrue(new ShortParser().canConvert("10"));
+    }
 
-import java.util.List;
+    @Test
+    public void b() {
+        Assert.assertFalse(new ShortParser().canConvert("abcv"));
+    }
 
-public interface IParamParser<T> {
-    T convert(String param);
-    boolean canConvert(String param);
-    List<String> complete(String arg, CommandSender sender);
+    @Test
+    public void c() {
+        String s = "ala";
+        Object o = s;
+        System.out.println(o.getClass());
+    }
 }

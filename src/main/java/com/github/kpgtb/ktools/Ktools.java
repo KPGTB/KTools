@@ -16,65 +16,86 @@
 
 package com.github.kpgtb.ktools;
 
-import com.github.kpgtb.ktools.manager.CacheManager;
-import com.github.kpgtb.ktools.manager.DebugManager;
-import com.github.kpgtb.ktools.manager.LanguageManager;
+import com.github.kpgtb.ktools.manager.*;
+import com.github.kpgtb.ktools.manager.command.parser.java.*;
+import com.github.kpgtb.ktools.manager.command.parser.spigot.OfflinePlayerParser;
+import com.github.kpgtb.ktools.manager.command.parser.spigot.PlayerParser;
+import com.github.kpgtb.ktools.manager.command.parser.spigot.WorldParser;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
+import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Ktools extends JavaPlugin {
 
-    private BukkitAudiences adventure;
-    private DebugManager debug;
-    private LanguageManager globalLanguageManager;
-    private CacheManager cacheManager;
+    private ToolsObjectWrapper toolsObjectWrapper;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
-        this.debug = new DebugManager(getConfig(),getLogger());
+        DebugManager debug = new DebugManager(getConfig(),getLogger());
 
         long startMillis = System.currentTimeMillis();
         debug.sendInfo(DebugType.START, "Enabling plugin...");
 
         debug.sendInfo(DebugType.START, "Loading audience...");
-        this.adventure = BukkitAudiences.create(this);
+        BukkitAudiences adventure = BukkitAudiences.create(this);
         debug.sendInfo(DebugType.START, "Loaded audience.");
 
         debug.sendInfo(DebugType.START, "Loading language...");
         String lang = getConfig().getString("lang");
         if(lang == null) lang = "en";
-        this.globalLanguageManager = new LanguageManager(getDataFolder(), lang, debug);
-        this.globalLanguageManager.saveDefaultLanguage("lang/en.yml", this);
-        this.globalLanguageManager.refreshMessages();
+        LanguageManager globalLanguageManager = new LanguageManager(getDataFolder(), lang, debug);
+        globalLanguageManager.saveDefaultLanguage("lang/en.yml", this);
+        globalLanguageManager.refreshMessages();
         debug.sendInfo(DebugType.START, "Loaded "+lang+" language.");
 
         debug.sendInfo(DebugType.START, "Loading cache...");
-        this.cacheManager = new CacheManager(getConfig(), getDataFolder(), debug);
-        this.cacheManager.setupCacheFile();
+        CacheManager cacheManager = new CacheManager(getConfig(), getDataFolder(), debug);
+        cacheManager.setupCacheFile();
         debug.sendInfo(DebugType.START, "Loaded cache.");
+
+        debug.sendInfo(DebugType.START, "Loading command param parsers...");
+        ParamParserManager paramParserManager = new ParamParserManager();
+        // JAVA TYPES
+        paramParserManager.registerParser(Boolean.class, new BooleanParser());
+        paramParserManager.registerParser(Byte.class, new ByteParser());
+        paramParserManager.registerParser(Double.class, new DoubleParser());
+        paramParserManager.registerParser(Float.class, new FloatParser());
+        paramParserManager.registerParser(Integer.class, new IntegerParser());
+        paramParserManager.registerParser(Long.class, new LongParser());
+        paramParserManager.registerParser(Short.class, new ShortParser());
+        paramParserManager.registerParser(String.class, new StringParser());
+        // SPIGOT
+        paramParserManager.registerParser(OfflinePlayer.class, new OfflinePlayerParser());
+        paramParserManager.registerParser(Player.class, new PlayerParser());
+        paramParserManager.registerParser(World.class, new WorldParser());
+        debug.sendInfo(DebugType.START, "Loaded command param parsers.");
+
+        debug.sendInfo(DebugType.START, "Loading tools object wrapper...");
+        this.toolsObjectWrapper = new ToolsObjectWrapper(cacheManager,debug,globalLanguageManager,getConfig(),adventure,paramParserManager);
+        debug.sendInfo(DebugType.START, "Loaded tools object wrapper.");
+
+        debug.sendInfo(DebugType.START, "Loading commands...");
+        CommandManager commandManager = new CommandManager(toolsObjectWrapper, getFile(), "ktools");
+        commandManager.registerCommands("com.github.kpgtb.ktools.command");
+        debug.sendInfo(DebugType.START, "Loaded commands.");
 
         debug.sendInfo(DebugType.START, "Enabled plugin in " + (System.currentTimeMillis() - startMillis) + "ms.");
     }
 
     @Override
     public void onDisable() {
-        if(this.adventure != null) {
-            this.adventure.close();
-            this.adventure = null;
+        BukkitAudiences adventure = this.toolsObjectWrapper.getAdventure();
+        if(adventure != null) {
+            adventure.close();
         }
     }
 
-    public DebugManager getDebug() {
-        return debug;
-    }
-
-    public LanguageManager getGlobalLanguageManager() {
-        return globalLanguageManager;
-    }
-
-    public CacheManager getCacheManager() {
-        return cacheManager;
+    public ToolsObjectWrapper getToolsObjectWrapper() {
+        return toolsObjectWrapper;
     }
 }

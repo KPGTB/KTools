@@ -27,14 +27,16 @@ public class Subcommand {
     private final boolean playerRequired;
     private final HashMap<String, Class<?>> argsType;
     private final Method method;
+    private final boolean endless;
 
-    public Subcommand(String name, String description, ArrayList<String> permissions, boolean playerRequired, HashMap<String, Class<?>> argsType, Method method) {
+    public Subcommand(String name, String description, ArrayList<String> permissions, boolean playerRequired, HashMap<String, Class<?>> argsType, Method method, boolean endless) {
         this.name = name;
         this.description = description;
         this.permissions = permissions;
         this.playerRequired = playerRequired;
         this.argsType = argsType;
         this.method = method;
+        this.endless = endless;
     }
 
     public String getName() {
@@ -59,5 +61,9 @@ public class Subcommand {
 
     public Method getMethod() {
         return method;
+    }
+
+    public boolean isEndless() {
+        return endless;
     }
 }

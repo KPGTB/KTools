@@ -41,4 +41,20 @@ public class ParamParserManager {
     public <T> IParamParser<T> getParser(Class<T> clazz) {
         return (IParamParser<T>) parsers.get(clazz);
     }
+
+    public <T> boolean canConvert(String s, Class<T> expected) {
+        IParamParser<T> parser = getParser(expected);
+        if(parser == null) {
+            return false;
+        }
+        return parser.canConvert(s);
+    }
+
+    public <T> T convert(String s, Class<T> expected) {
+        IParamParser<T> parser = getParser(expected);
+        if(!canConvert(s, expected) || parser == null) {
+            throw new IllegalArgumentException("You try convert string to class that you can't convert");
+        }
+        return parser.convert(s);
+    }
 }

@@ -196,6 +196,16 @@ public class LanguageManager {
     }
 
     /**
+     * Get message translation as list of {@link net.kyori.adventure.text.Component}
+     * @param languageLevel {@link com.github.kpgtb.ktools.manager.language.LanguageLevel} PLUGIN (from lang) or GLOBAL (from Ktools)
+     * @param code Code of message
+     * @return A list of translated components
+     */
+    public ArrayList<Component> getComponent(LanguageLevel languageLevel, String code) {
+        return this.getComponent(languageLevel, code,null,new ArrayList<>());
+    }
+
+    /**
      * Get message translation as list of {@link String}
      * @param languageLevel {@link com.github.kpgtb.ktools.manager.language.LanguageLevel} PLUGIN (from lang) or GLOBAL (from Ktools)
      * @param code Code of message
@@ -254,5 +264,15 @@ public class LanguageManager {
      */
     public ArrayList<String> getString(LanguageLevel languageLevel, String code, ArrayList<TagResolver> placeholders) {
         return this.getString(languageLevel, code,null,placeholders);
+    }
+
+    /**
+     * Get message translation as list of {@link String}
+     * @param languageLevel {@link com.github.kpgtb.ktools.manager.language.LanguageLevel} PLUGIN (from lang) or GLOBAL (from Ktools)
+     * @param code Code of message
+     * @return A list of translated strings
+     */
+    public ArrayList<String> getString(LanguageLevel languageLevel, String code) {
+        return this.getString(languageLevel, code,null,new ArrayList<>());
     }
 }
