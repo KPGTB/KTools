@@ -1,2 +1,3 @@
 message:
-  noPermission: ""
+  onlyPlayer: "<gray>>></gray> <red>This command is only for players!"
+  helpLine: "<gray>>> /</gray><orange><command></orange> <gray>-</gray> <yellow><description>"

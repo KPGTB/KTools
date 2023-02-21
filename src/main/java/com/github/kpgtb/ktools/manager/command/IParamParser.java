@@ -14,22 +14,15 @@
  *    limitations under the License.
  */
 
-package com.github.kpgtb.ktools.manager.debug;
+package com.github.kpgtb.ktools.manager.command;
 
-public enum DebugType {
-    START("debug.start"),
-    STOP("debug.stop"),
-    LANGUAGE("debug.language"),
-    CACHE("debug.cache"),
-    COMMAND("debug.command");
+import org.bukkit.command.CommandSender;
 
-    private final String configStr;
+import java.util.ArrayList;
+import java.util.List;
 
-    DebugType(String configStr) {
-        this.configStr = configStr;
-    }
-
-    public String getConfigStr() {
-        return configStr;
-    }
+public interface IParamParser<T> {
+    T convert(String param);
+    boolean canConvert(String param);
+    List<String> complete(ArrayList<String> args, CommandSender sender);
 }

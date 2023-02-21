@@ -14,22 +14,16 @@
  *    limitations under the License.
  */
 
-package com.github.kpgtb.ktools.manager.debug;
+package com.github.kpgtb.ktools.manager.command.annotation;
 
-public enum DebugType {
-    START("debug.start"),
-    STOP("debug.stop"),
-    LANGUAGE("debug.language"),
-    CACHE("debug.cache"),
-    COMMAND("debug.command");
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.util.ArrayList;
 
-    private final String configStr;
-
-    DebugType(String configStr) {
-        this.configStr = configStr;
-    }
-
-    public String getConfigStr() {
-        return configStr;
-    }
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface CommandAliases {
+    String[] aliases() default "";
 }

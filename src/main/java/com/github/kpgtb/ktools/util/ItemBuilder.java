@@ -17,7 +17,6 @@ package com.github.kpgtb.ktools.util;
 
 import com.google.gson.Gson;
 import org.apache.commons.lang.Validate;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -28,8 +27,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.material.MaterialData;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -48,6 +45,7 @@ public class ItemBuilder {
     private short damage = 0;
     private Map<Enchantment, Integer> enchantments = new HashMap<>();
     private String displayname;
+    private int model = 0;
     private List<String> lore = new ArrayList<>();
     private List<ItemFlag> flags = new ArrayList<>();
 
@@ -101,8 +99,10 @@ public class ItemBuilder {
         this.data = item.getData();
         this.damage = item.getDurability();
         this.enchantments = item.getEnchantments();
-        if(item.hasItemMeta())
+        if(item.hasItemMeta()) {
             this.displayname = item.getItemMeta().getDisplayName();
+            this.model = item.getItemMeta().getCustomModelData();
+        }
         if(item.hasItemMeta())
             this.lore = item.getItemMeta().getLore();
         if(item.hasItemMeta())
@@ -134,6 +134,7 @@ public class ItemBuilder {
         this.displayname = builder.displayname;
         this.lore = builder.lore;
         this.flags = builder.flags;
+        this.model = builder.model;
     }
 
     /**
@@ -143,6 +144,15 @@ public class ItemBuilder {
     public ItemBuilder amount(int amount) {
         if(((amount > material.getMaxStackSize()) || (amount <= 0)) && (!unsafeStackSize)) amount = 1;
         this.amount = amount;
+        return this;
+    }
+
+    /**
+     * Sets custom model data of the ItemStack
+     * @param model Custom model data value
+     */
+    public ItemBuilder model(int model) {
+        this.model = model;
         return this;
     }
 
@@ -523,6 +533,7 @@ public class ItemBuilder {
             flags = b.flags;
         damage = b.damage;
         amount = b.amount;
+        model = b.model;
         return this;
     }
 
@@ -541,6 +552,7 @@ public class ItemBuilder {
         if(displayname != null) {
             meta.setDisplayName(displayname);
         }
+        meta.setCustomModelData(model);
         if(lore.size() > 0) {
             meta.setLore(lore);
         }

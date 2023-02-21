@@ -8,3 +8,4 @@ debug:
   stop: true
   language: true
   cache: true
+  command: true
