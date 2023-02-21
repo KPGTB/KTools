@@ -17,9 +17,11 @@
 package com.github.kpgtb.ktools.manager;
 
 import com.github.kpgtb.ktools.manager.command.IParamParser;
+import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class ParamParserManager {
     private final HashMap<Class<?>, IParamParser<?>> parsers;
@@ -56,5 +58,13 @@ public class ParamParserManager {
             throw new IllegalArgumentException("You try convert string to class that you can't convert");
         }
         return parser.convert(s);
+    }
+
+    public <T> List<String> complete(String s, CommandSender sender, Class<T> expected) {
+        IParamParser<T> parser = getParser(expected);
+        if(parser == null) {
+            throw new IllegalArgumentException("You try convert string to class that you can't convert");
+        }
+        return parser.complete(s,sender);
     }
 }

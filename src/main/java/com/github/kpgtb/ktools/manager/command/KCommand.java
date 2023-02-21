@@ -36,10 +36,8 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class KCommand extends Command {
     private final String cmdName;
@@ -301,5 +299,87 @@ public abstract class KCommand extends Command {
         });
 
         toSend.forEach(audience::sendMessage);
+    }
+
+    @NotNull
+    @Override
+    public List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) throws IllegalArgumentException {
+        ArrayList<String> result = new ArrayList<>();
+
+        if(args.length == 0) {
+            return result;
+        }
+
+        int lastArgIdx = args.length - 1;
+        String lastArg = args[lastArgIdx];
+
+        if(args.length == 1) {
+            result.addAll(
+                    subcommands.keySet()
+                    .stream()
+                    .filter(s -> s.startsWith(lastArg))
+                    .collect(Collectors.toList())
+            );
+
+            mainCommands.forEach(mcmd -> {
+                if(mcmd.getArgsType().isEmpty()) {
+                    return;
+                }
+                Optional<Class<?>> clazz = mcmd.getArgsType().values().stream().findFirst();
+                if(!clazz.isPresent()) {
+                    return;
+                }
+                result.addAll(parser.complete(lastArg,sender,clazz.get()));
+            });
+
+            return result;
+        }
+
+        mainCommands.forEach(mcmd -> {
+            if(mcmd.getArgsType().size() < args.length) {
+                return;
+            }
+            boolean isIt = true;
+            for (int i = 0; i < lastArgIdx; i++) {
+                Class<?> clazz = (Class<?>) mcmd.getArgsType().values().toArray()[i];
+                if(!parser.canConvert(args[i], clazz)) {
+                    isIt = false;
+                    break;
+                }
+            }
+            if(!isIt) {
+                return;
+            }
+            Class<?> clazz = (Class<?>) mcmd.getArgsType().values().toArray()[lastArgIdx];
+            result.addAll(parser.complete(lastArg,sender,clazz));
+        });
+
+        subcommands.forEach((name,subcmd) -> {
+            if(!name.equalsIgnoreCase(args[0])) {
+                return;
+            }
+            List<String> trueArgs = Arrays.stream(args).collect(Collectors.toList());
+            trueArgs.remove(0);
+            int trueLastIdx = trueArgs.size() -1;
+
+            if(subcmd.getArgsType().size() < trueArgs.size()) {
+                return;
+            }
+            boolean isIt = true;
+            for (int i = 0; i < trueLastIdx; i++) {
+                Class<?> clazz = (Class<?>) subcmd.getArgsType().values().toArray()[i];
+                if(!parser.canConvert(trueArgs.get(i), clazz)) {
+                    isIt = false;
+                    break;
+                }
+            }
+            if(!isIt) {
+                return;
+            }
+            Class<?> clazz = (Class<?>) subcmd.getArgsType().values().toArray()[trueLastIdx];
+            result.addAll(parser.complete(lastArg,sender,clazz));
+        });
+
+        return result;
     }
 }
