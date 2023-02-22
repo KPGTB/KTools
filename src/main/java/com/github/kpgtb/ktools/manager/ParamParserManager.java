@@ -17,21 +17,47 @@
 package com.github.kpgtb.ktools.manager;
 
 import com.github.kpgtb.ktools.manager.command.IParamParser;
+import com.github.kpgtb.ktools.manager.debug.DebugType;
+import com.github.kpgtb.ktools.util.ReflectionUtil;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
+import java.lang.reflect.ParameterizedType;
 import java.util.HashMap;
 import java.util.List;
 
 public class ParamParserManager {
+    private final DebugManager debug;
+
     private final HashMap<Class<?>, IParamParser<?>> parsers;
 
-    public ParamParserManager() {
+    public ParamParserManager(DebugManager debug) {
+        this.debug = debug;
         this.parsers = new HashMap<>();
     }
 
     public <T> void registerParser(Class<T> clazz, IParamParser<T> parser) {
         parsers.put(clazz,parser);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> void registerParsers(String parsersPackage, File jarFile) {
+        for(Class<?> clazz : ReflectionUtil.getAllClassesInPackage(jarFile,parsersPackage)) {
+            if(!IParamParser.class.isAssignableFrom(clazz)) {
+               continue;
+            }
+            ParameterizedType type = (ParameterizedType) clazz.getGenericInterfaces()[0];
+            Class<T> typeArgClazz = (Class<T>) type.getActualTypeArguments()[0];
+            try {
+                IParamParser<T> parser = (IParamParser<T>) clazz.newInstance();
+                registerParser(typeArgClazz, parser);
+                debug.sendInfo(DebugType.PARSER, "Registered " + clazz.getSimpleName());
+            } catch (InstantiationException | IllegalAccessException e) {
+                debug.sendWarning(DebugType.PARSER, "Error while registering " + clazz.getSimpleName());
+                e.printStackTrace();
+            }
+        }
     }
 
     public void unregisterParser(Class<?> clazz) {

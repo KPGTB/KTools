@@ -32,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
 /**
  * CacheManager stores small data in object metadata or in files
@@ -83,112 +84,25 @@ public class CacheManager {
     }
 
     /**
-     * With this method you can save string data to cache
+     * With this method you can save data to cache
      * @param cacheSource {@link com.github.kpgtb.ktools.manager.cache.CacheSource}
      * @param target Object where you want to save data (or null if cacheSource is SERVER)
      * @param pluginName Name of plugin that save this data
      * @param key Key of data
-     * @param data String of data
+     * @param data Object with data
      */
-    public void setData(CacheSource cacheSource, Object target, String pluginName, String key, String data) {
+    @SuppressWarnings("unchecked")
+    public <T> void setData(CacheSource cacheSource, Object target, String pluginName, String key, T data) {
         String finalKey = pluginName + "-" + key;
-        debug.sendInfo(DebugType.CACHE, "Saving cache with type " + cacheSource.name() + " key: " + finalKey + " data (String): " + data+ "...");
-        switch (cacheSource) {
-            case SERVER:
-                cacheConfiguration.set("server."+finalKey, data);
-                try {
-                    cacheConfiguration.save(cacheFile);
-                    debug.sendInfo(DebugType.CACHE, "Saved server cache!");
-                } catch (IOException e) {
-                    debug.sendWarning(DebugType.CACHE, "Error while saving server cache!");
-                    throw new RuntimeException(e);
-                }
-                break;
-            case PLAYER:
-                if(!(target instanceof Player)) {
-                    debug.sendWarning(DebugType.CACHE, "Target isn't a player!");
-                    return;
-                }
-                Player player = (Player) target;
-                boolean playerSaveMeta = config.getString("cache.player").equalsIgnoreCase("metadata");
+        debug.sendInfo(DebugType.CACHE, "Saving cache with type " + cacheSource.name() + " key: " + finalKey + " data ("+data.getClass().getSimpleName()+"): " + data+ "...");
 
-                if(playerSaveMeta) {
-                    PersistentDataContainer playerPDC = player.getPersistentDataContainer();
-                    NamespacedKey playerKey = new NamespacedKey(pluginName,key);
-                    playerPDC.set(playerKey, PersistentDataType.STRING, data);
-                    debug.sendInfo(DebugType.CACHE, "Saved player cache in metadata.");
-                    return;
-                }
+        Class<T> clazz = (Class<T>) data.getClass();
+        PersistentDataType<T,T> pdcType = getPdcType(clazz);
 
-                cacheConfiguration.set("player." + player.getUniqueId().toString() + "." + finalKey, data);
-                try {
-                    cacheConfiguration.save(cacheFile);
-                    debug.sendInfo(DebugType.CACHE, "Saved player cache in files.");
-                } catch (IOException e) {
-                    debug.sendWarning(DebugType.CACHE, "Error while saving player cache in files.");
-                    throw new RuntimeException(e);
-                }
-                break;
-            case ENTITY:
-                if(!(target instanceof Entity)) {
-                    debug.sendWarning(DebugType.CACHE, "Target isn't an entity.");
-                    return;
-                }
-                Entity entity = (Entity) target;
-                boolean entitySaveMeta = config.getString("cache.entity").equalsIgnoreCase("metadata");
-
-                if(entitySaveMeta) {
-                    PersistentDataContainer entityPDC = entity.getPersistentDataContainer();
-                    NamespacedKey entityKey = new NamespacedKey(pluginName,key);
-                    entityPDC.set(entityKey, PersistentDataType.STRING, data);
-                    debug.sendInfo(DebugType.CACHE, "Saved entity cache in metadata.");
-                    return;
-                }
-
-                cacheConfiguration.set("entity." + entity.getUniqueId() + "." + finalKey, data);
-                try {
-                    cacheConfiguration.save(cacheFile);
-                    debug.sendInfo(DebugType.CACHE, "Saved entity cache in files.");
-                } catch (IOException e) {
-                    debug.sendWarning(DebugType.CACHE, "Error while saving entity cache in files.");
-                    throw new RuntimeException(e);
-                }
-                break;
-            case ITEMSTACK:
-                if(!(target instanceof ItemStack)) {
-                    debug.sendWarning(DebugType.CACHE, "Target isn't an item stack.");
-                    return;
-                }
-                ItemStack itemStack = (ItemStack) target;
-
-                if(itemStack == null || itemStack.getType().equals(Material.AIR)) {
-                    debug.sendWarning(DebugType.CACHE, "Item stack is empty.");
-                    return;
-                }
-
-                ItemMeta meta = itemStack.getItemMeta();
-                PersistentDataContainer itemPDC = meta.getPersistentDataContainer();
-                NamespacedKey itemKey = new NamespacedKey(pluginName,key);
-                itemPDC.set(itemKey,PersistentDataType.STRING, data);
-                itemStack.setItemMeta(meta);
-
-                debug.sendInfo(DebugType.CACHE, "Saved item stack cache in metadata.");
-
-                break;
+        if(pdcType == null) {
+            throw new IllegalArgumentException("You try to save wrong type!");
         }
-    }
 
-    /**
-     * With this method you can save int data to cache
-     * @param cacheSource {@link com.github.kpgtb.ktools.manager.cache.CacheSource}
-     * @param target Object where you want to save data (or null if cacheSource is SERVER)
-     * @param pluginName Name of plugin that save this data
-     * @param key Key of data
-     * @param data Int of data
-     */
-    public void setData(CacheSource cacheSource, Object target, String pluginName, String key, int data) {
-        String finalKey = pluginName + "-" + key;
-        debug.sendInfo(DebugType.CACHE, "Saving cache with type " + cacheSource.name() + " key: " + finalKey + " data (String): " + data+ "...");
         switch (cacheSource) {
             case SERVER:
                 cacheConfiguration.set("server."+finalKey, data);
@@ -211,7 +125,7 @@ public class CacheManager {
                 if(playerSaveMeta) {
                     PersistentDataContainer playerPDC = player.getPersistentDataContainer();
                     NamespacedKey playerKey = new NamespacedKey(pluginName,key);
-                    playerPDC.set(playerKey, PersistentDataType.INTEGER, data);
+                    playerPDC.set(playerKey, pdcType, data);
                     debug.sendInfo(DebugType.CACHE, "Saved player cache in metadata.");
                     return;
                 }
@@ -236,7 +150,7 @@ public class CacheManager {
                 if(entitySaveMeta) {
                     PersistentDataContainer entityPDC = entity.getPersistentDataContainer();
                     NamespacedKey entityKey = new NamespacedKey(pluginName,key);
-                    entityPDC.set(entityKey, PersistentDataType.INTEGER, data);
+                    entityPDC.set(entityKey, pdcType, data);
                     debug.sendInfo(DebugType.CACHE, "Saved entity cache in metadata.");
                     return;
                 }
@@ -265,103 +179,7 @@ public class CacheManager {
                 ItemMeta meta = itemStack.getItemMeta();
                 PersistentDataContainer itemPDC = meta.getPersistentDataContainer();
                 NamespacedKey itemKey = new NamespacedKey(pluginName,key);
-                itemPDC.set(itemKey,PersistentDataType.INTEGER, data);
-                itemStack.setItemMeta(meta);
-
-                debug.sendInfo(DebugType.CACHE, "Saved item stack cache in metadata.");
-
-                break;
-        }
-    }
-
-    /**
-     * With this method you can save double data to cache
-     * @param cacheSource {@link com.github.kpgtb.ktools.manager.cache.CacheSource}
-     * @param target Object where you want to save data (or null if cacheSource is SERVER)
-     * @param pluginName Name of plugin that save this data
-     * @param key Key of data
-     * @param data double of data
-     */
-    public void setData(CacheSource cacheSource, Object target, String pluginName, String key, double data) {
-        String finalKey = pluginName + "-" + key;
-        debug.sendInfo(DebugType.CACHE, "Saving cache with type " + cacheSource.name() + " key: " + finalKey + " data (String): " + data+ "...");
-        switch (cacheSource) {
-            case SERVER:
-                cacheConfiguration.set("server."+finalKey, data);
-                try {
-                    cacheConfiguration.save(cacheFile);
-                    debug.sendInfo(DebugType.CACHE, "Saved server cache!");
-                } catch (IOException e) {
-                    debug.sendWarning(DebugType.CACHE, "Error while saving server cache!");
-                    throw new RuntimeException(e);
-                }
-                break;
-            case PLAYER:
-                if(!(target instanceof Player)) {
-                    debug.sendWarning(DebugType.CACHE, "Target isn't a player!");
-                    return;
-                }
-                Player player = (Player) target;
-                boolean playerSaveMeta = config.getString("cache.player").equalsIgnoreCase("metadata");
-
-                if(playerSaveMeta) {
-                    PersistentDataContainer playerPDC = player.getPersistentDataContainer();
-                    NamespacedKey playerKey = new NamespacedKey(pluginName,key);
-                    playerPDC.set(playerKey, PersistentDataType.DOUBLE, data);
-                    debug.sendInfo(DebugType.CACHE, "Saved player cache in metadata.");
-                    return;
-                }
-
-                cacheConfiguration.set("player." + player.getUniqueId().toString() + "." + finalKey, data);
-                try {
-                    cacheConfiguration.save(cacheFile);
-                    debug.sendInfo(DebugType.CACHE, "Saved player cache in files.");
-                } catch (IOException e) {
-                    debug.sendWarning(DebugType.CACHE, "Error while saving player cache in files.");
-                    throw new RuntimeException(e);
-                }
-                break;
-            case ENTITY:
-                if(!(target instanceof Entity)) {
-                    debug.sendWarning(DebugType.CACHE, "Target isn't an entity.");
-                    return;
-                }
-                Entity entity = (Entity) target;
-                boolean entitySaveMeta = config.getString("cache.entity").equalsIgnoreCase("metadata");
-
-                if(entitySaveMeta) {
-                    PersistentDataContainer entityPDC = entity.getPersistentDataContainer();
-                    NamespacedKey entityKey = new NamespacedKey(pluginName,key);
-                    entityPDC.set(entityKey, PersistentDataType.DOUBLE, data);
-                    debug.sendInfo(DebugType.CACHE, "Saved entity cache in metadata.");
-                    return;
-                }
-
-                cacheConfiguration.set("entity." + entity.getUniqueId() + "." + finalKey, data);
-                try {
-                    cacheConfiguration.save(cacheFile);
-                    debug.sendInfo(DebugType.CACHE, "Saved entity cache in files.");
-                } catch (IOException e) {
-                    debug.sendWarning(DebugType.CACHE, "Error while saving entity cache in files.");
-                    throw new RuntimeException(e);
-                }
-                break;
-            case ITEMSTACK:
-                if(!(target instanceof ItemStack)) {
-                    debug.sendWarning(DebugType.CACHE, "Target isn't an item stack.");
-                    return;
-                }
-                ItemStack itemStack = (ItemStack) target;
-
-                if(itemStack == null || itemStack.getType().equals(Material.AIR)) {
-                    debug.sendWarning(DebugType.CACHE, "Item stack is empty.");
-                    return;
-                }
-
-                ItemMeta meta = itemStack.getItemMeta();
-                PersistentDataContainer itemPDC = meta.getPersistentDataContainer();
-                NamespacedKey itemKey = new NamespacedKey(pluginName,key);
-                itemPDC.set(itemKey,PersistentDataType.DOUBLE, data);
+                itemPDC.set(itemKey, pdcType, data);
                 itemStack.setItemMeta(meta);
 
                 debug.sendInfo(DebugType.CACHE, "Saved item stack cache in metadata.");
@@ -374,29 +192,9 @@ public class CacheManager {
      * With this method you can save string data to server's cache
      * @param pluginName Name of plugin that save this data
      * @param key Key of data
-     * @param data double of data
+     * @param data Object with data
      */
-    public void setServerData(String pluginName, String key, String data) {
-        this.setData(CacheSource.SERVER, null, pluginName,key,data);
-    }
-
-    /**
-     * With this method you can save int data to server's cache
-     * @param pluginName Name of plugin that save this data
-     * @param key Key of data
-     * @param int double of data
-     */
-    public void setServerData(String pluginName, String key, int data) {
-        this.setData(CacheSource.SERVER, null, pluginName,key,data);
-    }
-
-    /**
-     * With this method you can save double data to server's cache
-     * @param pluginName Name of plugin that save this data
-     * @param key Key of data
-     * @param data double of data
-     */
-    public void setServerData(String pluginName, String key, double data) {
+    public <T> void setServerData(String pluginName, String key, T data) {
         this.setData(CacheSource.SERVER, null, pluginName,key,data);
     }
 
@@ -406,15 +204,23 @@ public class CacheManager {
      * @param target Object from you want to get data (or null if cacheSource is SERVER)
      * @param pluginName Name of plugin that saves this data
      * @param key Key of data
-     * @return String of data or null if there isn't any data
+     * @param expected Class that is expected in return
+     * @return Object with data or null if there isn't any data
      */
     @Nullable
-    public String getStringData(CacheSource cacheSource, Object target, String pluginName, String key) {
+    @SuppressWarnings("unchecked")
+    public <T> T getData(CacheSource cacheSource, Object target, String pluginName, String key, Class<T> expected) {
+        PersistentDataType<T,T> pdcType = getPdcType(expected);
+
+        if(pdcType == null) {
+            throw new IllegalArgumentException("You try to save wrong type!");
+        }
+
         String finalKey = pluginName + "-" + key;
         debug.sendInfo(DebugType.CACHE, "Getting cache with type " + cacheSource.name() + " key: " + finalKey +  "...");
         switch (cacheSource) {
             case SERVER:
-                return cacheConfiguration.getString("server."+finalKey);
+                return (T) cacheConfiguration.get("server."+finalKey);
             case PLAYER:
                 if(!(target instanceof Player)) {
                     debug.sendWarning(DebugType.CACHE, "Target isn't a player!");
@@ -426,10 +232,10 @@ public class CacheManager {
                 if(playerSaveMeta) {
                     PersistentDataContainer playerPDC = player.getPersistentDataContainer();
                     NamespacedKey playerKey = new NamespacedKey(pluginName,key);
-                    return playerPDC.get(playerKey, PersistentDataType.STRING);
+                    return playerPDC.get(playerKey, pdcType);
                 }
 
-                return cacheConfiguration.getString("player." + player.getUniqueId().toString() + "." + finalKey);
+                return (T) cacheConfiguration.get("player." + player.getUniqueId().toString() + "." + finalKey);
             case ENTITY:
                 if(!(target instanceof Entity)) {
                     debug.sendWarning(DebugType.CACHE, "Target isn't an entity.");
@@ -441,10 +247,10 @@ public class CacheManager {
                 if(entitySaveMeta) {
                     PersistentDataContainer entityPDC = entity.getPersistentDataContainer();
                     NamespacedKey entityKey = new NamespacedKey(pluginName,key);
-                    return entityPDC.get(entityKey, PersistentDataType.STRING);
+                    return entityPDC.get(entityKey, pdcType);
                 }
 
-                return cacheConfiguration.getString("entity." + entity.getUniqueId() + "." + finalKey);
+                return (T) cacheConfiguration.get("entity." + entity.getUniqueId() + "." + finalKey);
             case ITEMSTACK:
                 if(!(target instanceof ItemStack)) {
                     debug.sendWarning(DebugType.CACHE, "Target isn't an item stack.");
@@ -460,166 +266,41 @@ public class CacheManager {
                 ItemMeta meta = itemStack.getItemMeta();
                 PersistentDataContainer itemPDC = meta.getPersistentDataContainer();
                 NamespacedKey itemKey = new NamespacedKey(pluginName,key);
-                return itemPDC.get(itemKey,PersistentDataType.STRING);
+                return itemPDC.get(itemKey,pdcType);
         }
         return null;
-    }
-
-    /**
-     * This method returns data from cache
-     * @param cacheSource {@link com.github.kpgtb.ktools.manager.cache.CacheSource}
-     * @param target Object from you want to get data (or null if cacheSource is SERVER)
-     * @param pluginName Name of plugin that saves this data
-     * @param key Key of data
-     * @return int of data or 0 if there isn't any data
-     */
-    public int getIntData(CacheSource cacheSource, Object target, String pluginName, String key) {
-        String finalKey = pluginName + "-" + key;
-        debug.sendInfo(DebugType.CACHE, "Getting cache with type " + cacheSource.name() + " key: " + finalKey +  "...");
-        switch (cacheSource) {
-            case SERVER:
-                return cacheConfiguration.getInt("server."+finalKey);
-            case PLAYER:
-                if(!(target instanceof Player)) {
-                    debug.sendWarning(DebugType.CACHE, "Target isn't a player!");
-                    return 0;
-                }
-                Player player = (Player) target;
-                boolean playerSaveMeta = config.getString("cache.player").equalsIgnoreCase("metadata");
-
-                if(playerSaveMeta) {
-                    PersistentDataContainer playerPDC = player.getPersistentDataContainer();
-                    NamespacedKey playerKey = new NamespacedKey(pluginName,key);
-                    return playerPDC.get(playerKey, PersistentDataType.INTEGER);
-                }
-
-                return cacheConfiguration.getInt("player." + player.getUniqueId().toString() + "." + finalKey);
-            case ENTITY:
-                if(!(target instanceof Entity)) {
-                    debug.sendWarning(DebugType.CACHE, "Target isn't an entity.");
-                    return 0;
-                }
-                Entity entity = (Entity) target;
-                boolean entitySaveMeta = config.getString("cache.entity").equalsIgnoreCase("metadata");
-
-                if(entitySaveMeta) {
-                    PersistentDataContainer entityPDC = entity.getPersistentDataContainer();
-                    NamespacedKey entityKey = new NamespacedKey(pluginName,key);
-                    return entityPDC.get(entityKey, PersistentDataType.INTEGER);
-                }
-
-                return cacheConfiguration.getInt("entity." + entity.getUniqueId() + "." + finalKey);
-            case ITEMSTACK:
-                if(!(target instanceof ItemStack)) {
-                    debug.sendWarning(DebugType.CACHE, "Target isn't an item stack.");
-                    return 0;
-                }
-                ItemStack itemStack = (ItemStack) target;
-
-                if(itemStack == null || itemStack.getType().equals(Material.AIR)) {
-                    debug.sendWarning(DebugType.CACHE, "Item stack is empty.");
-                    return 0;
-                }
-
-                ItemMeta meta = itemStack.getItemMeta();
-                PersistentDataContainer itemPDC = meta.getPersistentDataContainer();
-                NamespacedKey itemKey = new NamespacedKey(pluginName,key);
-                return itemPDC.get(itemKey,PersistentDataType.INTEGER);
-        }
-        return 0;
-    }
-
-    /**
-     * This method returns data from cache
-     * @param cacheSource {@link com.github.kpgtb.ktools.manager.cache.CacheSource}
-     * @param target Object from you want to get data (or null if cacheSource is SERVER)
-     * @param pluginName Name of plugin that saves this data
-     * @param key Key of data
-     * @return double of data or 0.0 if there isn't any data
-     */
-    public double getDoubleData(CacheSource cacheSource, Object target, String pluginName, String key) {
-        String finalKey = pluginName + "-" + key;
-        debug.sendInfo(DebugType.CACHE, "Getting cache with type " + cacheSource.name() + " key: " + finalKey +  "...");
-        switch (cacheSource) {
-            case SERVER:
-                return cacheConfiguration.getDouble("server."+finalKey);
-            case PLAYER:
-                if(!(target instanceof Player)) {
-                    debug.sendWarning(DebugType.CACHE, "Target isn't a player!");
-                    return 0.0;
-                }
-                Player player = (Player) target;
-                boolean playerSaveMeta = config.getString("cache.player").equalsIgnoreCase("metadata");
-
-                if(playerSaveMeta) {
-                    PersistentDataContainer playerPDC = player.getPersistentDataContainer();
-                    NamespacedKey playerKey = new NamespacedKey(pluginName,key);
-                    return playerPDC.get(playerKey, PersistentDataType.DOUBLE);
-                }
-
-                return cacheConfiguration.getDouble("player." + player.getUniqueId().toString() + "." + finalKey);
-            case ENTITY:
-                if(!(target instanceof Entity)) {
-                    debug.sendWarning(DebugType.CACHE, "Target isn't an entity.");
-                    return 0.0;
-                }
-                Entity entity = (Entity) target;
-                boolean entitySaveMeta = config.getString("cache.entity").equalsIgnoreCase("metadata");
-
-                if(entitySaveMeta) {
-                    PersistentDataContainer entityPDC = entity.getPersistentDataContainer();
-                    NamespacedKey entityKey = new NamespacedKey(pluginName,key);
-                    return entityPDC.get(entityKey, PersistentDataType.DOUBLE);
-                }
-
-                return cacheConfiguration.getDouble("entity." + entity.getUniqueId() + "." + finalKey);
-            case ITEMSTACK:
-                if(!(target instanceof ItemStack)) {
-                    debug.sendWarning(DebugType.CACHE, "Target isn't an item stack.");
-                    return 0.0;
-                }
-                ItemStack itemStack = (ItemStack) target;
-
-                if(itemStack == null || itemStack.getType().equals(Material.AIR)) {
-                    debug.sendWarning(DebugType.CACHE, "Item stack is empty.");
-                    return 0.0;
-                }
-
-                ItemMeta meta = itemStack.getItemMeta();
-                PersistentDataContainer itemPDC = meta.getPersistentDataContainer();
-                NamespacedKey itemKey = new NamespacedKey(pluginName,key);
-                return itemPDC.get(itemKey,PersistentDataType.DOUBLE);
-        }
-        return 0.0;
     }
 
     /**
      * This method returns data from server's cache
      * @param pluginName Name of plugin that saves this data
      * @param key Key of data
-     * @return String of data or null if there isn't any data
+     * @param expected Class that is expected in return
+     * @return Object with data or null if there isn't any data
      */
-    public String getStringServerData(String pluginName, String key) {
-        return this.getStringData(CacheSource.SERVER, null,pluginName,key);
+    public <T> T getServerData(String pluginName, String key, Class<T> expected) {
+        return this.getData(CacheSource.SERVER, null,pluginName,key, expected);
     }
 
     /**
-     * This method returns data from cache
-     * @param pluginName Name of plugin that saves this data
-     * @param key Key of data
-     * @return int of data or 0 if there isn't any data
+     * This method returns PersistentDataType from class
+     * @param clazz Class that is expected
+     * @return PersistentDataType of this class or null if there isn't any PDT with this class
      */
-    public int getIntServerData(String pluginName, String key) {
-        return this.getIntData(CacheSource.SERVER, null,pluginName,key);
-    }
-
-    /**
-     * This method returns data from cache
-     * @param pluginName Name of plugin that saves this data
-     * @param key Key of data
-     * @return double of data or 0.0 if there isn't any data
-     */
-    public double getDoubleServerData(String pluginName, String key) {
-        return this.getDoubleData(CacheSource.SERVER, null,pluginName,key);
+    @Nullable
+    @SuppressWarnings("unchecked")
+    private <Z> PersistentDataType<Z,Z> getPdcType(Class<Z> clazz) {
+        HashMap<Class<?>, PersistentDataType<?,?>> acceptedTypes = new HashMap<>();
+        acceptedTypes.put(Byte.class, PersistentDataType.BYTE);
+        acceptedTypes.put(Short.class, PersistentDataType.SHORT);
+        acceptedTypes.put(Integer.class, PersistentDataType.INTEGER);
+        acceptedTypes.put(Long.class, PersistentDataType.LONG);
+        acceptedTypes.put(Float.class, PersistentDataType.FLOAT);
+        acceptedTypes.put(Double.class, PersistentDataType.DOUBLE);
+        acceptedTypes.put(String.class, PersistentDataType.STRING);
+        acceptedTypes.put(byte[].class, PersistentDataType.BYTE_ARRAY);
+        acceptedTypes.put(int[].class, PersistentDataType.INTEGER_ARRAY);
+        acceptedTypes.put(long[].class, PersistentDataType.LONG_ARRAY);
+        return (PersistentDataType<Z, Z>) acceptedTypes.get(clazz);
     }
 }

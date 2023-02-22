@@ -44,7 +44,7 @@ public class DebugManager {
      * @return true if this type is enabled in config.yml
      */
     private boolean isEnabled(DebugType type) {
-        return config.getBoolean("debug.enabled") && config.getBoolean(type.getConfigStr());
+        return config.getBoolean("debug.enable") && config.getBoolean(type.getConfigStr());
     }
 
     /**
@@ -66,7 +66,7 @@ public class DebugManager {
         if(!isEnabled(type) && !force) {
             return;
         }
-        logger.info("[DEBUG]" + message);
+        logger.info("[DEBUG] " + message);
     }
 
     /**
@@ -88,6 +88,6 @@ public class DebugManager {
         if(!isEnabled(type) && !force) {
             return;
         }
-        logger.warning("[DEBUG]" + message);
+        logger.warning("[DEBUG] " + message);
     }
 }

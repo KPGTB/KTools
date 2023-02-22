@@ -17,16 +17,9 @@
 package com.github.kpgtb.ktools;
 
 import com.github.kpgtb.ktools.manager.*;
-import com.github.kpgtb.ktools.manager.command.parser.java.*;
-import com.github.kpgtb.ktools.manager.command.parser.spigot.OfflinePlayerParser;
-import com.github.kpgtb.ktools.manager.command.parser.spigot.PlayerParser;
-import com.github.kpgtb.ktools.manager.command.parser.spigot.WorldParser;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Ktools extends JavaPlugin {
@@ -59,21 +52,10 @@ public final class Ktools extends JavaPlugin {
         debug.sendInfo(DebugType.START, "Loaded cache.");
 
         debug.sendInfo(DebugType.START, "Loading command param parsers...");
-        ParamParserManager paramParserManager = new ParamParserManager();
-        // JAVA TYPES
-        paramParserManager.registerParser(Boolean.class, new BooleanParser());
-        paramParserManager.registerParser(Byte.class, new ByteParser());
-        paramParserManager.registerParser(Double.class, new DoubleParser());
-        paramParserManager.registerParser(Float.class, new FloatParser());
-        paramParserManager.registerParser(Integer.class, new IntegerParser());
-        paramParserManager.registerParser(Long.class, new LongParser());
-        paramParserManager.registerParser(Short.class, new ShortParser());
-        paramParserManager.registerParser(String.class, new StringParser());
-        // SPIGOT
-        paramParserManager.registerParser(OfflinePlayer.class, new OfflinePlayerParser());
-        paramParserManager.registerParser(Player.class, new PlayerParser());
-        paramParserManager.registerParser(World.class, new WorldParser());
+        ParamParserManager paramParserManager = new ParamParserManager(debug);
+        paramParserManager.registerParsers("com.github.kpgtb.ktools.manager.command.parser", getFile());
         debug.sendInfo(DebugType.START, "Loaded command param parsers.");
+
 
         debug.sendInfo(DebugType.START, "Loading tools object wrapper...");
         this.toolsObjectWrapper = new ToolsObjectWrapper(cacheManager,debug,globalLanguageManager,getConfig(),adventure,paramParserManager);

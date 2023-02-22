@@ -21,7 +21,8 @@ public enum DebugType {
     STOP("debug.stop"),
     LANGUAGE("debug.language"),
     CACHE("debug.cache"),
-    COMMAND("debug.command");
+    COMMAND("debug.command"),
+    PARSER("debug.parser");
 
     private final String configStr;
 

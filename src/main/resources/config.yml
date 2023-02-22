@@ -9,3 +9,4 @@ debug:
   language: true
   cache: true
   command: true
+  parser: true
