@@ -19,17 +19,18 @@ package com.github.kpgtb.ktools.manager.command;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class Subcommand {
     private final String name;
     private final String description;
     private final ArrayList<String> permissions;
     private final boolean playerRequired;
-    private final HashMap<String, Class<?>> argsType;
+    private final LinkedHashMap<String, Class<?>> argsType;
     private final Method method;
     private final boolean endless;
 
-    public Subcommand(String name, String description, ArrayList<String> permissions, boolean playerRequired, HashMap<String, Class<?>> argsType, Method method, boolean endless) {
+    public Subcommand(String name, String description, ArrayList<String> permissions, boolean playerRequired, LinkedHashMap<String, Class<?>> argsType, Method method, boolean endless) {
         this.name = name;
         this.description = description;
         this.permissions = permissions;
@@ -55,7 +56,7 @@ public class Subcommand {
         return playerRequired;
     }
 
-    public HashMap<String, Class<?>> getArgsType() {
+    public LinkedHashMap<String, Class<?>> getArgsType() {
         return argsType;
     }
 

@@ -37,6 +37,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public abstract class KCommand extends Command {
@@ -81,18 +82,27 @@ public abstract class KCommand extends Command {
         this.mainCommands = new ArrayList<>();
         this.subcommands = new HashMap<>();
 
+        this.debug.sendInfo(DebugType.COMMAND, "Registering command " + cmdName);
+
         for(Method method : getClass().getDeclaredMethods()) {
+            this.debug.sendInfo(DebugType.COMMAND, "Trying method " + method.getName());
             if(method.getAnnotation(NoCommand.class) != null) {
+                this.debug.sendInfo(DebugType.COMMAND, "This method is not a subcommand! Cancelling");
                 continue;
             }
+            this.debug.sendInfo(DebugType.COMMAND, "This method is a subcommand!");
 
             String subName = method.getName().toLowerCase();
             String subDescription = "";
+
+            this.debug.sendInfo(DebugType.COMMAND, "Name: " + subName);
 
             SubcommandDescription subcommandDescription = method.getAnnotation(SubcommandDescription.class);
             if(subcommandDescription != null) {
                 subDescription = subcommandDescription.description();
             }
+
+            this.debug.sendInfo(DebugType.COMMAND, "Description: " + subDescription);
 
             ArrayList<String> permissions = new ArrayList<>();
             // Method permission ex. command.admin.give.item
@@ -114,23 +124,32 @@ public abstract class KCommand extends Command {
                     "command.*"
             );
 
+            permissions.forEach(perm -> {
+                this.debug.sendInfo(DebugType.COMMAND, "Loaded permission: " + perm);
+            });
+
             boolean playerRequired;
             if(method.getParameterCount() == 0) {
                 continue;
             }
+
             Parameter[] parametersRaw = method.getParameters();
-            Class<?> typeClazz = parametersRaw[0].getType().getSuperclass();
+            Class<?> typeClazz = parametersRaw[0].getType();
 
             if (Player.class.equals(typeClazz)) {
                 playerRequired = true;
             } else if (CommandSender.class.equals(typeClazz)) {
                 playerRequired = false;
             } else {
+                this.debug.sendWarning(DebugType.COMMAND, "This command isn't for console or player! Cancelling!");
                 continue;
             }
 
-            HashMap<String, Class<?>> parameters = new HashMap<>();
+            this.debug.sendInfo(DebugType.COMMAND, "This command is only for player: " + (playerRequired ? "yes" : "no"));
+
+            LinkedHashMap<String, Class<?>> parameters = new LinkedHashMap<>();
             for (int i = 1; i < parametersRaw.length; i++) {
+                this.debug.sendInfo(DebugType.COMMAND, "Loaded parameter " + parametersRaw[i].getName() + " with type " + parametersRaw[i].getType().getSimpleName());
                 parameters.put(parametersRaw[i].getName(), parametersRaw[i].getType());
             }
 
@@ -144,13 +163,18 @@ public abstract class KCommand extends Command {
                 }
             }
 
+            this.debug.sendInfo(DebugType.COMMAND, "This command is endless: " + (endless ? "yes" : "no"));
+
             Subcommand subcommand = new Subcommand(subName, subDescription, permissions,playerRequired,parameters,method, endless);
             if(method.getDeclaredAnnotation(MainCommand.class) != null) {
+                this.debug.sendInfo(DebugType.COMMAND, "This command is main command!");
                 this.mainCommands.add(subcommand);
                 continue;
             }
+            this.debug.sendInfo(DebugType.COMMAND, "This command is sub command!");
             subcommands.put(subName, subcommand);
         }
+        this.debug.sendInfo(DebugType.COMMAND, "Registered command " + cmdName);
     }
 
     @Override
@@ -167,7 +191,7 @@ public abstract class KCommand extends Command {
                     continue;
                 }
                 try {
-                    mainCommand.getMethod().invoke(sender);
+                    mainCommand.getMethod().invoke(this, sender);
                     return true;
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     this.debug.sendWarning(DebugType.COMMAND, "Error while invoking main command");
@@ -184,19 +208,20 @@ public abstract class KCommand extends Command {
             return false;
         }
 
-        ArrayList<Subcommand> possibleSubcommands = new ArrayList<>(mainCommands);
+        ArrayList<Subcommand> possibleSubcommands = new ArrayList<>();
         subcommands.forEach((name, subcommand) -> {
             if(args[0].equalsIgnoreCase(name)) {
                 possibleSubcommands.add(subcommand);
             }
         });
+        possibleSubcommands.addAll(mainCommands);
 
         boolean found = false;
         for(Subcommand subcommand : possibleSubcommands) {
 
             ArrayList<Class<?>> subCommandArgs = new ArrayList<>(subcommand.getArgsType().values());
-            List<String> fixedArgs = Arrays.asList(args);
-            if(subcommands.keySet().contains(args[0])) {
+            ArrayList<String> fixedArgs = new ArrayList<>(Arrays.asList(args));
+            if(subcommand.getName().equalsIgnoreCase(args[0])) {
                 fixedArgs.remove(0);
             }
 
@@ -204,17 +229,21 @@ public abstract class KCommand extends Command {
                 continue;
             }
 
+            if(subcommand.isEndless() && fixedArgs.size() < subCommandArgs.size()) {
+                continue;
+            }
+
             boolean isIt = true;
             int i = 0;
-            for(String arg : fixedArgs) {
+            for(Class<?> expectedClass : subCommandArgs) {
                 if(subcommand.isEndless()) {
                     if(subCommandArgs.size() == (i+1)) {
-                        if (subCommandArgs.get(i).equals(String.class)) {
+                        if (expectedClass.equals(String.class)) {
                             break;
                         }
                     }
                 }
-                if(!parser.canConvert(arg, subCommandArgs.get(i))) {
+                if(!parser.canConvert(fixedArgs.get(i), expectedClass)) {
                     isIt = false;
                     break;
                 }
@@ -230,7 +259,7 @@ public abstract class KCommand extends Command {
                 continue;
             }
 
-            Object[] commandArgs = new Object[fixedArgs.size() + 1];
+            Object[] commandArgs = new Object[subCommandArgs.size() + 1];
             commandArgs[0] = sender;
             for (int j = 1; j < commandArgs.length; j++) {
                 int fixedJ = j - 1;
@@ -250,10 +279,10 @@ public abstract class KCommand extends Command {
             }
             try {
                 subcommand.getMethod().invoke(this, commandArgs);
+                return true;
             } catch (IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);
             }
-            break;
         }
 
         if(found) {
@@ -264,15 +293,23 @@ public abstract class KCommand extends Command {
         return false;
     }
 
-    private void sendHelp(Audience audience) {
+    protected void sendHelp(Audience audience) {
         ArrayList<Component> toSend = new ArrayList<>();
         mainCommands.forEach(command -> {
             StringBuilder cmdLine = new StringBuilder(cmdName + " ");
+            AtomicInteger i = new AtomicInteger(1);
             command.getArgsType().forEach((argName, argsType) -> {
+                String start = "<";
+                String end = ">";
+                if(command.isEndless() && i.get() == command.getArgsType().size()) {
+                    start = "[<";
+                    end = ">]";
+                }
+                i.getAndIncrement();
                 cmdLine
-                        .append("<")
+                        .append(start)
                         .append(argName)
-                        .append(">")
+                        .append(end)
                         .append(" ");
             });
             cmdLine.deleteCharAt(cmdLine.length() - 1);
@@ -284,11 +321,19 @@ public abstract class KCommand extends Command {
 
         subcommands.forEach((subName, command) -> {
             StringBuilder cmdLine = new StringBuilder(cmdName + " " + subName + " ");
+            AtomicInteger i = new AtomicInteger(1);
             command.getArgsType().forEach((argName, argsType) -> {
+                String start = "<";
+                String end = ">";
+                if(command.isEndless() && i.get() == command.getArgsType().size()) {
+                    start = "[<";
+                    end = ">]";
+                }
+                i.getAndIncrement();
                 cmdLine
-                        .append("<")
+                        .append(start)
                         .append(argName)
-                        .append(">")
+                        .append(end)
                         .append(" ");
             });
             cmdLine.deleteCharAt(cmdLine.length() - 1);

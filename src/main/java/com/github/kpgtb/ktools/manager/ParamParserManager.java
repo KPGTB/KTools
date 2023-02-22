@@ -17,6 +17,7 @@
 package com.github.kpgtb.ktools.manager;
 
 import com.github.kpgtb.ktools.manager.command.IParamParser;
+import com.github.kpgtb.ktools.manager.command.parser.java.IntegerParser;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.util.ReflectionUtil;
 import org.bukkit.command.CommandSender;
@@ -52,7 +53,25 @@ public class ParamParserManager {
             try {
                 IParamParser<T> parser = (IParamParser<T>) clazz.newInstance();
                 registerParser(typeArgClazz, parser);
-                debug.sendInfo(DebugType.PARSER, "Registered " + clazz.getSimpleName());
+                debug.sendInfo(DebugType.PARSER, "Registered " + clazz.getSimpleName() + " as " + typeArgClazz.getSimpleName());
+                if (!clazz.isPrimitive()) {
+                    Class<?> primitiveClazz = typeArgClazz.equals(Boolean.class) ? Boolean.TYPE :
+                            typeArgClazz.equals(Character.class) ? Character.TYPE :
+                                    typeArgClazz.equals(Byte.class) ? Byte.TYPE :
+                                            typeArgClazz.equals(Short.class) ? Short.TYPE :
+                                                    typeArgClazz.equals(Integer.class) ? Integer.TYPE :
+                                                            typeArgClazz.equals(Long.class) ? Long.TYPE :
+                                                                    typeArgClazz.equals(Float.class) ? Float.TYPE :
+                                                                            typeArgClazz.equals(Double.class) ? Double.TYPE :
+                                                                                    null;
+                    if (primitiveClazz != null) {
+                        Class<T> primitiveTypeArgClazz = (Class<T>) primitiveClazz;
+                        registerParser(primitiveTypeArgClazz, parser);
+                        debug.sendInfo(DebugType.PARSER, "Registered " + clazz.getSimpleName() + " as " + primitiveTypeArgClazz.getSimpleName());
+                    } else {
+                        debug.sendInfo(DebugType.PARSER, "This class don't have primitive representation");
+                    }
+                }
             } catch (InstantiationException | IllegalAccessException e) {
                 debug.sendWarning(DebugType.PARSER, "Error while registering " + clazz.getSimpleName());
                 e.printStackTrace();
