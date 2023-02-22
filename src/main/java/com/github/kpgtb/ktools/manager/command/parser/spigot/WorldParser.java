@@ -20,6 +20,7 @@ import com.github.kpgtb.ktools.manager.command.IParamParser;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,7 +37,7 @@ public class WorldParser implements IParamParser<World> {
     }
 
     @Override
-    public List<String> complete(String arg, CommandSender sender) {
+    public @NotNull List<String> complete(String arg, CommandSender sender) {
         return Bukkit.getWorlds().stream()
                 .map(World::getName)
                 .filter(s -> s.startsWith(arg))

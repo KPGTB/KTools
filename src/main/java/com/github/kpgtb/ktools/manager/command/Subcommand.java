@@ -18,9 +18,11 @@ package com.github.kpgtb.ktools.manager.command;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+/**
+ * Object that stores all information about sub command
+ */
 public class Subcommand {
     private final String name;
     private final String description;

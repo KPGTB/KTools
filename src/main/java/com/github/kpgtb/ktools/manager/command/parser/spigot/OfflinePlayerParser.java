@@ -20,6 +20,7 @@ import com.github.kpgtb.ktools.manager.command.IParamParser;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -37,7 +38,7 @@ public class OfflinePlayerParser implements IParamParser<OfflinePlayer> {
     }
 
     @Override
-    public List<String> complete(String arg, CommandSender sender) {
+    public @NotNull List<String> complete(String arg, CommandSender sender) {
         return Arrays.stream(Bukkit.getOfflinePlayers())
                 .map(OfflinePlayer::getName)
                 .filter(s -> s.startsWith(arg))

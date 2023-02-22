@@ -117,7 +117,7 @@ public class ItemBuilder {
     }
 
     /**
-     * Initalizes the ItemBuilder with an already existing {@link cc.acquized.itembuilder.api.ItemBuilder}
+     * Initalizes the ItemBuilder with an already existing
      * @deprecated Use the already initalized {@code ItemBuilder} Instance to improve performance
      */
     @Deprecated

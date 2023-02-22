@@ -17,11 +17,35 @@
 package com.github.kpgtb.ktools.manager.command;
 
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+/**
+ * Interface that is used to parse String to Class
+ * @param <T> Class that should be parsed
+ */
 public interface IParamParser<T> {
+    /**
+     * Convert String to Class
+     * @param param String that should be converted
+     * @return Converted string
+     */
     T convert(String param);
+
+    /**
+     * Check if String can be converted to Class
+     * @param param String that should be checked
+     * @return true if string can be converted or false if can't
+     */
     boolean canConvert(String param);
+
+    /**
+     * Prepare list of Strings that can be used to tab completer
+     * @param arg Argument that is written by player
+     * @param sender CommandSender
+     * @return List of strings to tab completer. It can be empty.
+     */
+    @NotNull
     List<String> complete(String arg, CommandSender sender);
 }

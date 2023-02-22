@@ -16,7 +16,16 @@
 
 package com.github.kpgtb.ktools.manager.language;
 
+/**
+ * Language Level of message
+ */
 public enum LanguageLevel {
+    /**
+     * Message from plugin that use it
+     */
     PLUGIN,
+    /**
+     * Message from Ktools
+     */
     GLOBAL
 }

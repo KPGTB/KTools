@@ -18,6 +18,7 @@ package com.github.kpgtb.ktools.manager.command.parser.java;
 
 import com.github.kpgtb.ktools.manager.command.IParamParser;
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,7 @@ public class DoubleParser implements IParamParser<Double> {
     }
 
     @Override
-    public List<String> complete(String arg, CommandSender sender) {
+    public @NotNull List<String> complete(String arg, CommandSender sender) {
         return new ArrayList<>();
     }
 }

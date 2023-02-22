@@ -16,6 +16,9 @@
 
 package com.github.kpgtb.ktools.manager.debug;
 
+/**
+ * Debug type that is used to send message
+ */
 public enum DebugType {
     START("debug.start"),
     STOP("debug.stop"),
@@ -30,6 +33,10 @@ public enum DebugType {
         this.configStr = configStr;
     }
 
+    /**
+     * Get path to config
+     * @return Path to config where type is enabled or disabled
+     */
     public String getConfigStr() {
         return configStr;
     }

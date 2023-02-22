@@ -23,6 +23,9 @@ import com.github.kpgtb.ktools.manager.ParamParserManager;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.configuration.file.FileConfiguration;
 
+/**
+ * Wrapper with all necessary objects
+ */
 public class ToolsObjectWrapper {
     private final CacheManager cacheManager;
     private final DebugManager debugManager;

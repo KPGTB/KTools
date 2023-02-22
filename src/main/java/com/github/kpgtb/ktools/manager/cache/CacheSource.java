@@ -16,6 +16,9 @@
 
 package com.github.kpgtb.ktools.manager.cache;
 
+/**
+ * Source to which cache should be saved
+ */
 public enum CacheSource {
     SERVER,
     PLAYER,

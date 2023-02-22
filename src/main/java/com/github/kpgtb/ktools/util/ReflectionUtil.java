@@ -23,7 +23,16 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+/**
+ * Util to get classes from package
+ */
 public class ReflectionUtil {
+    /**
+     * This method returns all classes in specified package
+     * @param jarFile JarFile in which is this plugin
+     * @param packageName Name of package that have this classes
+     * @return Set of classes in package
+     */
     public static Set<Class<?>> getAllClassesInPackage(File jarFile, String packageName) {
         Set<Class<?>> classes = new HashSet<>();
         try {
@@ -41,6 +50,13 @@ public class ReflectionUtil {
         return classes;
     }
 
+    /**
+     * This method returns all classes that extends specified class in specified package
+     * @param jarfile JarFile in which is this plugin
+     * @param packageName Name of package that have this classes
+     * @param abstractClass Class that need to be extended
+     * @return Set of classes in package
+     */
     public static Set<Class<?>> getAllClassesInPackage(File jarfile, String packageName, Class<?> abstractClass) {
         Set<Class<?>> classes = getAllClassesInPackage(jarfile, packageName);
         Set<Class<?>> result = new HashSet<>();

@@ -26,6 +26,9 @@ import org.bukkit.command.CommandMap;
 import java.io.File;
 import java.lang.reflect.Field;
 
+/**
+ * CommandManager handles all commands in plugin
+ */
 public class CommandManager {
     private final ToolsObjectWrapper toolsObjectWrapper;
     private final File jarFile;
@@ -33,6 +36,12 @@ public class CommandManager {
 
     private final DebugManager debug;
 
+    /**
+     * Constructor of manager
+     * @param toolsObjectWrapper ToolsObjectWrapper or object that extends it.
+     * @param jarFile JAR file of plugin
+     * @param pluginTag Tag of plugin
+     */
     public CommandManager(ToolsObjectWrapper toolsObjectWrapper, File jarFile, String pluginTag) {
         this.toolsObjectWrapper = toolsObjectWrapper;
         this.jarFile = jarFile;
@@ -41,6 +50,10 @@ public class CommandManager {
         this.debug = toolsObjectWrapper.getDebugManager();
     }
 
+    /**
+     * Register all commands from package
+     * @param commandsPackage Package with commands
+     */
     public void registerCommands(String commandsPackage) {
         Field f;
         CommandMap commandMap;
@@ -50,13 +63,12 @@ public class CommandManager {
             f.setAccessible(true);
             commandMap = (CommandMap) f.get(Bukkit.getServer());
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            debug.sendWarning(DebugType.COMMAND, "Error while loading commands");
+            debug.sendWarning(DebugType.COMMAND, "Error while loading command map");
             throw new RuntimeException(e);
         }
 
         for(Class<?> clazz : ReflectionUtil.getAllClassesInPackage(jarFile,commandsPackage, KCommand.class)) {
             try {
-
                 String[] groupPath = clazz.getName().split("\\.");
                 StringBuilder finalPath = new StringBuilder();
 

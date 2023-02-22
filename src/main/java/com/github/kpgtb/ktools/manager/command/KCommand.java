@@ -40,6 +40,9 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+/**
+ * Abstract class that handles process of preparing command
+ */
 public abstract class KCommand extends Command {
     private final String cmdName;
 
@@ -51,6 +54,11 @@ public abstract class KCommand extends Command {
     private final ArrayList<Subcommand> mainCommands;
     private final HashMap<String, Subcommand> subcommands;
 
+    /**
+     * Constructor of command. It also handles getting information about command
+     * @param toolsObjectWrapper ToolsObjectWrapper or object that extends it.
+     * @param groupPath Path to command from commands package
+     */
     public KCommand(ToolsObjectWrapper toolsObjectWrapper, String groupPath) {
         super("");
 
@@ -293,6 +301,10 @@ public abstract class KCommand extends Command {
         return false;
     }
 
+    /**
+     * Method that handles sending help info to sender. It can be overridden
+     * @param audience Audience instance from AdventureAPI
+     */
     protected void sendHelp(Audience audience) {
         ArrayList<Component> toSend = new ArrayList<>();
         mainCommands.forEach(command -> {

@@ -22,6 +22,9 @@ import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.plugin.java.JavaPlugin;
 
+/**
+ * Main class of plugin
+ */
 public final class Ktools extends JavaPlugin {
 
     private ToolsObjectWrapper toolsObjectWrapper;
@@ -77,6 +80,10 @@ public final class Ktools extends JavaPlugin {
         }
     }
 
+    /**
+     * Getter of object with all necessary managers
+     * @return Instance of Ktools ToolsObjectWrapper
+     */
     public ToolsObjectWrapper getToolsObjectWrapper() {
         return toolsObjectWrapper;
     }
