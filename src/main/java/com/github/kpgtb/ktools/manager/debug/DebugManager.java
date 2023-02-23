@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.github.kpgtb.ktools.manager;
+package com.github.kpgtb.ktools.manager.debug;
 
 import com.github.kpgtb.ktools.manager.debug.DebugType;
 import org.bukkit.configuration.file.FileConfiguration;

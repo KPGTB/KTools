@@ -14,8 +14,9 @@
  *    limitations under the License.
  */
 
-package com.github.kpgtb.ktools.manager;
+package com.github.kpgtb.ktools.manager.listener;
 
+import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.manager.listener.Klistener;
 import com.github.kpgtb.ktools.util.ReflectionUtil;

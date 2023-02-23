@@ -14,9 +14,9 @@
  *    limitations under the License.
  */
 
-package com.github.kpgtb.ktools.manager;
+package com.github.kpgtb.ktools.manager.cache;
 
-import com.github.kpgtb.ktools.manager.cache.CacheSource;
+import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;

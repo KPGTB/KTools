@@ -16,7 +16,7 @@
 
 package com.github.kpgtb.ktools.manager.command.parser.spigot;
 
-import com.github.kpgtb.ktools.manager.command.IParamParser;
+import com.github.kpgtb.ktools.manager.command.parser.IParamParser;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;

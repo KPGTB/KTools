@@ -14,10 +14,10 @@
  *    limitations under the License.
  */
 
-package com.github.kpgtb.ktools.manager;
+package com.github.kpgtb.ktools.manager.language;
 
+import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
-import com.github.kpgtb.ktools.manager.language.LanguageLevel;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -49,7 +49,7 @@ public class LanguageManager {
      * Constructor of Global LanguageManager. Use only in Ktools!
      * @param dataFolder Folder with plugin's data. Use JavaPlugin#getDataFolder() to get this
      * @param lang Language of messages. Get this from plugin's config
-     * @param debug Instance of {@link com.github.kpgtb.ktools.manager.DebugManager}
+     * @param debug Instance of {@link DebugManager}
      */
     public LanguageManager(File dataFolder, String lang, DebugManager debug) {
         this.dataFolder = dataFolder;
@@ -64,7 +64,7 @@ public class LanguageManager {
      * Constructor of Plugin's LanguageManager. Use in other plugins!
      * @param dataFolder Folder with plugin's data. Use JavaPlugin#getDataFolder() to get this
      * @param lang Language of messages. Get this from plugin's config
-     * @param debug Instance of {@link com.github.kpgtb.ktools.manager.DebugManager}
+     * @param debug Instance of {@link DebugManager}
      * @param globalManager Instance of Global LanguageManager. Take it from {@link com.github.kpgtb.ktools.Ktools}
      */
     public LanguageManager(File dataFolder, String lang, DebugManager debug, LanguageManager globalManager) {

@@ -16,10 +16,10 @@
 
 package com.github.kpgtb.ktools.util;
 
-import com.github.kpgtb.ktools.manager.CacheManager;
-import com.github.kpgtb.ktools.manager.DebugManager;
-import com.github.kpgtb.ktools.manager.LanguageManager;
-import com.github.kpgtb.ktools.manager.ParamParserManager;
+import com.github.kpgtb.ktools.manager.cache.CacheManager;
+import com.github.kpgtb.ktools.manager.debug.DebugManager;
+import com.github.kpgtb.ktools.manager.language.LanguageManager;
+import com.github.kpgtb.ktools.manager.command.parser.ParamParserManager;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.plugin.java.JavaPlugin;
 

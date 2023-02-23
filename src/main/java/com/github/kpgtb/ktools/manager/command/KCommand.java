@@ -16,9 +16,9 @@
 
 package com.github.kpgtb.ktools.manager.command;
 
-import com.github.kpgtb.ktools.manager.DebugManager;
-import com.github.kpgtb.ktools.manager.LanguageManager;
-import com.github.kpgtb.ktools.manager.ParamParserManager;
+import com.github.kpgtb.ktools.manager.command.parser.ParamParserManager;
+import com.github.kpgtb.ktools.manager.debug.DebugManager;
+import com.github.kpgtb.ktools.manager.language.LanguageManager;
 import com.github.kpgtb.ktools.manager.command.annotation.*;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.manager.language.LanguageLevel;

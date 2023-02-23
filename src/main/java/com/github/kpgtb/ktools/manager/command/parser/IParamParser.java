@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.github.kpgtb.ktools.manager.command;
+package com.github.kpgtb.ktools.manager.command.parser;
 
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;

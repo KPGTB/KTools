@@ -16,7 +16,7 @@
 
 package com.github.kpgtb.ktools.manager.command.parser.java;
 
-import com.github.kpgtb.ktools.manager.command.IParamParser;
+import com.github.kpgtb.ktools.manager.command.parser.IParamParser;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 

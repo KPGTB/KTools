@@ -14,9 +14,9 @@
  *    limitations under the License.
  */
 
-package com.github.kpgtb.ktools.manager;
+package com.github.kpgtb.ktools.manager.command.parser;
 
-import com.github.kpgtb.ktools.manager.command.IParamParser;
+import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.util.ReflectionUtil;
 import org.bukkit.command.CommandSender;
@@ -83,7 +83,7 @@ public class ParamParserManager {
     @SuppressWarnings("unchecked")
     public <T> void registerParsers(String parsersPackage, File jarFile) {
         for(Class<?> clazz : ReflectionUtil.getAllClassesInPackage(jarFile,parsersPackage)) {
-            if(!IParamParser.class.isAssignableFrom(clazz)) {
+            if(!IParamParser.class.isAssignableFrom(clazz) || IParamParser.class.equals(clazz)) {
                continue;
             }
             ParameterizedType type = (ParameterizedType) clazz.getGenericInterfaces()[0];
