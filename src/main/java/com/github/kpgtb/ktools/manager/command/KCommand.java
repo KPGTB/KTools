@@ -90,6 +90,14 @@ public abstract class KCommand extends Command {
         this.mainCommands = new ArrayList<>();
         this.subcommands = new HashMap<>();
 
+        String customCommandPermission = "";
+        boolean commandWithoutPermission = getClass().getDeclaredAnnotation(WithoutPermission.class) != null;
+
+        CustomPermission customCommandPermissionAnnotation = getClass().getDeclaredAnnotation(CustomPermission.class);
+        if(customCommandPermissionAnnotation != null) {
+            customCommandPermission = customCommandPermissionAnnotation.permission();
+        }
+
         this.debug.sendInfo(DebugType.COMMAND, "Registering command " + cmdName);
 
         for(Method method : getClass().getDeclaredMethods()) {
@@ -105,32 +113,52 @@ public abstract class KCommand extends Command {
 
             this.debug.sendInfo(DebugType.COMMAND, "Name: " + subName);
 
-            SubcommandDescription subcommandDescription = method.getAnnotation(SubcommandDescription.class);
+            SubcommandDescription subcommandDescription = method.getDeclaredAnnotation(SubcommandDescription.class);
             if(subcommandDescription != null) {
                 subDescription = subcommandDescription.description();
             }
 
             this.debug.sendInfo(DebugType.COMMAND, "Description: " + subDescription);
 
-            ArrayList<String> permissions = new ArrayList<>();
-            // Method permission ex. command.admin.give.item
-            permissions.add(
-                    "command." + groupPath + "." + cmdName + "." + subName
-            );
-            // Command permission ex. command.admin.give.*
-            permissions.add(
-                    "command." + groupPath + "." + cmdName + ".*"
-            );
-            // Group permission ex. command.admin.*
-            if(!groupPath.isEmpty()) {
-                permissions.add(
-                        "command." + groupPath + ".*"
-                );
+            String customPermission = "";
+            boolean withoutPermission = method.getDeclaredAnnotation(WithoutPermission.class) != null;
+
+            CustomPermission customPermissionAnnotation = method.getDeclaredAnnotation(CustomPermission.class);
+            if(customPermissionAnnotation != null) {
+                customPermission = customPermissionAnnotation.permission();
             }
-            // Global permission (command.*)
-            permissions.add(
-                    "command.*"
-            );
+
+            ArrayList<String> permissions = new ArrayList<>();
+            if(!withoutPermission && !commandWithoutPermission) {
+                // Method permission ex. command.admin.give.item
+                permissions.add(
+                        "command." + groupPath + "." + cmdName + "." + subName
+                );
+                // Command permission ex. command.admin.give.*
+                permissions.add(
+                        "command." + groupPath + "." + cmdName + ".*"
+                );
+                // Group permission ex. command.admin.*
+                if(!groupPath.isEmpty()) {
+                    permissions.add(
+                            "command." + groupPath + ".*"
+                    );
+                }
+                // Global permission (command.*)
+                permissions.add(
+                        "command.*"
+                );
+                if(!customCommandPermission.isEmpty()) {
+                    permissions.add(
+                            customCommandPermission
+                    );
+                }
+                if(!customPermission.isEmpty()) {
+                    permissions.add(
+                            customPermission
+                    );
+                }
+            }
 
             permissions.forEach(perm -> {
                 this.debug.sendInfo(DebugType.COMMAND, "Loaded permission: " + perm);
@@ -198,7 +226,7 @@ public abstract class KCommand extends Command {
                     found = true;
                     continue;
                 }
-                boolean hasPermission = false;
+                boolean hasPermission = mainCommand.getPermissions().isEmpty();
                 for(String perm : mainCommand.getPermissions()) {
                     if(sender.hasPermission(perm)) {
                         hasPermission = true;
@@ -278,7 +306,7 @@ public abstract class KCommand extends Command {
                 continue;
             }
 
-            boolean hasPermission = false;
+            boolean hasPermission = subcommand.getPermissions().isEmpty();
             for(String perm : subcommand.getPermissions()) {
                 if(sender.hasPermission(perm)) {
                     hasPermission = true;
