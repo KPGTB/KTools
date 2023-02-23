@@ -10,3 +10,5 @@ debug:
   cache: true
   command: true
   parser: true
+  listener: true
+  recipe: true

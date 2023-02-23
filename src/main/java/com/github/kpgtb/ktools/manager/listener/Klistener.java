@@ -14,32 +14,22 @@
  *    limitations under the License.
  */
 
-package com.github.kpgtb.ktools.manager.debug;
+package com.github.kpgtb.ktools.manager.listener;
+
+import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
+import org.bukkit.event.Listener;
 
 /**
- * Debug type that is used to send message
+ * Abstract class that handles process of preparing listener
  */
-public enum DebugType {
-    START("debug.start"),
-    STOP("debug.stop"),
-    LANGUAGE("debug.language"),
-    CACHE("debug.cache"),
-    COMMAND("debug.command"),
-    PARSER("debug.parser"),
-    LISTENER("debug.listener"),
-    RECIPE("debug.recipe");
-
-    private final String configStr;
-
-    DebugType(String configStr) {
-        this.configStr = configStr;
-    }
+public abstract class Klistener implements Listener {
+    private final ToolsObjectWrapper toolsObjectWrapper;
 
     /**
-     * Get path to config
-     * @return Path to config where type is enabled or disabled
+     * Constructor of listener.
+     * @param toolsObjectWrapper ToolsObjectWrapper or object that extends it.
      */
-    public String getConfigStr() {
-        return configStr;
+    public Klistener(ToolsObjectWrapper toolsObjectWrapper) {
+        this.toolsObjectWrapper = toolsObjectWrapper;
     }
 }

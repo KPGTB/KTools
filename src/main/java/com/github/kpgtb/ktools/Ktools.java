@@ -59,15 +59,24 @@ public final class Ktools extends JavaPlugin {
         paramParserManager.registerParsers("com.github.kpgtb.ktools.manager.command.parser", getFile());
         debug.sendInfo(DebugType.START, "Loaded command param parsers.");
 
-
         debug.sendInfo(DebugType.START, "Loading tools object wrapper...");
-        this.toolsObjectWrapper = new ToolsObjectWrapper(cacheManager,debug,globalLanguageManager,getConfig(),adventure,paramParserManager);
+        this.toolsObjectWrapper = new ToolsObjectWrapper(cacheManager,debug,globalLanguageManager,this,adventure,paramParserManager);
         debug.sendInfo(DebugType.START, "Loaded tools object wrapper.");
 
         debug.sendInfo(DebugType.START, "Loading commands...");
         CommandManager commandManager = new CommandManager(toolsObjectWrapper, getFile(), "ktools");
         commandManager.registerCommands("com.github.kpgtb.ktools.command");
         debug.sendInfo(DebugType.START, "Loaded commands.");
+
+        debug.sendInfo(DebugType.START, "Loading listeners...");
+        ListenerManager listenerManager = new ListenerManager(toolsObjectWrapper, getFile());
+        listenerManager.registerListeners("com.github.kpgtb.ktools.listener");
+        debug.sendInfo(DebugType.START, "Loaded listeners.");
+
+        debug.sendInfo(DebugType.START, "Loading recipes...");
+        RecipeManager recipeManager = new RecipeManager(toolsObjectWrapper, getFile(), "ktools");
+        recipeManager.registerRecipes("com.github.kpgtb.ktools.recipe");
+        debug.sendInfo(DebugType.START, "Loaded recipes.");
 
         debug.sendInfo(DebugType.START, "Enabled plugin in " + (System.currentTimeMillis() - startMillis) + "ms.");
     }
