@@ -198,6 +198,17 @@ public abstract class KCommand extends Command {
                     found = true;
                     continue;
                 }
+                boolean hasPermission = false;
+                for(String perm : mainCommand.getPermissions()) {
+                    if(sender.hasPermission(perm)) {
+                        hasPermission = true;
+                        break;
+                    }
+                }
+                if(!hasPermission) {
+                    language.getComponent(LanguageLevel.GLOBAL, "noPermission").forEach(audience::sendMessage);
+                    return false;
+                }
                 try {
                     mainCommand.getMethod().invoke(this, sender);
                     return true;
@@ -265,6 +276,18 @@ public abstract class KCommand extends Command {
             if(subcommand.isPlayerRequired() && (!(sender instanceof Player))) {
                 found = true;
                 continue;
+            }
+
+            boolean hasPermission = false;
+            for(String perm : subcommand.getPermissions()) {
+                if(sender.hasPermission(perm)) {
+                    hasPermission = true;
+                    break;
+                }
+            }
+            if(!hasPermission) {
+                language.getComponent(LanguageLevel.GLOBAL, "noPermission").forEach(audience::sendMessage);
+                return false;
             }
 
             Object[] commandArgs = new Object[subCommandArgs.size() + 1];
