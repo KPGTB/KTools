@@ -17,6 +17,7 @@
 package com.github.kpgtb.ktools.util;
 
 import com.github.kpgtb.ktools.manager.cache.CacheManager;
+import com.github.kpgtb.ktools.manager.data.DataManager;
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.language.LanguageManager;
 import com.github.kpgtb.ktools.manager.command.parser.ParamParserManager;
@@ -33,14 +34,16 @@ public class ToolsObjectWrapper {
     private final JavaPlugin plugin;
     private final BukkitAudiences adventure;
     private final ParamParserManager paramParserManager;
+    private final DataManager dataManager;
 
-    public ToolsObjectWrapper(CacheManager cacheManager, DebugManager debugManager, LanguageManager languageManager, JavaPlugin plugin, BukkitAudiences adventure, ParamParserManager paramParserManager) {
+    public ToolsObjectWrapper(CacheManager cacheManager, DebugManager debugManager, LanguageManager languageManager, JavaPlugin plugin, BukkitAudiences adventure, ParamParserManager paramParserManager, DataManager dataManager) {
         this.cacheManager = cacheManager;
         this.debugManager = debugManager;
         this.languageManager = languageManager;
         this.plugin = plugin;
         this.adventure = adventure;
         this.paramParserManager = paramParserManager;
+        this.dataManager = dataManager;
     }
 
     public CacheManager getCacheManager() {
@@ -65,5 +68,9 @@ public class ToolsObjectWrapper {
 
     public ParamParserManager getParamParserManager() {
         return paramParserManager;
+    }
+
+    public DataManager getDataManager() {
+        return dataManager;
     }
 }

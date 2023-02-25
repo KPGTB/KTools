@@ -28,7 +28,8 @@ public enum DebugType {
     PARSER("debug.parser"),
     LISTENER("debug.listener"),
     RECIPE("debug.recipe"),
-    GUI("debug.gui");
+    GUI("debug.gui"),
+    DATA("debug.data");
 
     private final String configStr;
 

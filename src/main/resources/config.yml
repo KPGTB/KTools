@@ -1,7 +1,15 @@
-lang: 'en'
+lang: "en"
 cache:
-  player: metadata # file or metadata
-  entity: metadata # file or metadata
+  player: "metadata" # file or metadata
+  entity: "metadata" # file or metadata
+data:
+  type: "SQLITE"
+  mysql:
+    host: "localhost"
+    port: 3306
+    username: "root"
+    password: ""
+    database: "minecraft"
 debug:
   enable: true
   start: true
@@ -13,3 +21,4 @@ debug:
   listener: true
   recipe: true
   gui: true
+  data: true

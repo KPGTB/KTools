@@ -19,6 +19,7 @@ package com.github.kpgtb.ktools;
 import com.github.kpgtb.ktools.manager.cache.CacheManager;
 import com.github.kpgtb.ktools.manager.command.CommandManager;
 import com.github.kpgtb.ktools.manager.command.parser.ParamParserManager;
+import com.github.kpgtb.ktools.manager.data.DataManager;
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.manager.language.LanguageManager;
@@ -65,8 +66,13 @@ public final class Ktools extends JavaPlugin {
         paramParserManager.registerParsers("com.github.kpgtb.ktools.manager.command.parser", getFile());
         debug.sendInfo(DebugType.START, "Loaded command param parsers.");
 
+        debug.sendInfo(DebugType.START, "Loading database...");
+        DataManager dataManager = new DataManager(debug,getConfig(),getDataFolder());
+        dataManager.registerTables("com.github.kpgtb.ktools.database", getFile());
+        debug.sendInfo(DebugType.START, "Loaded database.");
+
         debug.sendInfo(DebugType.START, "Loading tools object wrapper...");
-        this.toolsObjectWrapper = new ToolsObjectWrapper(cacheManager,debug,globalLanguageManager,this,adventure,paramParserManager);
+        this.toolsObjectWrapper = new ToolsObjectWrapper(cacheManager,debug,globalLanguageManager,this,adventure,paramParserManager, dataManager);
         debug.sendInfo(DebugType.START, "Loaded tools object wrapper.");
 
         debug.sendInfo(DebugType.START, "Loading commands...");
@@ -93,13 +99,6 @@ public final class Ktools extends JavaPlugin {
         if(adventure != null) {
             adventure.close();
         }
-    }
-
-    /**
-     * Getter of object with all necessary managers
-     * @return Instance of Ktools ToolsObjectWrapper
-     */
-    public ToolsObjectWrapper getToolsObjectWrapper() {
-        return toolsObjectWrapper;
+        this.toolsObjectWrapper.getDataManager().close();
     }
 }

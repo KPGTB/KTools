@@ -37,9 +37,9 @@ public class PagedGuiContainer extends GuiContainer {
      * @param debug Instance of DebugManager
      * @param gui Instance of KGui
      * @param x X position in KGui (0-8)
-     * @param y Y position in KGui (0-<KGui rows - 1>)
+     * @param y Y position in KGui (0-[KGui rows - 1])
      * @param width Width of container (1-9)
-     * @param height Height of container (1-<KGui rows>)
+     * @param height Height of container (1-[KGui rows])
      */
     public PagedGuiContainer(DebugManager debug, @NotNull KGui gui, int x, int y, int width, int height) {
         super(debug, gui, x, y, width, height);
