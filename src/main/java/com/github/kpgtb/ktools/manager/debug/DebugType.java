@@ -29,7 +29,8 @@ public enum DebugType {
     LISTENER("debug.listener"),
     RECIPE("debug.recipe"),
     GUI("debug.gui"),
-    DATA("debug.data");
+    DATA("debug.data"),
+    UPDATER("debug.updater");
 
     private final String configStr;
 

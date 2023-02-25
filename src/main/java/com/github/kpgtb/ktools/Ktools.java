@@ -25,6 +25,9 @@ import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.manager.language.LanguageManager;
 import com.github.kpgtb.ktools.manager.listener.ListenerManager;
 import com.github.kpgtb.ktools.manager.recipe.RecipeManager;
+import com.github.kpgtb.ktools.manager.updater.IUpdater;
+import com.github.kpgtb.ktools.manager.updater.SpigotUpdater;
+import com.github.kpgtb.ktools.manager.updater.UpdaterManager;
 import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -89,6 +92,10 @@ public final class Ktools extends JavaPlugin {
         RecipeManager recipeManager = new RecipeManager(toolsObjectWrapper, getFile(), "ktools");
         recipeManager.registerRecipes("com.github.kpgtb.ktools.recipe");
         debug.sendInfo(DebugType.START, "Loaded recipes.");
+
+        debug.sendInfo(DebugType.START, "Checking updates...");
+        UpdaterManager updaterManager = new UpdaterManager(getDescription(), new SpigotUpdater(""),debug);
+        updaterManager.checkUpdate();
 
         debug.sendInfo(DebugType.START, "Enabled plugin in " + (System.currentTimeMillis() - startMillis) + "ms.");
     }

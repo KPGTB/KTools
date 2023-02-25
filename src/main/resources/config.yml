@@ -22,3 +22,4 @@ debug:
   recipe: true
   gui: true
   data: true
+  updater: true
