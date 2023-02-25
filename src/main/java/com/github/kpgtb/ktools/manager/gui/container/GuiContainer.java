@@ -49,9 +49,9 @@ public class GuiContainer {
      * @param debug Instance of DebugManager
      * @param gui Instance of KGui
      * @param x X position in KGui (0-8)
-     * @param y Y position in KGui (0-<KGui rows - 1>)
+     * @param y Y position in KGui (0-[KGui rows - 1])
      * @param width Width of container (1-9)
-     * @param height Height of container (1-<KGui rows>)
+     * @param height Height of container (1-[KGui rows])
      */
     public GuiContainer(DebugManager debug, @NotNull KGui gui, int x, int y, int width, int height) {
         this.debug = debug;
@@ -135,8 +135,8 @@ public class GuiContainer {
 
     /**
      * Set item in container
-     * @param x X position in container (0-<width-1>)
-     * @param y Y position in container (0-<height-1>)
+     * @param x X position in container (0-[width-1])
+     * @param y Y position in container (0-[height-1])
      * @param item Instance of GuiItem
      */
     public void setItem(int x, int y, GuiItem item) {
@@ -153,8 +153,8 @@ public class GuiContainer {
 
     /**
      * Remove item from container
-     * @param x X position in container (0-<width-1>)
-     * @param y Y position in container (0-<height-1>)
+     * @param x X position in container (0-[width-1])
+     * @param y Y position in container (0-[height-1])
      */
     public void removeItem(int x, int y) {
         this.items.remove(new GuiItemLocation(x,y));
@@ -172,8 +172,8 @@ public class GuiContainer {
 
     /**
      * Get item from container
-     * @param x X position in container (0-<width-1>)
-     * @param y Y position in container (0-<height-1>)
+     * @param x X position in container (0-[width-1])
+     * @param y Y position in container (0-[height-1])
      * @return Item from container or null
      */
     @Nullable
@@ -210,8 +210,8 @@ public class GuiContainer {
 
     /**
      * Calculate slot in gui from position in container
-     * @param x X position in container (0-<width-1>)
-     * @param y Y position in container (0-<height-1>)
+     * @param x X position in container (0-[width-1])
+     * @param y Y position in container (0-[height-1])
      * @return Slot in GUI
      */
     public int getGuiLocFromContainerLoc(int x, int y) {
