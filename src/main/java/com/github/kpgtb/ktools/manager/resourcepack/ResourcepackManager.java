@@ -19,6 +19,7 @@ package com.github.kpgtb.ktools.manager.resourcepack;
 import com.github.kpgtb.ktools.manager.cache.CacheManager;
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
+import com.github.kpgtb.ktools.util.FontWidth;
 import com.google.gson.*;
 import com.google.gson.stream.JsonWriter;
 import org.bukkit.Material;
@@ -75,7 +76,7 @@ public class ResourcepackManager {
         this.required = required;
     }
 
-    public void registerCustomChar(String pluginName, String character, String imageName, InputStream image, int height, int ascent) {
+    public void registerCustomChar(String pluginName, String character, String imageName, InputStream image, int height, int ascent, int width) {
         if(!isEnabled()) {
             return;
         }
@@ -85,6 +86,7 @@ public class ResourcepackManager {
         }
         CustomChar customChar = new CustomChar(pluginName,imageFile,character,height,ascent);
         this.customChars.add(customChar);
+        FontWidth.registerCustomChar(character.charAt(0), width);
     }
     public void registerCustomModelData(String pluginName, int model, String imageName, InputStream image, Material material) {
         if(!isEnabled()) {

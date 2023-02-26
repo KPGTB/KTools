@@ -16,6 +16,8 @@
 
 package com.github.kpgtb.ktools;
 
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 import com.github.kpgtb.ktools.manager.cache.CacheManager;
 import com.github.kpgtb.ktools.manager.command.CommandManager;
 import com.github.kpgtb.ktools.manager.command.parser.ParamParserManager;
@@ -26,11 +28,12 @@ import com.github.kpgtb.ktools.manager.language.LanguageManager;
 import com.github.kpgtb.ktools.manager.listener.ListenerManager;
 import com.github.kpgtb.ktools.manager.recipe.RecipeManager;
 import com.github.kpgtb.ktools.manager.resourcepack.ResourcepackManager;
+import com.github.kpgtb.ktools.manager.ui.UiManager;
 import com.github.kpgtb.ktools.manager.updater.SpigotUpdater;
 import com.github.kpgtb.ktools.manager.updater.UpdaterManager;
 import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
-import org.bukkit.Material;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -76,6 +79,16 @@ public final class Ktools extends JavaPlugin {
         dataManager.registerTables("com.github.kpgtb.ktools.database", getFile());
         debug.sendInfo(DebugType.START, "Loaded database.");
 
+        UiManager uiManager = null;
+        if(Bukkit.getPluginManager().getPlugin("ProtocolLib") != null) {
+            debug.sendInfo(DebugType.START, "Loading ui...");
+            ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
+            uiManager = new UiManager(this,protocolManager, getTextResource("spaces.json"));
+            uiManager.setRequired(true);
+
+            debug.sendInfo(DebugType.START, "Loaded ui.");
+        }
+
         debug.sendInfo(DebugType.START, "Loading resourcepack...");
         ResourcepackManager resourcepackManager = new ResourcepackManager(this,debug,cacheManager);
         resourcepackManager.setRequired(true);
@@ -89,7 +102,7 @@ public final class Ktools extends JavaPlugin {
         debug.sendInfo(DebugType.START, "Loaded resourcepack.");
 
         debug.sendInfo(DebugType.START, "Loading tools object wrapper...");
-        this.toolsObjectWrapper = new ToolsObjectWrapper(cacheManager,debug,globalLanguageManager,this,adventure,paramParserManager, dataManager, resourcepackManager);
+        this.toolsObjectWrapper = new ToolsObjectWrapper(cacheManager,debug,globalLanguageManager,this,adventure,paramParserManager, dataManager, resourcepackManager, uiManager);
         debug.sendInfo(DebugType.START, "Loaded tools object wrapper.");
 
         debug.sendInfo(DebugType.START, "Loading commands...");
