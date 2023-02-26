@@ -21,6 +21,7 @@ import com.github.kpgtb.ktools.manager.data.DataManager;
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.language.LanguageManager;
 import com.github.kpgtb.ktools.manager.command.parser.ParamParserManager;
+import com.github.kpgtb.ktools.manager.resourcepack.ResourcepackManager;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -35,8 +36,9 @@ public class ToolsObjectWrapper {
     private final BukkitAudiences adventure;
     private final ParamParserManager paramParserManager;
     private final DataManager dataManager;
+    private final ResourcepackManager resourcepackManager;
 
-    public ToolsObjectWrapper(CacheManager cacheManager, DebugManager debugManager, LanguageManager languageManager, JavaPlugin plugin, BukkitAudiences adventure, ParamParserManager paramParserManager, DataManager dataManager) {
+    public ToolsObjectWrapper(CacheManager cacheManager, DebugManager debugManager, LanguageManager languageManager, JavaPlugin plugin, BukkitAudiences adventure, ParamParserManager paramParserManager, DataManager dataManager, ResourcepackManager resourcepackManager) {
         this.cacheManager = cacheManager;
         this.debugManager = debugManager;
         this.languageManager = languageManager;
@@ -44,6 +46,7 @@ public class ToolsObjectWrapper {
         this.adventure = adventure;
         this.paramParserManager = paramParserManager;
         this.dataManager = dataManager;
+        this.resourcepackManager = resourcepackManager;
     }
 
     public CacheManager getCacheManager() {
@@ -72,5 +75,9 @@ public class ToolsObjectWrapper {
 
     public DataManager getDataManager() {
         return dataManager;
+    }
+
+    public ResourcepackManager getResourcepackManager() {
+        return resourcepackManager;
     }
 }

@@ -25,12 +25,14 @@ import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.manager.language.LanguageManager;
 import com.github.kpgtb.ktools.manager.listener.ListenerManager;
 import com.github.kpgtb.ktools.manager.recipe.RecipeManager;
-import com.github.kpgtb.ktools.manager.updater.IUpdater;
+import com.github.kpgtb.ktools.manager.resourcepack.ResourcepackManager;
 import com.github.kpgtb.ktools.manager.updater.SpigotUpdater;
 import com.github.kpgtb.ktools.manager.updater.UpdaterManager;
 import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  * Main class of plugin
@@ -74,8 +76,20 @@ public final class Ktools extends JavaPlugin {
         dataManager.registerTables("com.github.kpgtb.ktools.database", getFile());
         debug.sendInfo(DebugType.START, "Loaded database.");
 
+        debug.sendInfo(DebugType.START, "Loading resourcepack...");
+        ResourcepackManager resourcepackManager = new ResourcepackManager(this,debug,cacheManager);
+        resourcepackManager.setRequired(true);
+        resourcepackManager.registerPlugin("ktools", 1.0);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                resourcepackManager.prepareResourcepack();
+            }
+        }.runTaskLater(this,1L);
+        debug.sendInfo(DebugType.START, "Loaded resourcepack.");
+
         debug.sendInfo(DebugType.START, "Loading tools object wrapper...");
-        this.toolsObjectWrapper = new ToolsObjectWrapper(cacheManager,debug,globalLanguageManager,this,adventure,paramParserManager, dataManager);
+        this.toolsObjectWrapper = new ToolsObjectWrapper(cacheManager,debug,globalLanguageManager,this,adventure,paramParserManager, dataManager, resourcepackManager);
         debug.sendInfo(DebugType.START, "Loaded tools object wrapper.");
 
         debug.sendInfo(DebugType.START, "Loading commands...");

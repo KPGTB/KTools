@@ -2,6 +2,7 @@ lang: "en"
 cache:
   player: "metadata" # file or metadata
   entity: "metadata" # file or metadata
+resourcepack: true
 data:
   type: "SQLITE"
   mysql:
@@ -23,3 +24,4 @@ debug:
   gui: true
   data: true
   updater: true
+  resourcepack: true

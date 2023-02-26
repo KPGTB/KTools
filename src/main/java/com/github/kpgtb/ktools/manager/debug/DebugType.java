@@ -30,7 +30,8 @@ public enum DebugType {
     RECIPE("debug.recipe"),
     GUI("debug.gui"),
     DATA("debug.data"),
-    UPDATER("debug.updater");
+    UPDATER("debug.updater"),
+    RESOURCEPACK("debug.resourcepack");
 
     private final String configStr;
 
