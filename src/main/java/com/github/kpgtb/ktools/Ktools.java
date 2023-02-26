@@ -31,6 +31,7 @@ import com.github.kpgtb.ktools.manager.resourcepack.ResourcepackManager;
 import com.github.kpgtb.ktools.manager.ui.UiManager;
 import com.github.kpgtb.ktools.manager.updater.SpigotUpdater;
 import com.github.kpgtb.ktools.manager.updater.UpdaterManager;
+import com.github.kpgtb.ktools.util.GlobalManagersWrapper;
 import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
@@ -43,6 +44,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public final class Ktools extends JavaPlugin {
 
     private ToolsObjectWrapper toolsObjectWrapper;
+    private GlobalManagersWrapper globalManagersWrapper;
 
     @Override
     public void onEnable() {
@@ -120,6 +122,10 @@ public final class Ktools extends JavaPlugin {
         recipeManager.registerRecipes("com.github.kpgtb.ktools.recipe");
         debug.sendInfo(DebugType.START, "Loaded recipes.");
 
+        debug.sendInfo(DebugType.START, "Loading global managers wrapper...");
+        this.globalManagersWrapper = new GlobalManagersWrapper(debug, globalLanguageManager,cacheManager,paramParserManager,dataManager,uiManager,resourcepackManager);
+        debug.sendInfo(DebugType.START, "Loaded global managers wrapper.");
+
         debug.sendInfo(DebugType.START, "Checking updates...");
         UpdaterManager updaterManager = new UpdaterManager(getDescription(), new SpigotUpdater(""),debug);
         updaterManager.checkUpdate();
@@ -134,5 +140,9 @@ public final class Ktools extends JavaPlugin {
             adventure.close();
         }
         this.toolsObjectWrapper.getDataManager().close();
+    }
+
+    public GlobalManagersWrapper getGlobalManagersWrapper() {
+        return globalManagersWrapper;
     }
 }
