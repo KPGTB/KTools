@@ -26,6 +26,9 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+/**
+ * JoinListener handles setting resourcepack when player join to the server
+ */
 public class JoinListener extends Klistener {
     private final CacheManager cacheManager;
     private final ResourcepackManager resourcepackManager;

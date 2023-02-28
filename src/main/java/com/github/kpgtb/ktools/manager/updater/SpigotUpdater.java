@@ -20,6 +20,9 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 
+/**
+ * Updater from spigotmc
+ */
 public class SpigotUpdater implements IUpdater {
     private final String resourceID;
 

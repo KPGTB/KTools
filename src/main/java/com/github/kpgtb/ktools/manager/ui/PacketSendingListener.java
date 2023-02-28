@@ -26,6 +26,9 @@ import com.comphenix.protocol.wrappers.EnumWrappers;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.plugin.java.JavaPlugin;
 
+/**
+ * This class handles all actionbars on server
+ */
 public class PacketSendingListener {
     private final ProtocolManager protocolManager;
     private final PacketAdapter packetAdapter;

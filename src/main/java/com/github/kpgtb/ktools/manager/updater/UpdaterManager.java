@@ -20,17 +20,29 @@ import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
 import org.bukkit.plugin.PluginDescriptionFile;
 
+/**
+ * UpdaterManager handles checking updates in plugin
+ */
 public class UpdaterManager {
     private final PluginDescriptionFile description;
     private final IUpdater updater;
     private final DebugManager debug;
 
+    /**
+     * Constructor of this manager
+     * @param description Description of plugin JavaPlugin#getDescription()
+     * @param updater Instance of IUpdater interface
+     * @param debug Instance of DebugManager
+     */
     public UpdaterManager(PluginDescriptionFile description, IUpdater updater, DebugManager debug) {
         this.description = description;
         this.updater = updater;
         this.debug = debug;
     }
 
+    /**
+     * Check if there are some updates
+     */
     public void checkUpdate() {
         double version;
         try {

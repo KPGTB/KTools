@@ -18,6 +18,9 @@ package com.github.kpgtb.ktools.manager.resourcepack;
 
 import java.io.File;
 
+/**
+ * Object that contains information about custom character
+ */
 public class CustomChar {
     private final String pluginName;
     private final File imageFile;

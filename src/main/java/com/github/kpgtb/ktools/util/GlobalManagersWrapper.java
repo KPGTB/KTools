@@ -24,6 +24,9 @@ import com.github.kpgtb.ktools.manager.language.LanguageManager;
 import com.github.kpgtb.ktools.manager.resourcepack.ResourcepackManager;
 import com.github.kpgtb.ktools.manager.ui.UiManager;
 
+/**
+ * Wrapper with all objects that should have only one instance - from KTools
+ */
 public class GlobalManagersWrapper {
     private final DebugManager debugManager;
     private final LanguageManager globalLanguageManager;

@@ -16,7 +16,20 @@
 
 package com.github.kpgtb.ktools.manager.updater;
 
+/**
+ * Interface with update checkers
+ */
 public interface IUpdater {
+    /**
+     * Check if there are some updates of this plugin
+     * @param version Version of plugin
+     * @return true if there are some updates
+     */
     boolean hasUpdate(double version);
+
+    /**
+     * Check download link to update
+     * @return Download link to update
+     */
     String getDownloadLink();
 }

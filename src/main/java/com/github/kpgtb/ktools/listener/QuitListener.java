@@ -25,6 +25,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.UUID;
 
+/**
+ * QuitListener handles removing ui from player when they leave the server
+ */
 public class QuitListener extends Klistener {
     private final UiManager uiManager;
 

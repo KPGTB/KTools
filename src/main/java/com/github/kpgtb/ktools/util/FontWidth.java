@@ -20,10 +20,17 @@ import com.google.gson.JsonElement;
 
 import java.util.HashMap;
 
+/**
+ * Util with width of characters
+ */
 public class FontWidth {
     public static final HashMap<Character, Integer> customWidths = new HashMap<>();
     private static JsonElement spacesJson;
 
+    /**
+     * Init widths
+     * @param spaces File with spaces from NegativeSpaces represented as JsonElement
+     */
     public static void initWidth(JsonElement spaces) {
         customWidths.put(' ', 4);
         customWidths.put('f', 5);
@@ -53,49 +60,32 @@ public class FontWidth {
         customWidths.put('@',7 );
         customWidths.put('~', 7);
 
-        customWidths.put('\uF801', -1);
-        customWidths.put('\uF802', -2);
-        customWidths.put('\uF803', -3);
-        customWidths.put('\uF804', -4);
-        customWidths.put('\uF805', -5);
-        customWidths.put('\uF806', -6);
-        customWidths.put('\uF807', -7);
-        customWidths.put('\uF808', -8);
-        customWidths.put('\uF809', -16);
-        customWidths.put('\uF80A', -32);
-        customWidths.put('\uF80B', -64);
-        customWidths.put('\uF80C', -128);
-        customWidths.put('\uF80D', -256);
-        customWidths.put('\uF80E', -512);
-        customWidths.put('\uF80F', -1024);
-
-        customWidths.put('\uF821', 1);
-        customWidths.put('\uF822', 2);
-        customWidths.put('\uF823', 3);
-        customWidths.put('\uF824', 4);
-        customWidths.put('\uF825', 5);
-        customWidths.put('\uF826', 6);
-        customWidths.put('\uF827', 7);
-        customWidths.put('\uF828', 8);
-        customWidths.put('\uF829', 16);
-        customWidths.put('\uF82A', 32);
-        customWidths.put('\uF82B', 64);
-        customWidths.put('\uF82C', 128);
-        customWidths.put('\uF82D', 256);
-        customWidths.put('\uF82E', 512);
-        customWidths.put('\uF82F', 1024);
-
         spacesJson = spaces;
     }
 
+    /**
+     * Register custom character width
+     * @param character Character
+     * @param width Width
+     */
     public static void registerCustomChar(Character character, int width) {
         customWidths.put(character, width);
     }
 
+    /**
+     * Get width of character
+     * @param character Character
+     * @return Width of character
+     */
     public static Integer getWidth(Character character) {
         return customWidths.getOrDefault(character, 6);
     }
 
+    /**
+     * Get string with negative spaces
+     * @param spaces Spaces number
+     * @return String with spaces chars
+     */
     public static String getSpaces(int spaces) {
 
         if(spaces > 1024 || spaces < -1024) {

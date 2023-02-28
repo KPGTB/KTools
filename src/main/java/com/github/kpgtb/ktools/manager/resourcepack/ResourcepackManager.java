@@ -21,7 +21,6 @@ import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.util.FontWidth;
 import com.google.gson.*;
-import com.google.gson.stream.JsonWriter;
 import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -38,6 +37,9 @@ import java.util.HashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+/**
+ * ResourceManager handles process of creating resourcepack with custom chars and custom models.
+ */
 public class ResourcepackManager {
     private final JavaPlugin plugin;
     private final DebugManager debug;
@@ -50,32 +52,54 @@ public class ResourcepackManager {
     private final ArrayList<CustomModelData> customModels;
     private final ArrayList<String> plugins;
 
+    /**
+     * Constructor of ResourcepackManager
+     * @param plugin Instance of plugin
+     * @param debug Instance of DebugManager
+     * @param cache Instance of CacheManager
+     */
     public ResourcepackManager(JavaPlugin plugin, DebugManager debug, CacheManager cache) {
         this.plugin = plugin;
         this.debug = debug;
         this.cache = cache;
         this.required = false;
 
-        if(!plugin.getDataFolder().exists()) {
-            plugin.getDataFolder().mkdirs();
-        }
-        this.texturesFolder = new File(plugin.getDataFolder(), "textures");
-        if(!texturesFolder.exists()) {
-            texturesFolder.mkdirs();
-        }
+        File dataFolder = plugin.getDataFolder();
+        dataFolder.mkdirs();
+        this.texturesFolder = new File(dataFolder, "textures");
+        this.texturesFolder.mkdirs();
 
         this.customChars = new ArrayList<>();
         this.customModels = new ArrayList<>();
         this.plugins = new ArrayList<>();
     }
 
+    /**
+     * Check if resourcepack is required by other plugins and if is enabled in config
+     * @return true if is required and enabled
+     */
     public boolean isEnabled() {
         return required && plugin.getConfig().getBoolean("resourcepack");
     }
+
+    /**
+     * Mark resourcepack manager as required
+     * @param required boolean
+     */
     public void setRequired(boolean required) {
         this.required = required;
     }
 
+    /**
+     * Register custom character to resourcepack
+     * @param pluginName Name of plugin (and folder that will contain texture)
+     * @param character Character represented as String
+     * @param imageName Name of image
+     * @param image InputStream with image
+     * @param height Height of char
+     * @param ascent Ascent of char
+     * @param width Width of char
+     */
     public void registerCustomChar(String pluginName, String character, String imageName, InputStream image, int height, int ascent, int width) {
         if(!isEnabled()) {
             return;
@@ -88,6 +112,15 @@ public class ResourcepackManager {
         this.customChars.add(customChar);
         FontWidth.registerCustomChar(character.charAt(0), width);
     }
+
+    /**
+     * Register custom model data to resourcepack
+     * @param pluginName Name of plugin (and folder that will contain texture)
+     * @param model Custom model data
+     * @param imageName Name of image
+     * @param image InputStream with image
+     * @param material Material that will have custom model data
+     */
     public void registerCustomModelData(String pluginName, int model, String imageName, InputStream image, Material material) {
         if(!isEnabled()) {
             return;
@@ -99,10 +132,20 @@ public class ResourcepackManager {
         CustomModelData customModelData = new CustomModelData(imageFile,material,model);
         this.customModels.add(customModelData);
     }
+
+    /**
+     * Register plugin in resourcepack manager to check updates
+     * @param pluginName
+     * @param version
+     */
     public void registerPlugin(String pluginName, double version) {
         this.plugins.add(pluginName+"["+version+"]");
     }
 
+    /**
+     * Check plugins that require resourcepack manager
+     * @return String with plugins and versions
+     */
     private String getPluginsString() {
         Collections.sort(this.plugins);
         StringBuilder builder = new StringBuilder();
@@ -112,6 +155,11 @@ public class ResourcepackManager {
         });
         return builder.toString();
     }
+
+    /**
+     * Check if resourcepack has latest version
+     * @return true if is latest
+     */
     private boolean isResourcepackLatest() {
         String urlString = cache.getServerData("ktools", "resourcepackUrl", String.class);
         if(urlString == null || urlString.isEmpty()) {
@@ -126,6 +174,10 @@ public class ResourcepackManager {
         }
         return urlExists(urlString);
     }
+
+    /**
+     * Generate resourcepack
+     */
     public void prepareResourcepack() {
         if(isResourcepackLatest() || !isEnabled()) {
             return;
@@ -293,6 +345,8 @@ public class ResourcepackManager {
         }
         this.debug.sendInfo(DebugType.RESOURCEPACK, "Prepared resourcepack in " + (System.currentTimeMillis() - millis) + "ms.");
     }
+
+    // Private utils
 
     private File folderToZip(File folder, String name) {
         try {

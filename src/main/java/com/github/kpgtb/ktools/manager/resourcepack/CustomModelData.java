@@ -20,6 +20,9 @@ import org.bukkit.Material;
 
 import java.io.File;
 
+/**
+ * Object that contains information about custom model data
+ */
 public class CustomModelData {
     private final File imageFile;
     private final Material material;

@@ -32,6 +32,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
+/**
+ * UIManager handles custom UIs on server
+ */
 public class UiManager {
     private final HashMap<UUID, ArrayList<BaseUiObject>> ui;
     private final HashMap<UUID, ArrayList<String>> standardActionBars;
@@ -43,6 +46,12 @@ public class UiManager {
     private PacketSendingListener packet;
     private final ProtocolManager protocolManager;
 
+    /**
+     * Constructor of this manager
+     * @param plugin Instance of plugin
+     * @param protocolManager Instance of ProtocolManager (ProtocolLib)
+     * @param spaces File with spaces from NegativeSpaces Resourcepack
+     */
     public UiManager(JavaPlugin plugin, ProtocolManager protocolManager, Reader spaces) {
         this.plugin = plugin;
         this.ui = new HashMap<>();
@@ -54,10 +63,18 @@ public class UiManager {
         FontWidth.initWidth (new JsonParser().parse(spaces));
     }
 
+    /**
+     * Check if UI is requires
+     * @return true if is requires
+     */
     public boolean isRequired() {
         return required;
     }
 
+    /**
+     * Mark ui manager as required
+     * @param required
+     */
     public void setRequired(boolean required) {
         this.required = required;
         if(required) {
@@ -101,7 +118,6 @@ public class UiManager {
             }
         }.runTaskTimer(plugin, 20,20);
     }
-
     private void stopActionBar() {
         if(packet != null) {
             packet.disable();
@@ -113,10 +129,19 @@ public class UiManager {
         task.cancel();
     }
 
+    /**
+     * Check if actionbaar is sending
+     * @return true if actionbar is sending
+     */
     public boolean isSending() {
         return sending;
     }
 
+    /**
+     * Add custom UI to player
+     * @param uuid UUID od player
+     * @param BaseUiObject Object that represents UI
+     */
     public void addUI(UUID uuid, BaseUiObject BaseUiObject) {
         if(!ui.containsKey(uuid)) {
             ui.put(uuid, new ArrayList<>());
@@ -128,6 +153,11 @@ public class UiManager {
         ui.replace(uuid, uis);
     }
 
+    /**
+     * Remove custom UI from player
+     * @param uuid UUID od player
+     * @param BaseUiObject Object that represents UI
+     */
     public void removeUI(UUID uuid, BaseUiObject BaseUiObject) {
         if(!ui.containsKey(uuid)) {
             ui.put(uuid, new ArrayList<>());
@@ -138,6 +168,12 @@ public class UiManager {
         ui.replace(uuid, uis);
     }
 
+    /**
+     * Send normal actionbar to player
+     * @param uuid UUID of player
+     * @param text Text of actionbar
+     * @param time Time in ticks
+     */
     public void addActionBar(UUID uuid, String text, int time) {
         if(!standardActionBars.containsKey(uuid)) {
             standardActionBars.put(uuid, new ArrayList<>());
@@ -156,6 +192,11 @@ public class UiManager {
         }.runTaskLater(plugin, time);
     }
 
+    /**
+     * Remove normal actionbar from player
+     * @param uuid UUID of player
+     * @param text Text of actionbar
+     */
     public void removeActionBar(UUID uuid, String text) {
         if(!standardActionBars.containsKey(uuid)) {
             standardActionBars.put(uuid, new ArrayList<>());
