@@ -178,7 +178,7 @@ public final class Ktools extends JavaPlugin {
         debug.sendInfo(DebugType.START, "Loaded global managers wrapper.");
 
         debug.sendInfo(DebugType.START, "Checking updates...");
-        UpdaterManager updaterManager = new UpdaterManager(getDescription(), new SpigotUpdater(""),debug);
+        UpdaterManager updaterManager = new UpdaterManager(getDescription(), new SpigotUpdater("108301"),debug);
         updaterManager.checkUpdate();
 
         debug.sendInfo(DebugType.START, "Enabled plugin in " + (System.currentTimeMillis() - startMillis) + "ms.");
