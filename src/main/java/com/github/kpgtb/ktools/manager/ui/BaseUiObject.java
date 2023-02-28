@@ -22,6 +22,9 @@ import org.bukkit.Bukkit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * This object contains information about UI objects
+ */
 public class BaseUiObject {
     private String text;
     private final Alignment alignment;
@@ -44,12 +47,18 @@ public class BaseUiObject {
         textToShow = FontWidth.getSpaces(pixels[0]) + text + FontWidth.getSpaces(pixels[1]);
     }
 
+    /**
+     * Update text
+     * @param text
+     */
     public void update(String text) {
         this.text = text;
         build();
     }
 
-    private static String fixString(String text) {
+    // Private utils
+
+    private String fixString(String text) {
         String fixed = text;
 
         Pattern colorPattern = Pattern.compile("§[a-fA-F0-9]");
@@ -71,7 +80,6 @@ public class BaseUiObject {
         }
         return fixed;
     }
-
     private Integer[] getLeftAndRightPixels() {
         int width = 0;
 
@@ -98,7 +106,6 @@ public class BaseUiObject {
 
         return pixels;
     }
-
     public String getTextToShow() {
         return textToShow;
     }
