@@ -19,14 +19,12 @@ package com.github.kpgtb.ktools;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.github.kpgtb.ktools.manager.cache.CacheManager;
-import com.github.kpgtb.ktools.manager.command.CommandManager;
 import com.github.kpgtb.ktools.manager.command.parser.ParamParserManager;
 import com.github.kpgtb.ktools.manager.data.DataManager;
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.manager.language.LanguageManager;
 import com.github.kpgtb.ktools.manager.listener.ListenerManager;
-import com.github.kpgtb.ktools.manager.recipe.RecipeManager;
 import com.github.kpgtb.ktools.manager.resourcepack.ResourcepackManager;
 import com.github.kpgtb.ktools.manager.ui.UiManager;
 import com.github.kpgtb.ktools.manager.updater.SpigotUpdater;
@@ -86,15 +84,11 @@ public final class Ktools extends JavaPlugin {
             debug.sendInfo(DebugType.START, "Loading ui...");
             ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
             uiManager = new UiManager(this,protocolManager, getTextResource("spaces.json"));
-            uiManager.setRequired(true);
-
             debug.sendInfo(DebugType.START, "Loaded ui.");
         }
 
         debug.sendInfo(DebugType.START, "Loading resourcepack...");
         ResourcepackManager resourcepackManager = new ResourcepackManager(this,debug,cacheManager);
-        resourcepackManager.setRequired(true);
-        resourcepackManager.registerPlugin("ktools", 1.0);
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -174,20 +168,10 @@ public final class Ktools extends JavaPlugin {
         this.toolsObjectWrapper = new ToolsObjectWrapper(cacheManager,debug,globalLanguageManager,this,adventure,paramParserManager, dataManager, resourcepackManager, uiManager);
         debug.sendInfo(DebugType.START, "Loaded tools object wrapper.");
 
-        debug.sendInfo(DebugType.START, "Loading commands...");
-        CommandManager commandManager = new CommandManager(toolsObjectWrapper, getFile(), "ktools");
-        commandManager.registerCommands("com.github.kpgtb.ktools.command");
-        debug.sendInfo(DebugType.START, "Loaded commands.");
-
         debug.sendInfo(DebugType.START, "Loading listeners...");
         ListenerManager listenerManager = new ListenerManager(toolsObjectWrapper, getFile());
         listenerManager.registerListeners("com.github.kpgtb.ktools.listener");
         debug.sendInfo(DebugType.START, "Loaded listeners.");
-
-        debug.sendInfo(DebugType.START, "Loading recipes...");
-        RecipeManager recipeManager = new RecipeManager(toolsObjectWrapper, getFile(), "ktools");
-        recipeManager.registerRecipes("com.github.kpgtb.ktools.recipe");
-        debug.sendInfo(DebugType.START, "Loaded recipes.");
 
         debug.sendInfo(DebugType.START, "Loading global managers wrapper...");
         this.globalManagersWrapper = new GlobalManagersWrapper(debug, globalLanguageManager,cacheManager,paramParserManager,dataManager,uiManager,resourcepackManager);

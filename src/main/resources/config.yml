@@ -12,7 +12,7 @@ data:
     password: ""
     database: "minecraft"
 debug:
-  enable: true
+  enable: false
   start: true
   stop: true
   language: true
