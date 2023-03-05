@@ -16,6 +16,7 @@
 
 package com.github.kpgtb.ktools.manager.command.parser;
 
+import com.github.kpgtb.ktools.manager.command.parser.cusotm.EnumParser;
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.util.ReflectionUtil;
@@ -83,7 +84,7 @@ public class ParamParserManager {
     @SuppressWarnings("unchecked")
     public <T> void registerParsers(String parsersPackage, File jarFile) {
         for(Class<?> clazz : ReflectionUtil.getAllClassesInPackage(jarFile,parsersPackage)) {
-            if(!IParamParser.class.isAssignableFrom(clazz) || IParamParser.class.equals(clazz)) {
+            if(!IParamParser.class.isAssignableFrom(clazz) || IParamParser.class.equals(clazz) || clazz.equals(EnumParser.class)) {
                continue;
             }
             ParameterizedType type = (ParameterizedType) clazz.getGenericInterfaces()[0];
@@ -124,7 +125,13 @@ public class ParamParserManager {
      * @param expected Class that is expected
      * @return true if you can convert, or false if you can't
      */
-    public <T> boolean canConvert(String s, Class<T> expected) {
+    @SuppressWarnings("unchecked")
+    public <T, Z extends Enum<Z>> boolean canConvert(String s, Class<T> expected) {
+        if(expected.isEnum()) {
+            Class<Z> enumClass = (Class<Z>) expected;
+            EnumParser<Z> enumParser = new EnumParser<>(enumClass);
+            return enumParser.canConvert(s);
+        }
         IParamParser<T> parser = getParser(expected);
         if(parser == null) {
             return false;
@@ -138,7 +145,13 @@ public class ParamParserManager {
      * @param expected Class that is expected
      * @return Class that is converted from string
      */
-    public <T> T convert(String s, Class<T> expected) {
+    @SuppressWarnings("unchecked")
+    public <T, Z extends Enum<Z>> T convert(String s, Class<T> expected) {
+        if(expected.isEnum()) {
+            Class<Z> enumClass = (Class<Z>) expected;
+            EnumParser<Z> enumParser = new EnumParser<>(enumClass);
+            return (T) enumParser.convert(s);
+        }
         IParamParser<T> parser = getParser(expected);
         if(!canConvert(s, expected) || parser == null) {
             throw new IllegalArgumentException("You try convert string to class that you can't convert");
@@ -152,7 +165,13 @@ public class ParamParserManager {
      * @param sender CommandSender
      * @param expected Class that is expected
      */
-    public <T> List<String> complete(String s, CommandSender sender, Class<T> expected) {
+    @SuppressWarnings("unchecked")
+    public <T, Z extends Enum<Z>> List<String> complete(String s, CommandSender sender, Class<T> expected) {
+        if(expected.isEnum()) {
+            Class<Z> enumClass = (Class<Z>) expected;
+            EnumParser<Z> enumParser = new EnumParser<>(enumClass);
+            return enumParser.complete(s,sender);
+        }
         IParamParser<T> parser = getParser(expected);
         if(parser == null) {
             throw new IllegalArgumentException("You try convert string to class that you can't convert");
