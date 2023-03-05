@@ -20,6 +20,7 @@ import com.github.kpgtb.ktools.manager.command.parser.cusotm.EnumParser;
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.util.ReflectionUtil;
+import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Nullable;
 
@@ -126,7 +127,7 @@ public class ParamParserManager {
      * @return true if you can convert, or false if you can't
      */
     @SuppressWarnings("unchecked")
-    public <T, Z extends Enum<Z>> boolean canConvert(String s, Class<T> expected) {
+    public <T, Z extends Enum<Z>> boolean canConvert(String s, Class<T> expected, ToolsObjectWrapper wrapper) {
         if(expected.isEnum()) {
             Class<Z> enumClass = (Class<Z>) expected;
             EnumParser<Z> enumParser = new EnumParser<>(enumClass);
@@ -136,7 +137,7 @@ public class ParamParserManager {
         if(parser == null) {
             return false;
         }
-        return parser.canConvert(s);
+        return parser.canConvert(s, wrapper);
     }
 
     /**
@@ -146,17 +147,17 @@ public class ParamParserManager {
      * @return Class that is converted from string
      */
     @SuppressWarnings("unchecked")
-    public <T, Z extends Enum<Z>> T convert(String s, Class<T> expected) {
+    public <T, Z extends Enum<Z>> T convert(String s, Class<T> expected, ToolsObjectWrapper wrapper) {
         if(expected.isEnum()) {
             Class<Z> enumClass = (Class<Z>) expected;
             EnumParser<Z> enumParser = new EnumParser<>(enumClass);
             return (T) enumParser.convert(s);
         }
         IParamParser<T> parser = getParser(expected);
-        if(!canConvert(s, expected) || parser == null) {
+        if(!canConvert(s, expected, wrapper) || parser == null) {
             throw new IllegalArgumentException("You try convert string to class that you can't convert");
         }
-        return parser.convert(s);
+        return parser.convert(s, wrapper);
     }
 
     /**
@@ -166,7 +167,7 @@ public class ParamParserManager {
      * @param expected Class that is expected
      */
     @SuppressWarnings("unchecked")
-    public <T, Z extends Enum<Z>> List<String> complete(String s, CommandSender sender, Class<T> expected) {
+    public <T, Z extends Enum<Z>> List<String> complete(String s, CommandSender sender, Class<T> expected, ToolsObjectWrapper wrapper) {
         if(expected.isEnum()) {
             Class<Z> enumClass = (Class<Z>) expected;
             EnumParser<Z> enumParser = new EnumParser<>(enumClass);
@@ -176,6 +177,6 @@ public class ParamParserManager {
         if(parser == null) {
             throw new IllegalArgumentException("You try convert string to class that you can't convert");
         }
-        return parser.complete(s,sender);
+        return parser.complete(s,sender, wrapper);
     }
 }

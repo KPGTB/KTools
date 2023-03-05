@@ -17,6 +17,7 @@
 package com.github.kpgtb.ktools.manager.command.parser.spigot;
 
 import com.github.kpgtb.ktools.manager.command.parser.IParamParser;
+import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.HumanEntity;
@@ -28,17 +29,17 @@ import java.util.stream.Collectors;
 
 public class PlayerParser implements IParamParser<Player> {
     @Override
-    public Player convert(String param) {
+    public Player convert(String param, ToolsObjectWrapper wrapper) {
         return Bukkit.getPlayer(param);
     }
 
     @Override
-    public boolean canConvert(String param) {
-       return convert(param) != null;
+    public boolean canConvert(String param, ToolsObjectWrapper wrapper) {
+       return convert(param, wrapper) != null;
     }
 
     @Override
-    public @NotNull List<String> complete(String arg, CommandSender sender) {
+    public @NotNull List<String> complete(String arg, CommandSender sender, ToolsObjectWrapper wrapper) {
         return Bukkit.getOnlinePlayers().stream()
                 .map(HumanEntity::getName)
                 .filter(s -> s.startsWith(arg))

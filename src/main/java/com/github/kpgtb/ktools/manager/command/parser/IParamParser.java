@@ -16,6 +16,7 @@
 
 package com.github.kpgtb.ktools.manager.command.parser;
 
+import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,23 +30,26 @@ public interface IParamParser<T> {
     /**
      * Convert String to Class
      * @param param String that should be converted
+     * @param wrapper Instance of ToolsObjectWrapper
      * @return Converted string
      */
-    T convert(String param);
+    T convert(String param, ToolsObjectWrapper wrapper);
 
     /**
      * Check if String can be converted to Class
      * @param param String that should be checked
+    * @param wrapper Instance of ToolsObjectWrapper
      * @return true if string can be converted or false if can't
      */
-    boolean canConvert(String param);
+    boolean canConvert(String param, ToolsObjectWrapper wrapper);
 
     /**
      * Prepare list of Strings that can be used to tab completer
      * @param arg Argument that is written by player
      * @param sender CommandSender
+     * @param wrapper Instance of ToolsObjectWrapper
      * @return List of strings to tab completer. It can be empty.
      */
     @NotNull
-    List<String> complete(String arg, CommandSender sender);
+    List<String> complete(String arg, CommandSender sender, ToolsObjectWrapper wrapper);
 }

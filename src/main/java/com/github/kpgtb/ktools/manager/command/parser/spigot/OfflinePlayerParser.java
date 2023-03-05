@@ -17,6 +17,7 @@
 package com.github.kpgtb.ktools.manager.command.parser.spigot;
 
 import com.github.kpgtb.ktools.manager.command.parser.IParamParser;
+import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -28,17 +29,17 @@ import java.util.stream.Collectors;
 
 public class OfflinePlayerParser implements IParamParser<OfflinePlayer> {
     @Override
-    public OfflinePlayer convert(String param) {
+    public OfflinePlayer convert(String param, ToolsObjectWrapper wrapper) {
         return Bukkit.getOfflinePlayer(param);
     }
 
     @Override
-    public boolean canConvert(String param) {
-        return convert(param) != null;
+    public boolean canConvert(String param, ToolsObjectWrapper wrapper) {
+        return convert(param, wrapper) != null;
     }
 
     @Override
-    public @NotNull List<String> complete(String arg, CommandSender sender) {
+    public @NotNull List<String> complete(String arg, CommandSender sender, ToolsObjectWrapper wrapper) {
         return Arrays.stream(Bukkit.getOfflinePlayers())
                 .map(OfflinePlayer::getName)
                 .filter(s -> s.startsWith(arg))

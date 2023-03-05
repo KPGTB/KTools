@@ -17,6 +17,7 @@
 package com.github.kpgtb.ktools.manager.command.parser.java;
 
 import com.github.kpgtb.ktools.manager.command.parser.IParamParser;
+import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,14 +26,14 @@ import java.util.List;
 
 public class ShortParser implements IParamParser<Short> {
     @Override
-    public Short convert(String param) {
+    public Short convert(String param, ToolsObjectWrapper wrapper) {
         return Short.parseShort(param);
     }
 
     @Override
-    public boolean canConvert(String param) {
+    public boolean canConvert(String param, ToolsObjectWrapper wrapper) {
         try {
-            convert(param);
+            convert(param,wrapper);
         } catch (Exception e) {
             return false;
         }
@@ -40,7 +41,7 @@ public class ShortParser implements IParamParser<Short> {
     }
 
     @Override
-    public @NotNull List<String> complete(String arg, CommandSender sender) {
+    public @NotNull List<String> complete(String arg, CommandSender sender, ToolsObjectWrapper wrapper) {
         return new ArrayList<>();
     }
 }

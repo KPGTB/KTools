@@ -46,6 +46,7 @@ import java.util.stream.Collectors;
 public abstract class KCommand extends Command {
     private final String cmdName;
 
+    private final ToolsObjectWrapper wrapper;
     private final DebugManager debug;
     private final LanguageManager language;
     private final BukkitAudiences adventure;
@@ -62,6 +63,7 @@ public abstract class KCommand extends Command {
     public KCommand(ToolsObjectWrapper toolsObjectWrapper, String groupPath) {
         super("");
 
+        this.wrapper = toolsObjectWrapper;
         this.debug = toolsObjectWrapper.getDebugManager();
         this.language = toolsObjectWrapper.getLanguageManager();
         this.adventure = toolsObjectWrapper.getAdventure();
@@ -290,7 +292,7 @@ public abstract class KCommand extends Command {
                         }
                     }
                 }
-                if(!parser.canConvert(fixedArgs.get(i), expectedClass)) {
+                if(!parser.canConvert(fixedArgs.get(i), expectedClass,wrapper)) {
                     isIt = false;
                     break;
                 }
@@ -334,7 +336,7 @@ public abstract class KCommand extends Command {
                         break;
                     }
                 }
-                commandArgs[j] = parser.convert(fixedArgs.get(fixedJ), subCommandArgs.get(fixedJ));
+                commandArgs[j] = parser.convert(fixedArgs.get(fixedJ), subCommandArgs.get(fixedJ),wrapper);
             }
             try {
                 subcommand.getMethod().invoke(this, commandArgs);
@@ -437,7 +439,7 @@ public abstract class KCommand extends Command {
                 if(!clazz.isPresent()) {
                     return;
                 }
-                result.addAll(parser.complete(lastArg,sender,clazz.get()));
+                result.addAll(parser.complete(lastArg,sender,clazz.get(),wrapper));
             });
 
             return result;
@@ -450,7 +452,7 @@ public abstract class KCommand extends Command {
             boolean isIt = true;
             for (int i = 0; i < lastArgIdx; i++) {
                 Class<?> clazz = (Class<?>) mcmd.getArgsType().values().toArray()[i];
-                if(!parser.canConvert(args[i], clazz)) {
+                if(!parser.canConvert(args[i], clazz,wrapper)) {
                     isIt = false;
                     break;
                 }
@@ -459,7 +461,7 @@ public abstract class KCommand extends Command {
                 return;
             }
             Class<?> clazz = (Class<?>) mcmd.getArgsType().values().toArray()[lastArgIdx];
-            result.addAll(parser.complete(lastArg,sender,clazz));
+            result.addAll(parser.complete(lastArg,sender,clazz,wrapper));
         });
 
         subcommands.forEach((name,subcmd) -> {
@@ -476,7 +478,7 @@ public abstract class KCommand extends Command {
             boolean isIt = true;
             for (int i = 0; i < trueLastIdx; i++) {
                 Class<?> clazz = (Class<?>) subcmd.getArgsType().values().toArray()[i];
-                if(!parser.canConvert(trueArgs.get(i), clazz)) {
+                if(!parser.canConvert(trueArgs.get(i), clazz,wrapper)) {
                     isIt = false;
                     break;
                 }
@@ -485,7 +487,7 @@ public abstract class KCommand extends Command {
                 return;
             }
             Class<?> clazz = (Class<?>) subcmd.getArgsType().values().toArray()[trueLastIdx];
-            result.addAll(parser.complete(lastArg,sender,clazz));
+            result.addAll(parser.complete(lastArg,sender,clazz,wrapper));
         });
 
         return result;

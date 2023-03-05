@@ -17,6 +17,7 @@
 package com.github.kpgtb.ktools.manager.command.parser.java;
 
 import com.github.kpgtb.ktools.manager.command.parser.IParamParser;
+import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,14 +27,14 @@ import java.util.stream.Collectors;
 
 public class BooleanParser implements IParamParser<Boolean> {
     @Override
-    public Boolean convert(String param) {
+    public Boolean convert(String param, ToolsObjectWrapper wrapper) {
         return Boolean.parseBoolean(param);
     }
 
     @Override
-    public boolean canConvert(String param) {
+    public boolean canConvert(String param, ToolsObjectWrapper wrapper) {
         try {
-            convert(param);
+            convert(param, wrapper);
         }catch (Exception e) {
             return false;
         }
@@ -41,7 +42,7 @@ public class BooleanParser implements IParamParser<Boolean> {
     }
 
     @Override
-    public @NotNull List<String> complete(String arg, CommandSender sender) {
+    public @NotNull List<String> complete(String arg, CommandSender sender, ToolsObjectWrapper wrapper) {
         ArrayList<String> result = new ArrayList<>();
         result.add("true");
         result.add("false");
