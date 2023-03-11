@@ -16,6 +16,7 @@
 
 package com.github.kpgtb.ktools.manager.command;
 
+import com.github.kpgtb.ktools.manager.command.filter.IFilter;
 import com.github.kpgtb.ktools.manager.command.parser.ParamParserManager;
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.language.LanguageManager;
@@ -26,11 +27,13 @@ import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
@@ -74,9 +77,9 @@ public abstract class KCommand extends Command {
                 .replace("command","");
 
         String description = "";
-        CommandDescription descriptionAnnotation = getClass().getDeclaredAnnotation(CommandDescription.class);
+        Description descriptionAnnotation = getClass().getDeclaredAnnotation(Description.class);
         if(descriptionAnnotation != null) {
-            description = descriptionAnnotation.description();
+            description = descriptionAnnotation.text();
         }
 
         String[] aliases = new String[0];
@@ -103,6 +106,10 @@ public abstract class KCommand extends Command {
         this.debug.sendInfo(DebugType.COMMAND, "Registering command " + cmdName);
 
         for(Method method : getClass().getDeclaredMethods()) {
+            if(method.isSynthetic()) {
+                continue;
+            }
+
             this.debug.sendInfo(DebugType.COMMAND, "Trying method " + method.getName());
             if(method.getAnnotation(NoCommand.class) != null) {
                 this.debug.sendInfo(DebugType.COMMAND, "This method is not a subcommand! Cancelling");
@@ -115,9 +122,9 @@ public abstract class KCommand extends Command {
 
             this.debug.sendInfo(DebugType.COMMAND, "Name: " + subName);
 
-            SubcommandDescription subcommandDescription = method.getDeclaredAnnotation(SubcommandDescription.class);
+            Description subcommandDescription = method.getDeclaredAnnotation(Description.class);
             if(subcommandDescription != null) {
-                subDescription = subcommandDescription.description();
+                subDescription = subcommandDescription.text();
             }
 
             this.debug.sendInfo(DebugType.COMMAND, "Description: " + subDescription);
@@ -134,11 +141,11 @@ public abstract class KCommand extends Command {
             if(!withoutPermission && !commandWithoutPermission) {
                 // Method permission ex. command.admin.give.item
                 permissions.add(
-                        "command." + groupPath + "." + cmdName + "." + subName
+                        ("command." + groupPath + "." + cmdName + "." + subName).replace("..", ".")
                 );
                 // Command permission ex. command.admin.give.*
                 permissions.add(
-                        "command." + groupPath + "." + cmdName + ".*"
+                        ("command." + groupPath + "." + cmdName + ".*").replace("..", ".")
                 );
                 // Group permission ex. command.admin.*
                 if(!groupPath.isEmpty()) {
@@ -167,12 +174,15 @@ public abstract class KCommand extends Command {
             });
 
             boolean playerRequired;
+            Class<? extends IFilter<?>>[] senderOrFilters = array();
+            Class<? extends IFilter<?>>[] senderAndFilters = array();
             if(method.getParameterCount() == 0) {
                 continue;
             }
 
             Parameter[] parametersRaw = method.getParameters();
-            Class<?> typeClazz = parametersRaw[0].getType();
+            Parameter typeParam = parametersRaw[0];
+            Class<?> typeClazz = typeParam.getType();
 
             if (Player.class.equals(typeClazz)) {
                 playerRequired = true;
@@ -183,12 +193,32 @@ public abstract class KCommand extends Command {
                 continue;
             }
 
+            Filter senderFilter = typeParam.getDeclaredAnnotation(Filter.class);
+            if(senderFilter != null) {
+                senderOrFilters = senderFilter.orFilters();
+                senderAndFilters = senderFilter.andFilters();
+            }
+
             this.debug.sendInfo(DebugType.COMMAND, "This command is only for player: " + (playerRequired ? "yes" : "no"));
 
-            LinkedHashMap<String, Class<?>> parameters = new LinkedHashMap<>();
+            LinkedHashMap<String, CommandArgument> parameters = new LinkedHashMap<>();
             for (int i = 1; i < parametersRaw.length; i++) {
                 this.debug.sendInfo(DebugType.COMMAND, "Loaded parameter " + parametersRaw[i].getName() + " with type " + parametersRaw[i].getType().getSimpleName());
-                parameters.put(parametersRaw[i].getName(), parametersRaw[i].getType());
+                Parameter param = parametersRaw[i];
+
+                String paramName = param.getName();
+                Class<?> paramClass = param.getType();
+                Class<? extends IFilter<?>>[] paramOrFilters = array();
+                Class<? extends IFilter<?>>[] paramAndFilters = array();
+
+                Filter paramFilter = param.getDeclaredAnnotation(Filter.class);
+                if(paramFilter != null) {
+                    paramOrFilters = paramFilter.orFilters();
+                    paramAndFilters = paramFilter.andFilters();
+                }
+
+                CommandArgument argument = new CommandArgument(paramName, paramClass, paramOrFilters, paramAndFilters);
+                parameters.put(paramName, argument);
             }
 
             boolean endless = false;
@@ -203,7 +233,7 @@ public abstract class KCommand extends Command {
 
             this.debug.sendInfo(DebugType.COMMAND, "This command is endless: " + (endless ? "yes" : "no"));
 
-            Subcommand subcommand = new Subcommand(subName, subDescription, permissions,playerRequired,parameters,method, endless);
+            Subcommand subcommand = new Subcommand(subName, subDescription, permissions,playerRequired, senderOrFilters, senderAndFilters, parameters,method, endless);
             if(method.getDeclaredAnnotation(MainCommand.class) != null) {
                 this.debug.sendInfo(DebugType.COMMAND, "This command is main command!");
                 this.mainCommands.add(subcommand);
@@ -228,15 +258,12 @@ public abstract class KCommand extends Command {
                     found = true;
                     continue;
                 }
-                boolean hasPermission = mainCommand.getPermissions().isEmpty();
-                for(String perm : mainCommand.getPermissions()) {
-                    if(sender.hasPermission(perm)) {
-                        hasPermission = true;
-                        break;
-                    }
-                }
-                if(!hasPermission) {
+                if(!hasPermission(sender,mainCommand)) {
                     language.getComponent(LanguageLevel.GLOBAL, "noPermission").forEach(audience::sendMessage);
+                    return false;
+                }
+                if(!passFilters(mainCommand.getSenderOrFilters(), mainCommand.getSenderAndFilters(), sender)) {
+                    sendFilterMessages(mainCommand.getSenderOrFilters(), mainCommand.getSenderAndFilters(), sender,audience);
                     return false;
                 }
                 try {
@@ -253,7 +280,7 @@ public abstract class KCommand extends Command {
                 return false;
             }
 
-            sendHelp(audience);
+            sendHelp(sender);
             return false;
         }
 
@@ -266,9 +293,16 @@ public abstract class KCommand extends Command {
         possibleSubcommands.addAll(mainCommands);
 
         boolean found = false;
+        CommandArgument notPassArg = null;
+        Object notPassObj = null;
+
         for(Subcommand subcommand : possibleSubcommands) {
 
-            ArrayList<Class<?>> subCommandArgs = new ArrayList<>(subcommand.getArgsType().values());
+            ArrayList<CommandArgument> subCommandArgs = new ArrayList<>(subcommand.getArgsType().values());
+            ArrayList<Class<?>> subCommandClasses = new ArrayList<>();
+            subCommandArgs.forEach(arg -> {
+                subCommandClasses.add(arg.getClazz());
+            });
             ArrayList<String> fixedArgs = new ArrayList<>(Arrays.asList(args));
             if(subcommand.getName().equalsIgnoreCase(args[0])) {
                 fixedArgs.remove(0);
@@ -284,7 +318,7 @@ public abstract class KCommand extends Command {
 
             boolean isIt = true;
             int i = 0;
-            for(Class<?> expectedClass : subCommandArgs) {
+            for(Class<?> expectedClass : subCommandClasses) {
                 if(subcommand.isEndless()) {
                     if(subCommandArgs.size() == (i+1)) {
                         if (expectedClass.equals(String.class)) {
@@ -308,14 +342,7 @@ public abstract class KCommand extends Command {
                 continue;
             }
 
-            boolean hasPermission = subcommand.getPermissions().isEmpty();
-            for(String perm : subcommand.getPermissions()) {
-                if(sender.hasPermission(perm)) {
-                    hasPermission = true;
-                    break;
-                }
-            }
-            if(!hasPermission) {
+            if(!hasPermission(sender,subcommand)) {
                 language.getComponent(LanguageLevel.GLOBAL, "noPermission").forEach(audience::sendMessage);
                 return false;
             }
@@ -336,8 +363,30 @@ public abstract class KCommand extends Command {
                         break;
                     }
                 }
-                commandArgs[j] = parser.convert(fixedArgs.get(fixedJ), subCommandArgs.get(fixedJ),wrapper);
+                commandArgs[j] = parser.convert(fixedArgs.get(fixedJ), subCommandArgs.get(fixedJ).getClazz(),wrapper);
             }
+
+            boolean passSenderFilters = passFilters(subcommand.getSenderOrFilters(), subcommand.getSenderAndFilters(), sender);
+            if(!passSenderFilters) {
+                notPassArg = new CommandArgument("",null,subcommand.getSenderOrFilters(), subcommand.getSenderAndFilters());
+                notPassObj = sender;
+                continue;
+            }
+            boolean passArgsFilters = true;
+
+            for (int i1 = 1; i1 < commandArgs.length; i1++) {
+                passArgsFilters = passFilters(subCommandArgs.get((i1-1)), commandArgs[i1]);
+                if(!passArgsFilters) {
+                    notPassArg = subCommandArgs.get((i1-1));
+                    notPassObj = commandArgs[i1];
+                    break;
+                }
+            }
+
+            if(!passArgsFilters) {
+                continue;
+            }
+
             try {
                 subcommand.getMethod().invoke(this, commandArgs);
                 return true;
@@ -347,21 +396,40 @@ public abstract class KCommand extends Command {
         }
 
         if(found) {
+            if(notPassArg != null && notPassObj != null) {
+                sendFilterMessages(notPassArg, notPassObj, audience);
+                return false;
+            }
             language.getComponent(LanguageLevel.GLOBAL, "onlyPlayer").forEach(audience::sendMessage);
             return false;
         }
-        sendHelp(audience);
+        sendHelp(sender);
         return false;
     }
 
     /**
      * Method that handles sending help info to sender. It can be overridden
-     * @param audience Audience instance from AdventureAPI
+     * @param sender Instance of CommandSender
      */
-    protected void sendHelp(Audience audience) {
+    protected void sendHelp(CommandSender sender) {
+        Audience audience = this.adventure.sender(sender);
+
+        HashMap<String, Subcommand> commands = new HashMap<>();
+        for (int i = 0; i < mainCommands.size(); i++) {
+            String key = "mcmd_" + i;
+            commands.put(key,mainCommands.get(i));
+        }
+        commands.putAll(subcommands);
+
         ArrayList<Component> toSend = new ArrayList<>();
-        mainCommands.forEach(command -> {
-            StringBuilder cmdLine = new StringBuilder(cmdName + " ");
+        toSend.add(Component.text(" "));
+
+        commands.forEach((subName, command) -> {
+            if(!hasPermission(sender,command)) {
+                return;
+            }
+
+            StringBuilder cmdLine = subName.startsWith("mcmd_") ? new StringBuilder(cmdName + " ") : new StringBuilder(cmdName + " " + subName + " ");
             AtomicInteger i = new AtomicInteger(1);
             command.getArgsType().forEach((argName, argsType) -> {
                 String start = "<";
@@ -384,29 +452,7 @@ public abstract class KCommand extends Command {
             toSend.addAll(language.getComponent(LanguageLevel.GLOBAL, "helpLine", placeholders));
         });
 
-        subcommands.forEach((subName, command) -> {
-            StringBuilder cmdLine = new StringBuilder(cmdName + " " + subName + " ");
-            AtomicInteger i = new AtomicInteger(1);
-            command.getArgsType().forEach((argName, argsType) -> {
-                String start = "<";
-                String end = ">";
-                if(command.isEndless() && i.get() == command.getArgsType().size()) {
-                    start = "[<";
-                    end = ">]";
-                }
-                i.getAndIncrement();
-                cmdLine
-                        .append(start)
-                        .append(argName)
-                        .append(end)
-                        .append(" ");
-            });
-            cmdLine.deleteCharAt(cmdLine.length() - 1);
-            ArrayList<TagResolver> placeholders = new ArrayList<>();
-            placeholders.add(Placeholder.parsed("command", cmdLine.toString()));
-            placeholders.add(Placeholder.parsed("description", command.getDescription()));
-            toSend.addAll(language.getComponent(LanguageLevel.GLOBAL, "helpLine", placeholders));
-        });
+        toSend.add(Component.text(" "));
 
         toSend.forEach(audience::sendMessage);
     }
@@ -425,59 +471,59 @@ public abstract class KCommand extends Command {
 
         if(args.length == 1) {
             result.addAll(
-                    subcommands.keySet()
-                    .stream()
-                    .filter(s -> s.startsWith(lastArg))
-                    .collect(Collectors.toList())
+                    subcommands.values()
+                        .stream()
+                        .filter(cmd -> hasPermission(sender,cmd))
+                        .map(Subcommand::getName)
+                        .filter(s -> s.startsWith(lastArg))
+                        .collect(Collectors.toList())
             );
 
-            mainCommands.forEach(mcmd -> {
-                if(mcmd.getArgsType().isEmpty()) {
+            mainCommands.forEach(cmd -> {
+                if(cmd.getArgsType().isEmpty()) {
                     return;
                 }
-                Optional<Class<?>> clazz = mcmd.getArgsType().values().stream().findFirst();
+                if(!hasPermission(sender,cmd)) {
+                    return;
+                }
+                Optional<CommandArgument> clazz = cmd.getArgsType().values().stream().findFirst();
                 if(!clazz.isPresent()) {
                     return;
                 }
-                result.addAll(parser.complete(lastArg,sender,clazz.get(),wrapper));
+                result.addAll(parser.complete(lastArg,sender,clazz.get().getClazz(),wrapper));
             });
 
             return result;
         }
 
-        mainCommands.forEach(mcmd -> {
-            if(mcmd.getArgsType().size() < args.length) {
-                return;
-            }
-            boolean isIt = true;
-            for (int i = 0; i < lastArgIdx; i++) {
-                Class<?> clazz = (Class<?>) mcmd.getArgsType().values().toArray()[i];
-                if(!parser.canConvert(args[i], clazz,wrapper)) {
-                    isIt = false;
-                    break;
-                }
-            }
-            if(!isIt) {
-                return;
-            }
-            Class<?> clazz = (Class<?>) mcmd.getArgsType().values().toArray()[lastArgIdx];
-            result.addAll(parser.complete(lastArg,sender,clazz,wrapper));
-        });
+        HashMap<String, Subcommand> commands = new HashMap<>();
+        for (int i = 0; i < mainCommands.size(); i++) {
+            String key = "mcmd_" + i;
+            commands.put(key,mainCommands.get(i));
+        }
+        commands.putAll(subcommands);
 
-        subcommands.forEach((name,subcmd) -> {
-            if(!name.equalsIgnoreCase(args[0])) {
+        commands.forEach((subName, cmd) -> {
+            if(!hasPermission(sender,cmd)) {
                 return;
             }
+            boolean mainCmd = subName.startsWith("mcmd_");
+
             List<String> trueArgs = Arrays.stream(args).collect(Collectors.toList());
-            trueArgs.remove(0);
+            if(!mainCmd) {
+                if(!subName.equalsIgnoreCase(args[0])) {
+                    return;
+                }
+                trueArgs.remove(0);
+            }
             int trueLastIdx = trueArgs.size() -1;
 
-            if(subcmd.getArgsType().size() < trueArgs.size()) {
+            if(cmd.getArgsType().size() < trueArgs.size()) {
                 return;
             }
             boolean isIt = true;
             for (int i = 0; i < trueLastIdx; i++) {
-                Class<?> clazz = (Class<?>) subcmd.getArgsType().values().toArray()[i];
+                Class<?> clazz = (Class<?>) cmd.getArgsType().values().toArray()[i];
                 if(!parser.canConvert(trueArgs.get(i), clazz,wrapper)) {
                     isIt = false;
                     break;
@@ -486,10 +532,143 @@ public abstract class KCommand extends Command {
             if(!isIt) {
                 return;
             }
-            Class<?> clazz = (Class<?>) subcmd.getArgsType().values().toArray()[trueLastIdx];
+            Class<?> clazz = (Class<?>) cmd.getArgsType().values().toArray()[trueLastIdx];
             result.addAll(parser.complete(lastArg,sender,clazz,wrapper));
         });
 
         return result;
+    }
+
+    /**
+     * Check if sender has permissions to use command
+     * @param sender Command sender
+     * @param command Instance of Subcommand object
+     * @return true if it has one of required permissions
+     */
+    protected boolean hasPermission(CommandSender sender, Subcommand command) {
+        boolean hasPermission = command.getPermissions().isEmpty();
+        for(String perm : command.getPermissions()) {
+            if(sender.hasPermission(perm)) {
+                hasPermission = true;
+                break;
+            }
+        }
+        return hasPermission;
+    }
+
+    /**
+     * Check if obj pass filters
+     * @param orFilterClasses Or filters
+     * @param andFilterClasses And filters
+     * @param obj Object that should pass the test
+     * @return true if object pass tests
+     */
+    @SuppressWarnings("unchecked")
+    protected <T> boolean passFilters(Class<? extends IFilter<?>>[] orFilterClasses, Class<? extends IFilter<?>>[] andFilterClasses, T obj){
+        IFilter<T>[] orFilters = (IFilter<T>[]) convertFilterClassesToArray(orFilterClasses, obj.getClass());
+        IFilter<T>[] andFilters = (IFilter<T>[]) convertFilterClassesToArray(andFilterClasses, obj.getClass());
+
+        boolean passOr = true;
+        boolean passAnd = true;
+
+        for (IFilter<T> filter : orFilters) {
+            if (filter.filter(obj, wrapper)) {
+                passOr = true;
+                break;
+            }
+            passOr = false;
+        }
+
+        for (IFilter<T> filter : andFilters) {
+            if (!filter.filter(obj, wrapper)) {
+                passAnd = false;
+                break;
+            }
+        }
+        return passOr && passAnd;
+    }
+
+
+    /**
+     * Check if obj pass filters
+     * @param argument Instance of CommandArgument
+     * @param obj Object that should pass the test
+     * @return true if object pass tests
+     */
+    @SuppressWarnings("unchecked")
+    protected <T> boolean passFilters(CommandArgument argument, T obj){
+        Class<? extends IFilter<?>>[] orFilterClasses = argument.getOrFilters();
+        Class<? extends IFilter<?>>[] andFilterClasses = argument.getAndFilters();
+
+        return passFilters(orFilterClasses,andFilterClasses,obj);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <T> void sendFilterMessages(Class<? extends IFilter<?>>[] orFilterClasses, Class<? extends IFilter<?>>[] andFilterClasses, T obj, Audience audience) {
+        List<Component> message = new ArrayList<>();
+        int lastWeight = -1;
+
+        IFilter<T>[] orFilters = (IFilter<T>[]) convertFilterClassesToArray(orFilterClasses, obj.getClass());
+        IFilter<T>[] andFilters = (IFilter<T>[]) convertFilterClassesToArray(andFilterClasses, obj.getClass());
+
+        boolean passOr = false;
+
+        for (IFilter<T> filter : orFilters) {
+            if (filter.filter(obj, wrapper)) {
+                passOr = true;
+                break;
+            }
+            if(filter.weight() > lastWeight) {
+                message = filter.notPassMessage(obj,wrapper);
+                lastWeight = filter.weight();
+            }
+        }
+
+        if(passOr) {
+            message = new ArrayList<>();
+            lastWeight = -1;
+        }
+
+        for (IFilter<T> filter : andFilters) {
+            if (!filter.filter(obj, wrapper)) {
+                if(filter.weight() > lastWeight) {
+                    message = filter.notPassMessage(obj,wrapper);
+                    lastWeight = filter.weight();
+                }
+            }
+        }
+
+        message.forEach(audience::sendMessage);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <T> void sendFilterMessages(CommandArgument argument, T obj, Audience audience) {
+        Class<? extends IFilter<?>>[] orFilterClasses = argument.getOrFilters();
+        Class<? extends IFilter<?>>[] andFilterClasses = argument.getAndFilters();
+
+       sendFilterMessages(orFilterClasses,andFilterClasses,obj,audience);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> IFilter<T>[] convertFilterClassesToArray(Class<? extends IFilter<?>>[] filters, Class<T> expected) {
+        return (IFilter<T>[]) Arrays.stream(filters)
+                .map(clazz -> {
+                    try {
+                        return clazz.newInstance();
+                    } catch (Exception e) {
+                        return null;
+                    }
+                })
+                .filter(filter -> {
+                    if(filter == null) {
+                        return false;
+                    }
+                    return filter.getClass().getTypeParameters().length > 0 && filter.getClass().getTypeParameters()[0].equals(expected);
+                })
+                .toArray();
+    }
+
+    private <T> T[] array(T... arr) {
+        return arr;
     }
 }

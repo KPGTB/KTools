@@ -16,16 +16,25 @@
 
 package com.github.kpgtb.ktools.manager.command.annotation;
 
+import com.github.kpgtb.ktools.manager.command.filter.IFilter;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation that provide description of sub command
+ * Filter to command's args
  */
-@Target(ElementType.METHOD)
+@Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface SubcommandDescription {
-    String description() default "";
+public @interface Filter {
+    /**
+     * "Or filters" are filters that argument must pass minimum one
+     */
+    Class<? extends IFilter<?>>[] orFilters() default {};
+    /**
+     * "And filters" are filters that argument must pass all
+     */
+    Class<? extends IFilter<?>>[] andFilters() default {};
 }

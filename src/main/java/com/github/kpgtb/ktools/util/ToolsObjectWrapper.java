@@ -52,6 +52,19 @@ public class ToolsObjectWrapper {
         this.uiManager = uiManager;
     }
 
+    public ToolsObjectWrapper(GlobalManagersWrapper globalManagersWrapper, LanguageManager languageManager, JavaPlugin plugin, BukkitAudiences adventure) {
+        this.cacheManager = globalManagersWrapper.getCacheManager();
+        this.debugManager = globalManagersWrapper.getDebugManager();
+        this.paramParserManager = globalManagersWrapper.getParamParserManager();
+        this.dataManager = globalManagersWrapper.getDataManager();
+        this.resourcepackManager = globalManagersWrapper.getResourcepackManager();
+        this.uiManager = globalManagersWrapper.getUiManager();
+
+        this.languageManager = languageManager;
+        this.plugin = plugin;
+        this.adventure = adventure;
+    }
+
     public CacheManager getCacheManager() {
         return cacheManager;
     }

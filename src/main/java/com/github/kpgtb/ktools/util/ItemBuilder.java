@@ -17,12 +17,15 @@ package com.github.kpgtb.ktools.util;
 
 import com.google.gson.Gson;
 import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.material.MaterialData;
@@ -34,28 +37,28 @@ import java.util.*;
  * @version 1.8
  * @author Acquized
  * @contributor Kev575
+ * @contributor KPG-TB
  */
 public class ItemBuilder {
 
-    private ItemStack item;
-    private ItemMeta meta;
-    private Material material = Material.STONE;
+    private Material material;
     private int amount = 1;
-    private MaterialData data;
-    private short damage = 0;
+    private int damage = 0;
     private Map<Enchantment, Integer> enchantments = new HashMap<>();
-    private String displayname;
+    private String displayName;
     private int model = 0;
     private List<String> lore = new ArrayList<>();
     private List<ItemFlag> flags = new ArrayList<>();
 
-    private boolean andSymbol = true;
+    private boolean unbreakable = false;
+    private OfflinePlayer owner;
+
+
     private boolean unsafeStackSize = false;
 
     /** Initalizes the ItemBuilder with {@link org.bukkit.Material} */
     public ItemBuilder(Material material) {
         if(material == null) material = Material.AIR;
-        this.item = new ItemStack(material);
         this.material = material;
     }
 
@@ -64,7 +67,6 @@ public class ItemBuilder {
         if(material == null) material = Material.AIR;
         if(((amount > material.getMaxStackSize()) || (amount <= 0)) && (!unsafeStackSize)) amount = 1;
         this.amount = amount;
-        this.item = new ItemStack(material, amount);
         this.material = material;
     }
 
@@ -72,43 +74,44 @@ public class ItemBuilder {
     public ItemBuilder(Material material, int amount, String displayname) {
         if(material == null) material = Material.AIR;
         Validate.notNull(displayname, "The Displayname is null.");
-        this.item = new ItemStack(material, amount);
         this.material = material;
         if(((amount > material.getMaxStackSize()) || (amount <= 0)) && (!unsafeStackSize)) amount = 1;
         this.amount = amount;
-        this.displayname = displayname;
+        this.displayName = displayname;
     }
 
     /** Initalizes the ItemBuilder with {@link org.bukkit.Material} and Displayname */
     public ItemBuilder(Material material, String displayname) {
         if(material == null) material = Material.AIR;
         Validate.notNull(displayname, "The Displayname is null.");
-        this.item = new ItemStack(material);
         this.material = material;
-        this.displayname = displayname;
+        this.displayName = displayname;
     }
 
     /** Initalizes the ItemBuilder with a {@link org.bukkit.inventory.ItemStack} */
     public ItemBuilder(ItemStack item) {
         Validate.notNull(item, "The Item is null.");
-        this.item = item;
         if(item.hasItemMeta())
-            this.meta = item.getItemMeta();
         this.material = item.getType();
         this.amount = item.getAmount();
-        this.data = item.getData();
-        this.damage = item.getDurability();
         this.enchantments = item.getEnchantments();
         if(item.hasItemMeta()) {
-            this.displayname = item.getItemMeta().getDisplayName();
-            this.model = item.getItemMeta().getCustomModelData();
-        }
-        if(item.hasItemMeta())
-            this.lore = item.getItemMeta().getLore();
-        if(item.hasItemMeta())
-            for (ItemFlag f : item.getItemMeta().getItemFlags()) {
+            ItemMeta meta = item.getItemMeta();
+            this.displayName = meta.getDisplayName();
+            this.model = meta.getCustomModelData();
+            this.lore = meta.getLore();
+            this.unbreakable = meta.isUnbreakable();
+            for (ItemFlag f : meta.getItemFlags()) {
                 flags.add(f);
             }
+            this.damage = 0;
+            if(meta instanceof Damageable) {
+                this.damage = ((Damageable) meta).getDamage();
+            }
+            if(this.material.equals(Material.PLAYER_HEAD)) {
+                this.owner = ((SkullMeta)meta).getOwningPlayer();
+            }
+        }
     }
 
     /** Initalizes the ItemBuilder with a {@link org.bukkit.configuration.file.FileConfiguration} ItemStack in Path */
@@ -123,18 +126,16 @@ public class ItemBuilder {
     @Deprecated
     public ItemBuilder(ItemBuilder builder) {
         Validate.notNull(builder, "The ItemBuilder is null.");
-        this.item = builder.item;
-        this.meta = builder.meta;
         this.material = builder.material;
         this.amount = builder.amount;
         this.damage = builder.damage;
-        this.data = builder.data;
-        this.damage = builder.damage;
         this.enchantments = builder.enchantments;
-        this.displayname = builder.displayname;
+        this.displayName = builder.displayName;
         this.lore = builder.lore;
         this.flags = builder.flags;
         this.model = builder.model;
+        this.unbreakable = builder.unbreakable;
+        this.owner = builder.owner;
     }
 
     /**
@@ -153,16 +154,6 @@ public class ItemBuilder {
      */
     public ItemBuilder model(int model) {
         this.model = model;
-        return this;
-    }
-
-    /**
-     * Sets the {@link org.bukkit.material.MaterialData} of the ItemStack
-     * @param data MaterialData for the ItemStack
-     */
-    public ItemBuilder data(MaterialData data) {
-        Validate.notNull(data, "The Data is null.");
-        this.data = data;
         return this;
     }
 
@@ -197,16 +188,6 @@ public class ItemBuilder {
     }
 
     /**
-     * Sets the {@link org.bukkit.inventory.meta.ItemMeta} of the ItemStack
-     * @param meta Meta for the ItemStack
-     */
-    public ItemBuilder meta(ItemMeta meta) {
-        Validate.notNull(meta, "The Meta is null.");
-        this.meta = meta;
-        return this;
-    }
-
-    /**
      * Adds a {@link org.bukkit.enchantments.Enchantment} to the ItemStack
      * @param enchant Enchantment for the ItemStack
      * @param level Level of the Enchantment
@@ -233,7 +214,7 @@ public class ItemBuilder {
      */
     public ItemBuilder displayname(String displayname) {
         Validate.notNull(displayname, "The Displayname is null.");
-        this.displayname = andSymbol ? ChatColor.translateAlternateColorCodes('&', displayname) : displayname;
+        this.displayName = displayname;
         return this;
     }
 
@@ -243,7 +224,7 @@ public class ItemBuilder {
      */
     public ItemBuilder lore(String line) {
         Validate.notNull(line, "The Line is null.");
-        lore.add(andSymbol ? ChatColor.translateAlternateColorCodes('&', line) : line);
+        lore.add(line);
         return this;
     }
 
@@ -266,7 +247,7 @@ public class ItemBuilder {
     public ItemBuilder lores(String... lines) {
         Validate.notNull(lines, "The Lines are null.");
         for (String line : lines) {
-            lore(andSymbol ? ChatColor.translateAlternateColorCodes('&', line) : line);
+            lore(line);
         }
         return this;
     }
@@ -278,7 +259,7 @@ public class ItemBuilder {
     public ItemBuilder lore(String... lines) {
         Validate.notNull(lines, "The Lines are null.");
         for (String line : lines) {
-            lore(andSymbol ? ChatColor.translateAlternateColorCodes('&', line) : line);
+            lore(line);
         }
         return this;
     }
@@ -290,7 +271,7 @@ public class ItemBuilder {
      */
     public ItemBuilder lore(String line, int index) {
         Validate.notNull(line, "The Line is null.");
-        lore.set(index, andSymbol ? ChatColor.translateAlternateColorCodes('&', line) : line);
+        lore.set(index, line);
         return this;
     }
 
@@ -319,7 +300,7 @@ public class ItemBuilder {
      * @param unbreakable If it should be unbreakable
      */
     public ItemBuilder unbreakable(boolean unbreakable) {
-        meta.spigot().setUnbreakable(unbreakable);
+        this.unbreakable = unbreakable;
         return this;
     }
 
@@ -333,41 +314,13 @@ public class ItemBuilder {
     /**
      * Sets the Skin for the Skull
      * @param user Username of the Skull
-     * @deprecated Make it yourself - This Meta destrys the already setted Metas
      */
-    @Deprecated
     public ItemBuilder owner(String user) {
         Validate.notNull(user, "The Username is null.");
         if(material == Material.PLAYER_HEAD) {
-            SkullMeta smeta = (SkullMeta) meta;
-            smeta.setOwner(user);
-            meta = smeta;
+            OfflinePlayer op = Bukkit.getOfflinePlayer(user);
+            this.owner = op;
         }
-        return this;
-    }
-
-    /**
-     * Toggles replacement of the '&' Characters in Strings
-     * @deprecated Use {@code ItemBuilder#toggleReplaceAndSymbol}
-     */
-    @Deprecated
-    public ItemBuilder replaceAndSymbol() {
-        replaceAndSymbol(!andSymbol);
-        return this;
-    }
-
-    /**
-     * Enables / Disables replacement of the '&' Character in Strings
-     * @param replace Determinates if it should be replaced or not
-     */
-    public ItemBuilder replaceAndSymbol(boolean replace) {
-        andSymbol = replace;
-        return this;
-    }
-
-    /** Toggles replacement of the '&' Character in Strings */
-    public ItemBuilder toggleReplaceAndSymbol() {
-        replaceAndSymbol(!andSymbol);
         return this;
     }
 
@@ -387,8 +340,8 @@ public class ItemBuilder {
     }
 
     /** Returns the Displayname */
-    public String getDisplayname() {
-        return displayname;
+    public String getDisplayName() {
+        return displayName;
     }
 
     /** Returns the Amount */
@@ -403,26 +356,19 @@ public class ItemBuilder {
 
     /**
      * Returns the Damage
-     * @deprecated Use {@code ItemBuilder#getDurability}
      */
-    @Deprecated
-    public short getDamage() {
+    public int getDamage() {
         return damage;
     }
 
     /** Returns the Durability */
-    public short getDurability() {
+    public int getDurability() {
         return damage;
     }
 
     /** Returns the Lores */
     public List<String> getLores() {
         return lore;
-    }
-
-    /** Returns if the '&' Character will be replaced */
-    public boolean getAndSymbol() {
-        return andSymbol;
     }
 
     /** Returns all ItemFlags */
@@ -435,21 +381,9 @@ public class ItemBuilder {
         return material;
     }
 
-    /** Returns the ItemMeta */
-    public ItemMeta getMeta() {
-        return meta;
-    }
-
-    /** Returns the MaterialData */
-    public MaterialData getData() {
-        return data;
-    }
-
     /**
      * Returns all Lores
-     * @deprecated Use {@code ItemBuilder#getLores}
      */
-    @Deprecated
     public List<String> getLore() {
         return lore;
     }
@@ -517,40 +451,39 @@ public class ItemBuilder {
         ItemBuilder b = new Gson().fromJson(json, ItemBuilder.class);
         if(overwrite)
             return b;
-        if(b.displayname != null)
-            displayname = b.displayname;
-        if(b.data != null)
-            data = b.data;
+        if(b.displayName != null)
+            displayName = b.displayName;
         if(b.material != null)
             material = b.material;
         if(b.lore != null)
             lore = b.lore;
         if(b.enchantments != null)
             enchantments = b.enchantments;
-        if(b.item != null)
-            item = b.item;
         if(b.flags != null)
             flags = b.flags;
         damage = b.damage;
         amount = b.amount;
         model = b.model;
+        owner = b.owner;
+        unbreakable = b.unbreakable;
         return this;
     }
 
     /** Converts the ItemBuilder to a {@link org.bukkit.inventory.ItemStack} */
     public ItemStack build() {
+        ItemStack item = new ItemStack(material, amount);
         item.setType(material);
         item.setAmount(amount);
-        item.setDurability(damage);
-        meta = item.getItemMeta();
-        if(data != null) {
-            item.setData(data);
+        ItemMeta meta = item.getItemMeta();
+        if(meta instanceof Damageable) {
+            ((Damageable) meta).setDamage(damage);
         }
+        meta.setUnbreakable(unbreakable);
         if(enchantments.size() > 0) {
             item.addUnsafeEnchantments(enchantments);
         }
-        if(displayname != null) {
-            meta.setDisplayName(displayname);
+        if(displayName != null) {
+            meta.setDisplayName(displayName);
         }
         meta.setCustomModelData(model);
         if(lore.size() > 0) {
@@ -561,7 +494,13 @@ public class ItemBuilder {
                 meta.addItemFlags(f);
             }
         }
-        item.setItemMeta(meta);
+        if(material.equals(Material.PLAYER_HEAD)) {
+            SkullMeta skullMeta = (SkullMeta) meta;
+            skullMeta.setOwningPlayer(owner);
+            item.setItemMeta(skullMeta);
+        } else {
+            item.setItemMeta(meta);
+        }
         return item;
     }
 }

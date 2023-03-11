@@ -16,6 +16,8 @@
 
 package com.github.kpgtb.ktools.manager.command;
 
+import com.github.kpgtb.ktools.manager.command.filter.IFilter;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -28,15 +30,19 @@ public class Subcommand {
     private final String description;
     private final ArrayList<String> permissions;
     private final boolean playerRequired;
-    private final LinkedHashMap<String, Class<?>> argsType;
+    private final Class<? extends IFilter<?>>[] senderOrFilters;
+    private final Class<? extends IFilter<?>>[] senderAndFilters;
+    private final LinkedHashMap<String, CommandArgument> argsType;
     private final Method method;
     private final boolean endless;
 
-    public Subcommand(String name, String description, ArrayList<String> permissions, boolean playerRequired, LinkedHashMap<String, Class<?>> argsType, Method method, boolean endless) {
+    public Subcommand(String name, String description, ArrayList<String> permissions, boolean playerRequired, Class<? extends IFilter<?>>[] senderOrFilters, Class<? extends IFilter<?>>[] senderAndFilters, LinkedHashMap<String, CommandArgument> argsType, Method method, boolean endless) {
         this.name = name;
         this.description = description;
         this.permissions = permissions;
         this.playerRequired = playerRequired;
+        this.senderOrFilters = senderOrFilters;
+        this.senderAndFilters = senderAndFilters;
         this.argsType = argsType;
         this.method = method;
         this.endless = endless;
@@ -58,7 +64,7 @@ public class Subcommand {
         return playerRequired;
     }
 
-    public LinkedHashMap<String, Class<?>> getArgsType() {
+    public LinkedHashMap<String, CommandArgument> getArgsType() {
         return argsType;
     }
 
@@ -68,5 +74,13 @@ public class Subcommand {
 
     public boolean isEndless() {
         return endless;
+    }
+
+    public Class<? extends IFilter<?>>[] getSenderOrFilters() {
+        return senderOrFilters;
+    }
+
+    public Class<? extends IFilter<?>>[] getSenderAndFilters() {
+        return senderAndFilters;
     }
 }
