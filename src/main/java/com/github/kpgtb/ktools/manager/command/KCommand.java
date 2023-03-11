@@ -32,10 +32,13 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -72,9 +75,15 @@ public abstract class KCommand extends Command {
         this.adventure = toolsObjectWrapper.getAdventure();
         this.parser = toolsObjectWrapper.getParamParserManager();
 
+        File dataFolder = toolsObjectWrapper.getPlugin().getDataFolder();
+        File commandsFile = new File(dataFolder, "commands.yml");
+        YamlConfiguration commandsConfig = YamlConfiguration.loadConfiguration(commandsFile);
+
         cmdName = getClass().getSimpleName()
                 .toLowerCase()
                 .replace("command","");
+
+        commandsConfig.set(cmdName+".command", "/" + cmdName);
 
         String description = "";
         Description descriptionAnnotation = getClass().getDeclaredAnnotation(Description.class);
@@ -82,11 +91,15 @@ public abstract class KCommand extends Command {
             description = descriptionAnnotation.text();
         }
 
+        commandsConfig.set(cmdName+".description", description);
+
         String[] aliases = new String[0];
         CommandAliases commandAliases = getClass().getDeclaredAnnotation(CommandAliases.class);
         if(commandAliases != null) {
             aliases = commandAliases.aliases();
         }
+
+        commandsConfig.set(cmdName+".aliases", aliases);
 
         super.setName(cmdName);
         super.setDescription(description);
@@ -233,14 +246,47 @@ public abstract class KCommand extends Command {
 
             this.debug.sendInfo(DebugType.COMMAND, "This command is endless: " + (endless ? "yes" : "no"));
 
+            boolean isMain = method.getDeclaredAnnotation(MainCommand.class) != null;
+
+            StringBuilder cmdString = new StringBuilder("/" + cmdName);
+            if(isMain) {
+                cmdString.append(" ")
+                        .append(subName);
+            }
+            AtomicInteger i = new AtomicInteger(1);
+            boolean finalEndless = endless;
+            parameters.forEach((argName, argsType) -> {
+                String start = "<";
+                String end = ">";
+                if(finalEndless && i.get() == parameters.size()) {
+                    start = "[<";
+                    end = ">]";
+                }
+                i.getAndIncrement();
+                cmdString
+                        .append(" ")
+                        .append(start)
+                        .append(argName)
+                        .append(end);
+            });
+            commandsConfig.set(cmdName+".variants."+subName+".command", cmdString.toString());
+            commandsConfig.set(cmdName+".variants."+subName+".description", subDescription);
+            commandsConfig.set(cmdName+".variants."+subName+".permissions", permissions);
+            commandsConfig.set(cmdName+".variants."+subName+".onlyPlayer", playerRequired);
+
             Subcommand subcommand = new Subcommand(subName, subDescription, permissions,playerRequired, senderOrFilters, senderAndFilters, parameters,method, endless);
-            if(method.getDeclaredAnnotation(MainCommand.class) != null) {
+            if(isMain) {
                 this.debug.sendInfo(DebugType.COMMAND, "This command is main command!");
                 this.mainCommands.add(subcommand);
                 continue;
             }
             this.debug.sendInfo(DebugType.COMMAND, "This command is sub command!");
             subcommands.put(subName, subcommand);
+        }
+        try {
+            commandsConfig.save(commandsFile);
+        } catch (IOException e) {
+            this.debug.sendWarning(DebugType.COMMAND, "Error while saving commands list");
         }
         this.debug.sendInfo(DebugType.COMMAND, "Registered command " + cmdName);
     }

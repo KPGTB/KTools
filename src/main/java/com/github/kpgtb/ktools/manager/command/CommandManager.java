@@ -24,6 +24,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 
 /**
@@ -48,6 +49,20 @@ public class CommandManager {
         this.pluginTag = pluginTag;
 
         this.debug = toolsObjectWrapper.getDebugManager();
+
+        debug.sendInfo(DebugType.COMMAND, "Loading command list file...");
+        File dataFolder = toolsObjectWrapper.getPlugin().getDataFolder();
+        dataFolder.mkdirs();
+        File commandsFile = new File(dataFolder, "commands.yml");
+        if(commandsFile.exists()) {
+            commandsFile.delete();
+        }
+        try {
+            commandsFile.createNewFile();
+        } catch (IOException e) {
+            debug.sendWarning(DebugType.COMMAND, "Error while creating file...");
+        }
+        debug.sendInfo(DebugType.COMMAND, "Loaded command list file.");
     }
 
     /**
