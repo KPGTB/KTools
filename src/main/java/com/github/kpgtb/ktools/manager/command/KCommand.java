@@ -27,14 +27,12 @@ import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -42,6 +40,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -249,7 +248,7 @@ public abstract class KCommand extends Command {
             boolean isMain = method.getDeclaredAnnotation(MainCommand.class) != null;
 
             StringBuilder cmdString = new StringBuilder("/" + cmdName);
-            if(isMain) {
+            if(!isMain) {
                 cmdString.append(" ")
                         .append(subName);
             }
@@ -414,6 +413,7 @@ public abstract class KCommand extends Command {
 
             boolean passSenderFilters = passFilters(subcommand.getSenderOrFilters(), subcommand.getSenderAndFilters(), sender);
             if(!passSenderFilters) {
+                found = true;
                 notPassArg = new CommandArgument("",null,subcommand.getSenderOrFilters(), subcommand.getSenderAndFilters());
                 notPassObj = sender;
                 continue;
@@ -423,6 +423,7 @@ public abstract class KCommand extends Command {
             for (int i1 = 1; i1 < commandArgs.length; i1++) {
                 passArgsFilters = passFilters(subCommandArgs.get((i1-1)), commandArgs[i1]);
                 if(!passArgsFilters) {
+                    found = true;
                     notPassArg = subCommandArgs.get((i1-1));
                     notPassObj = commandArgs[i1];
                     break;
@@ -536,7 +537,9 @@ public abstract class KCommand extends Command {
                 if(!clazz.isPresent()) {
                     return;
                 }
-                result.addAll(parser.complete(lastArg,sender,clazz.get().getClazz(),wrapper));
+
+                List<String> complete = parser.complete(lastArg,sender,clazz.get().getClazz(),wrapper);
+                result.addAll(getCompleterThatPass(complete,clazz.get()));
             });
 
             return result;
@@ -569,7 +572,8 @@ public abstract class KCommand extends Command {
             }
             boolean isIt = true;
             for (int i = 0; i < trueLastIdx; i++) {
-                Class<?> clazz = (Class<?>) cmd.getArgsType().values().toArray()[i];
+                CommandArgument argument = (CommandArgument) cmd.getArgsType().values().toArray()[i];
+                Class<?> clazz = argument.getClazz();
                 if(!parser.canConvert(trueArgs.get(i), clazz,wrapper)) {
                     isIt = false;
                     break;
@@ -578,8 +582,10 @@ public abstract class KCommand extends Command {
             if(!isIt) {
                 return;
             }
-            Class<?> clazz = (Class<?>) cmd.getArgsType().values().toArray()[trueLastIdx];
-            result.addAll(parser.complete(lastArg,sender,clazz,wrapper));
+            CommandArgument argument = (CommandArgument) cmd.getArgsType().values().toArray()[trueLastIdx];
+            Class<?> clazz = argument.getClazz();
+            List<String> complete = parser.complete(lastArg,sender,clazz,wrapper);
+            result.addAll(getCompleterThatPass(complete,argument));
         });
 
         return result;
@@ -695,9 +701,31 @@ public abstract class KCommand extends Command {
        sendFilterMessages(orFilterClasses,andFilterClasses,obj,audience);
     }
 
+    protected List<String> getCompleterThatPass(List<String> complete, CommandArgument argument) {
+        List<String> result = new ArrayList<>();
+        complete.forEach(s -> {
+            Object obj = parser.convert(s, argument.getClazz(), wrapper);
+            if(passFilters(argument,obj)) {
+                result.add(s);
+            }
+        });
+        return result;
+    }
+
     @SuppressWarnings("unchecked")
     private <T> IFilter<T>[] convertFilterClassesToArray(Class<? extends IFilter<?>>[] filters, Class<T> expected) {
-        return (IFilter<T>[]) Arrays.stream(filters)
+        return Arrays.stream(filters)
+                .filter(clazz -> {
+                    if(clazz.getGenericInterfaces().length == 0) {
+                        return false;
+                    }
+                    ParameterizedType type = (ParameterizedType) clazz.getGenericInterfaces()[0];
+                    if(type.getActualTypeArguments().length == 0) {
+                        return false;
+                    }
+                    Class<T> typeArgClazz = (Class<T>) type.getActualTypeArguments()[0];
+                    return typeArgClazz.isAssignableFrom(expected);
+                })
                 .map(clazz -> {
                     try {
                         return clazz.newInstance();
@@ -705,13 +733,8 @@ public abstract class KCommand extends Command {
                         return null;
                     }
                 })
-                .filter(filter -> {
-                    if(filter == null) {
-                        return false;
-                    }
-                    return filter.getClass().getTypeParameters().length > 0 && filter.getClass().getTypeParameters()[0].equals(expected);
-                })
-                .toArray();
+                .filter(Objects::nonNull)
+                .toArray(IFilter[]::new);
     }
 
     private <T> T[] array(T... arr) {
