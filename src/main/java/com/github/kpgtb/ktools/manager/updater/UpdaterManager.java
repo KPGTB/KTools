@@ -55,7 +55,7 @@ public class UpdaterManager {
         }
         if(this.updater.hasUpdate(version)) {
             String url = this.updater.getDownloadLink();
-            this.debug.sendInfo(DebugType.UPDATER, "Detected new version of this plugin! Download it here -> " + url);
+            this.debug.sendInfo(DebugType.UPDATER, "Detected new version of this plugin! Download it here -> " + url, true);
             return;
         }
         this.debug.sendInfo(DebugType.UPDATER, "You have the newest version of this plugin");

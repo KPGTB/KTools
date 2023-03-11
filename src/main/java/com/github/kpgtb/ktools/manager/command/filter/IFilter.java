@@ -19,7 +19,7 @@ package com.github.kpgtb.ktools.manager.command.filter;
 import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
 import net.kyori.adventure.text.Component;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Filter to command's arguments. It can be used by annotation {@link com.github.kpgtb.ktools.manager.command.annotation.Filter}
@@ -39,7 +39,7 @@ public interface IFilter<T> {
      * @param wrapper Instance of ToolsObjectWrapper
      * @return Component that can be sent
      */
-    ArrayList<Component> notPassMessage(T obj, ToolsObjectWrapper wrapper);
+    List<Component> notPassMessage(T obj, ToolsObjectWrapper wrapper);
 
     /**
      * Weight of the filter
