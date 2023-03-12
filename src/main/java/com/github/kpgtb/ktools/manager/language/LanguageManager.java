@@ -33,6 +33,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * LanguageManager handles all message translations
@@ -143,7 +144,7 @@ public class LanguageManager {
      * @param placeholders List of {@link net.kyori.adventure.text.minimessage.tag.resolver.Placeholder}
      * @return A list of translated components with PAPI and plugin's placeholders
      */
-    public ArrayList<Component> getComponent(LanguageLevel languageLevel, String code, Player player, ArrayList<TagResolver> placeholders) {
+    public ArrayList<Component> getComponent(LanguageLevel languageLevel, String code, Player player, List<TagResolver> placeholders) {
         ArrayList<String> messages = new ArrayList<>();
 
         LanguageManager manager = languageLevel == LanguageLevel.PLUGIN ? this : this.globalManager;
@@ -191,7 +192,7 @@ public class LanguageManager {
      * @param placeholders List of {@link net.kyori.adventure.text.minimessage.tag.resolver.Placeholder}
      * @return A list of translated components with plugin's placeholders
      */
-    public ArrayList<Component> getComponent(LanguageLevel languageLevel, String code, ArrayList<TagResolver> placeholders) {
+    public ArrayList<Component> getComponent(LanguageLevel languageLevel, String code, List<TagResolver> placeholders) {
         return this.getComponent(languageLevel, code,null,placeholders);
     }
 
@@ -213,7 +214,7 @@ public class LanguageManager {
      * @param placeholders List of {@link net.kyori.adventure.text.minimessage.tag.resolver.Placeholder}
      * @return A list of translated strings with PAPI and plugin's placeholders
      */
-    public ArrayList<String> getString(LanguageLevel languageLevel, String code, Player player, ArrayList<TagResolver> placeholders) {
+    public ArrayList<String> getString(LanguageLevel languageLevel, String code, Player player, List<TagResolver> placeholders) {
         ArrayList<Component> components = this.getComponent(languageLevel, code,player,placeholders);
         ArrayList<String> result = new ArrayList<>();
 
@@ -262,7 +263,7 @@ public class LanguageManager {
      * @param placeholders List of {@link net.kyori.adventure.text.minimessage.tag.resolver.Placeholder}
      * @return A list of translated strings with plugin's placeholders
      */
-    public ArrayList<String> getString(LanguageLevel languageLevel, String code, ArrayList<TagResolver> placeholders) {
+    public ArrayList<String> getString(LanguageLevel languageLevel, String code, List<TagResolver> placeholders) {
         return this.getString(languageLevel, code,null,placeholders);
     }
 
