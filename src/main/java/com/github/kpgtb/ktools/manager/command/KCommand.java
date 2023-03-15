@@ -307,8 +307,8 @@ public abstract class KCommand extends Command {
                     language.getComponent(LanguageLevel.GLOBAL, "noPermission").forEach(audience::sendMessage);
                     return false;
                 }
-                if(!passFilters(mainCommand.getSenderOrFilters(), mainCommand.getSenderAndFilters(), sender)) {
-                    sendFilterMessages(mainCommand.getSenderOrFilters(), mainCommand.getSenderAndFilters(), sender,audience);
+                if(!passFilters(mainCommand.getSenderOrFilters(), mainCommand.getSenderAndFilters(), sender,sender)) {
+                    sendFilterMessages(mainCommand.getSenderOrFilters(), mainCommand.getSenderAndFilters(), sender,sender,audience);
                     return false;
                 }
                 try {
@@ -411,7 +411,7 @@ public abstract class KCommand extends Command {
                 commandArgs[j] = parser.convert(fixedArgs.get(fixedJ), subCommandArgs.get(fixedJ).getClazz(),wrapper);
             }
 
-            boolean passSenderFilters = passFilters(subcommand.getSenderOrFilters(), subcommand.getSenderAndFilters(), sender);
+            boolean passSenderFilters = passFilters(subcommand.getSenderOrFilters(), subcommand.getSenderAndFilters(), sender,sender);
             if(!passSenderFilters) {
                 found = true;
                 notPassArg = new CommandArgument("",null,subcommand.getSenderOrFilters(), subcommand.getSenderAndFilters());
@@ -421,7 +421,7 @@ public abstract class KCommand extends Command {
             boolean passArgsFilters = true;
 
             for (int i1 = 1; i1 < commandArgs.length; i1++) {
-                passArgsFilters = passFilters(subCommandArgs.get((i1-1)), commandArgs[i1]);
+                passArgsFilters = passFilters(subCommandArgs.get((i1-1)), commandArgs[i1],sender);
                 if(!passArgsFilters) {
                     found = true;
                     notPassArg = subCommandArgs.get((i1-1));
@@ -444,7 +444,7 @@ public abstract class KCommand extends Command {
 
         if(found) {
             if(notPassArg != null && notPassObj != null) {
-                sendFilterMessages(notPassArg, notPassObj, audience);
+                sendFilterMessages(notPassArg, notPassObj, sender,audience);
                 return false;
             }
             language.getComponent(LanguageLevel.GLOBAL, "onlyPlayer").forEach(audience::sendMessage);
@@ -539,7 +539,7 @@ public abstract class KCommand extends Command {
                 }
 
                 List<String> complete = parser.complete(lastArg,sender,clazz.get().getClazz(),wrapper);
-                result.addAll(getCompleterThatPass(complete,clazz.get()));
+                result.addAll(getCompleterThatPass(complete,clazz.get(),sender));
             });
 
             return result;
@@ -585,7 +585,7 @@ public abstract class KCommand extends Command {
             CommandArgument argument = (CommandArgument) cmd.getArgsType().values().toArray()[trueLastIdx];
             Class<?> clazz = argument.getClazz();
             List<String> complete = parser.complete(lastArg,sender,clazz,wrapper);
-            result.addAll(getCompleterThatPass(complete,argument));
+            result.addAll(getCompleterThatPass(complete,argument,sender));
         });
 
         return result;
@@ -616,7 +616,7 @@ public abstract class KCommand extends Command {
      * @return true if object pass tests
      */
     @SuppressWarnings("unchecked")
-    protected <T> boolean passFilters(Class<? extends IFilter<?>>[] orFilterClasses, Class<? extends IFilter<?>>[] andFilterClasses, T obj){
+    protected <T> boolean passFilters(Class<? extends IFilter<?>>[] orFilterClasses, Class<? extends IFilter<?>>[] andFilterClasses, T obj, CommandSender sender){
         IFilter<T>[] orFilters = (IFilter<T>[]) convertFilterClassesToArray(orFilterClasses, obj.getClass());
         IFilter<T>[] andFilters = (IFilter<T>[]) convertFilterClassesToArray(andFilterClasses, obj.getClass());
 
@@ -624,7 +624,7 @@ public abstract class KCommand extends Command {
         boolean passAnd = true;
 
         for (IFilter<T> filter : orFilters) {
-            if (filter.filter(obj, wrapper)) {
+            if (filter.filter(obj, wrapper,sender)) {
                 passOr = true;
                 break;
             }
@@ -632,7 +632,7 @@ public abstract class KCommand extends Command {
         }
 
         for (IFilter<T> filter : andFilters) {
-            if (!filter.filter(obj, wrapper)) {
+            if (!filter.filter(obj, wrapper,sender)) {
                 passAnd = false;
                 break;
             }
@@ -648,15 +648,15 @@ public abstract class KCommand extends Command {
      * @return true if object pass tests
      */
     @SuppressWarnings("unchecked")
-    protected <T> boolean passFilters(CommandArgument argument, T obj){
+    protected <T> boolean passFilters(CommandArgument argument, T obj, CommandSender sender){
         Class<? extends IFilter<?>>[] orFilterClasses = argument.getOrFilters();
         Class<? extends IFilter<?>>[] andFilterClasses = argument.getAndFilters();
 
-        return passFilters(orFilterClasses,andFilterClasses,obj);
+        return passFilters(orFilterClasses,andFilterClasses,obj, sender);
     }
 
     @SuppressWarnings("unchecked")
-    protected <T> void sendFilterMessages(Class<? extends IFilter<?>>[] orFilterClasses, Class<? extends IFilter<?>>[] andFilterClasses, T obj, Audience audience) {
+    protected <T> void sendFilterMessages(Class<? extends IFilter<?>>[] orFilterClasses, Class<? extends IFilter<?>>[] andFilterClasses, T obj, CommandSender sender, Audience audience) {
         List<Component> message = new ArrayList<>();
         int lastWeight = -1;
 
@@ -666,7 +666,7 @@ public abstract class KCommand extends Command {
         boolean passOr = false;
 
         for (IFilter<T> filter : orFilters) {
-            if (filter.filter(obj, wrapper)) {
+            if (filter.filter(obj, wrapper,sender)) {
                 passOr = true;
                 break;
             }
@@ -682,7 +682,7 @@ public abstract class KCommand extends Command {
         }
 
         for (IFilter<T> filter : andFilters) {
-            if (!filter.filter(obj, wrapper)) {
+            if (!filter.filter(obj, wrapper,sender)) {
                 if(filter.weight() > lastWeight) {
                     message = filter.notPassMessage(obj,wrapper);
                     lastWeight = filter.weight();
@@ -694,18 +694,18 @@ public abstract class KCommand extends Command {
     }
 
     @SuppressWarnings("unchecked")
-    protected <T> void sendFilterMessages(CommandArgument argument, T obj, Audience audience) {
+    protected <T> void sendFilterMessages(CommandArgument argument, T obj, CommandSender sender, Audience audience) {
         Class<? extends IFilter<?>>[] orFilterClasses = argument.getOrFilters();
         Class<? extends IFilter<?>>[] andFilterClasses = argument.getAndFilters();
 
-       sendFilterMessages(orFilterClasses,andFilterClasses,obj,audience);
+       sendFilterMessages(orFilterClasses,andFilterClasses,obj,sender,audience);
     }
 
-    protected List<String> getCompleterThatPass(List<String> complete, CommandArgument argument) {
+    protected List<String> getCompleterThatPass(List<String> complete, CommandArgument argument, CommandSender sender) {
         List<String> result = new ArrayList<>();
         complete.forEach(s -> {
             Object obj = parser.convert(s, argument.getClazz(), wrapper);
-            if(passFilters(argument,obj)) {
+            if(passFilters(argument,obj,sender)) {
                 result.add(s);
             }
         });

@@ -18,6 +18,7 @@ package com.github.kpgtb.ktools.manager.command.filter;
 
 import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
 import net.kyori.adventure.text.Component;
+import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
@@ -29,9 +30,10 @@ public interface IFilter<T> {
      * Filter method
      * @param obj Object that must be filtered
      * @param wrapper Instance of ToolsObjectWrapper
+     * @param sender Command sender
      * @return true if object pass the test
      */
-    boolean filter(T obj, ToolsObjectWrapper wrapper);
+    boolean filter(T obj, ToolsObjectWrapper wrapper, CommandSender sender);
 
     /**
      * Component message that should be sent when filter is not passed
