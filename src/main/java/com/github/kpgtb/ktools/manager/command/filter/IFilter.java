@@ -39,9 +39,10 @@ public interface IFilter<T> {
      * Component message that should be sent when filter is not passed
      * @param obj Object that must be filtered
      * @param wrapper Instance of ToolsObjectWrapper
+     * @param sender Command sender
      * @return Component that can be sent
      */
-    List<Component> notPassMessage(T obj, ToolsObjectWrapper wrapper);
+    List<Component> notPassMessage(T obj, ToolsObjectWrapper wrapper, CommandSender sender);
 
     /**
      * Weight of the filter

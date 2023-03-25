@@ -18,6 +18,7 @@ package com.github.kpgtb.ktools.manager.updater;
 
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
+import com.github.kpgtb.ktools.manager.updater.version.KVersion;
 import org.bukkit.plugin.PluginDescriptionFile;
 
 /**
@@ -44,18 +45,17 @@ public class UpdaterManager {
      * Check if there are some updates
      */
     public void checkUpdate() {
-        double version;
+        KVersion version;
         try {
             String versionName = description.getVersion();
-            String[] versionParts = versionName.split("-");
-            version = Double.parseDouble(versionParts[0]);
+            version = new KVersion(versionName.split("-")[0]);
         } catch (Exception e) {
             this.debug.sendWarning(DebugType.UPDATER, "Error while checking plugin version");
             return;
         }
         if(this.updater.hasUpdate(version)) {
             String url = this.updater.getDownloadLink();
-            this.debug.sendInfo(DebugType.UPDATER, "Detected new version of this plugin! Download it here -> " + url, true);
+            this.debug.sendWarning(DebugType.UPDATER, "Detected new version of this plugin! Download it here -> " + url, true);
             return;
         }
         this.debug.sendInfo(DebugType.UPDATER, "You have the newest version of this plugin");

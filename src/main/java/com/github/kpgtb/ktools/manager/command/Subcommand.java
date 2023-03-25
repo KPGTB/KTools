@@ -35,8 +35,9 @@ public class Subcommand {
     private final LinkedHashMap<String, CommandArgument> argsType;
     private final Method method;
     private final boolean endless;
+    private final boolean hidden;
 
-    public Subcommand(String name, String description, ArrayList<String> permissions, boolean playerRequired, Class<? extends IFilter<?>>[] senderOrFilters, Class<? extends IFilter<?>>[] senderAndFilters, LinkedHashMap<String, CommandArgument> argsType, Method method, boolean endless) {
+    public Subcommand(String name, String description, ArrayList<String> permissions, boolean playerRequired, Class<? extends IFilter<?>>[] senderOrFilters, Class<? extends IFilter<?>>[] senderAndFilters, LinkedHashMap<String, CommandArgument> argsType, Method method, boolean endless, boolean hidden) {
         this.name = name;
         this.description = description;
         this.permissions = permissions;
@@ -46,6 +47,7 @@ public class Subcommand {
         this.argsType = argsType;
         this.method = method;
         this.endless = endless;
+        this.hidden = hidden;
     }
 
     public String getName() {
@@ -82,5 +84,9 @@ public class Subcommand {
 
     public Class<? extends IFilter<?>>[] getSenderAndFilters() {
         return senderAndFilters;
+    }
+
+    public boolean isHidden() {
+        return hidden;
     }
 }

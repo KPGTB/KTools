@@ -14,24 +14,17 @@
  *    limitations under the License.
  */
 
-package com.github.kpgtb.ktools.manager.updater;
+package com.github.kpgtb.ktools.manager.command.annotation;
 
-import com.github.kpgtb.ktools.manager.updater.version.KVersion;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Interface with update checkers
+ * Hide sub command from tab completer and from help
  */
-public interface IUpdater {
-    /**
-     * Check if there are some updates of this plugin
-     * @param version Version of plugin as KVersion
-     * @return true if there are some updates
-     */
-    boolean hasUpdate(KVersion version);
-
-    /**
-     * Check download link to update
-     * @return Download link to update
-     */
-    String getDownloadLink();
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Hidden {
 }

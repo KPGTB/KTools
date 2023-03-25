@@ -31,9 +31,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * LanguageManager handles all message translations
@@ -84,6 +86,29 @@ public class LanguageManager {
      */
     public void saveDefaultLanguage(String path, JavaPlugin plugin) {
         plugin.saveResource(path,false);
+
+        File defaultLangFile = new File(dataFolder, path);
+        FileConfiguration langConfig = YamlConfiguration.loadConfiguration(defaultLangFile);
+
+        FileConfiguration pluginLangConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(
+                plugin.getResource(path)
+        ));
+
+        AtomicBoolean changed = new AtomicBoolean(false);
+        pluginLangConfig.getConfigurationSection("message").getKeys(false).forEach(langKey -> {
+            if(!langConfig.getConfigurationSection("message").contains(langKey)) {
+                langConfig.set("message."+langKey, pluginLangConfig.getString("message."+langKey));
+                changed.set(true);
+            }
+        });
+        if(changed.get()) {
+            try {
+                langConfig.save(defaultLangFile);
+            } catch (IOException e) {
+                debug.sendWarning(DebugType.LANGUAGE, "Error while saving changes to default language file ["+path+"].");
+            }
+            debug.sendInfo(DebugType.LANGUAGE, "Saved default language file with changes ["+path+"].");
+        }
         debug.sendInfo(DebugType.LANGUAGE, "Saved default language file ["+path+"].");
     }
 
@@ -141,10 +166,10 @@ public class LanguageManager {
      * @param languageLevel {@link com.github.kpgtb.ktools.manager.language.LanguageLevel} PLUGIN (from lang) or GLOBAL (from Ktools)
      * @param code Code of message
      * @param player {@link org.bukkit.entity.Player} to PlaceholderAPI
-     * @param placeholders List of {@link net.kyori.adventure.text.minimessage.tag.resolver.Placeholder}
+     * @param placeholders Array of {@link net.kyori.adventure.text.minimessage.tag.resolver.Placeholder}
      * @return A list of translated components with PAPI and plugin's placeholders
      */
-    public ArrayList<Component> getComponent(LanguageLevel languageLevel, String code, Player player, List<TagResolver> placeholders) {
+    public ArrayList<Component> getComponent(LanguageLevel languageLevel, String code, Player player, TagResolver... placeholders) {
         ArrayList<String> messages = new ArrayList<>();
 
         LanguageManager manager = languageLevel == LanguageLevel.PLUGIN ? this : this.globalManager;
@@ -167,7 +192,7 @@ public class LanguageManager {
                 msg = PlaceholderAPI.setPlaceholders(player, msg);
             }
             result.add(
-                    mm.deserialize(msg, placeholders.toArray(new TagResolver[0]))
+                    mm.deserialize(msg, placeholders)
             );
         });
 
@@ -178,32 +203,34 @@ public class LanguageManager {
      * Get message translation as list of {@link net.kyori.adventure.text.Component}
      * @param languageLevel {@link com.github.kpgtb.ktools.manager.language.LanguageLevel} PLUGIN (from lang) or GLOBAL (from Ktools)
      * @param code Code of message
-     * @param player {@link org.bukkit.entity.Player} to PlaceholderAPI
-     * @return A list of translated components with PAPI
-     */
-    public ArrayList<Component> getComponent(LanguageLevel languageLevel, String code, Player player) {
-        return this.getComponent(languageLevel, code,player,new ArrayList<>());
-    }
-
-    /**
-     * Get message translation as list of {@link net.kyori.adventure.text.Component}
-     * @param languageLevel {@link com.github.kpgtb.ktools.manager.language.LanguageLevel} PLUGIN (from lang) or GLOBAL (from Ktools)
-     * @param code Code of message
-     * @param placeholders List of {@link net.kyori.adventure.text.minimessage.tag.resolver.Placeholder}
+     * @param placeholders Array of {@link net.kyori.adventure.text.minimessage.tag.resolver.Placeholder}
      * @return A list of translated components with plugin's placeholders
      */
-    public ArrayList<Component> getComponent(LanguageLevel languageLevel, String code, List<TagResolver> placeholders) {
+    public ArrayList<Component> getComponent(LanguageLevel languageLevel, String code, TagResolver... placeholders) {
         return this.getComponent(languageLevel, code,null,placeholders);
     }
 
     /**
-     * Get message translation as list of {@link net.kyori.adventure.text.Component}
+     * Get first line of message translation as {@link net.kyori.adventure.text.Component}
      * @param languageLevel {@link com.github.kpgtb.ktools.manager.language.LanguageLevel} PLUGIN (from lang) or GLOBAL (from Ktools)
      * @param code Code of message
-     * @return A list of translated components
+     * @param player {@link org.bukkit.entity.Player} to PlaceholderAPI
+     * @param placeholders Array of {@link net.kyori.adventure.text.minimessage.tag.resolver.Placeholder}
+     * @return A first line of translated components with plugin's placeholders
      */
-    public ArrayList<Component> getComponent(LanguageLevel languageLevel, String code) {
-        return this.getComponent(languageLevel, code,null,new ArrayList<>());
+    public Component getSingleComponent(LanguageLevel languageLevel, String code, Player player, TagResolver... placeholders) {
+        return this.getComponent(languageLevel,code,player,placeholders).get(0);
+    }
+
+    /**
+     * Get first line of message translation as {@link net.kyori.adventure.text.Component}
+     * @param languageLevel {@link com.github.kpgtb.ktools.manager.language.LanguageLevel} PLUGIN (from lang) or GLOBAL (from Ktools)
+     * @param code Code of message
+     * @param placeholders Array of {@link net.kyori.adventure.text.minimessage.tag.resolver.Placeholder}
+     * @return A first line of translated components with plugin's placeholders
+     */
+    public Component getSingleComponent(LanguageLevel languageLevel, String code, TagResolver... placeholders) {
+        return this.getComponent(languageLevel, code, placeholders).get(0);
     }
 
     /**
@@ -211,10 +238,10 @@ public class LanguageManager {
      * @param languageLevel {@link com.github.kpgtb.ktools.manager.language.LanguageLevel} PLUGIN (from lang) or GLOBAL (from Ktools)
      * @param code Code of message
      * @param player {@link org.bukkit.entity.Player} to PlaceholderAPI
-     * @param placeholders List of {@link net.kyori.adventure.text.minimessage.tag.resolver.Placeholder}
+     * @param placeholders Array of {@link net.kyori.adventure.text.minimessage.tag.resolver.Placeholder}
      * @return A list of translated strings with PAPI and plugin's placeholders
      */
-    public ArrayList<String> getString(LanguageLevel languageLevel, String code, Player player, List<TagResolver> placeholders) {
+    public ArrayList<String> getString(LanguageLevel languageLevel, String code, Player player, TagResolver... placeholders) {
         ArrayList<Component> components = this.getComponent(languageLevel, code,player,placeholders);
         ArrayList<String> result = new ArrayList<>();
 
@@ -249,31 +276,34 @@ public class LanguageManager {
      * Get message translation as list of {@link String}
      * @param languageLevel {@link com.github.kpgtb.ktools.manager.language.LanguageLevel} PLUGIN (from lang) or GLOBAL (from Ktools)
      * @param code Code of message
-     * @param player {@link org.bukkit.entity.Player} to PlaceholderAPI
-     * @return A list of translated strings with PAPI
-     */
-    public ArrayList<String> getString(LanguageLevel languageLevel, String code, Player player) {
-        return this.getString(languageLevel, code,player,new ArrayList<>());
-    }
-
-    /**
-     * Get message translation as list of {@link String}
-     * @param languageLevel {@link com.github.kpgtb.ktools.manager.language.LanguageLevel} PLUGIN (from lang) or GLOBAL (from Ktools)
-     * @param code Code of message
-     * @param placeholders List of {@link net.kyori.adventure.text.minimessage.tag.resolver.Placeholder}
+     * @param placeholders Array of {@link net.kyori.adventure.text.minimessage.tag.resolver.Placeholder}
      * @return A list of translated strings with plugin's placeholders
      */
-    public ArrayList<String> getString(LanguageLevel languageLevel, String code, List<TagResolver> placeholders) {
+    public ArrayList<String> getString(LanguageLevel languageLevel, String code, TagResolver... placeholders) {
         return this.getString(languageLevel, code,null,placeholders);
     }
 
+
     /**
-     * Get message translation as list of {@link String}
+     * Get first line of message translation as {@link String}
      * @param languageLevel {@link com.github.kpgtb.ktools.manager.language.LanguageLevel} PLUGIN (from lang) or GLOBAL (from Ktools)
      * @param code Code of message
-     * @return A list of translated strings
+     * @param player {@link org.bukkit.entity.Player} to PlaceholderAPI
+     * @param placeholders Array of {@link net.kyori.adventure.text.minimessage.tag.resolver.Placeholder}
+     * @return A first line of translated strings with plugin's placeholders
      */
-    public ArrayList<String> getString(LanguageLevel languageLevel, String code) {
-        return this.getString(languageLevel, code,null,new ArrayList<>());
+    public String getSingleString(LanguageLevel languageLevel, String code, Player player, TagResolver... placeholders) {
+        return this.getString(languageLevel,code,player,placeholders).get(0);
+    }
+
+    /**
+     * Get first line of message translation as {@link String}
+     * @param languageLevel {@link com.github.kpgtb.ktools.manager.language.LanguageLevel} PLUGIN (from lang) or GLOBAL (from Ktools)
+     * @param code Code of message
+     * @param placeholders Array of {@link net.kyori.adventure.text.minimessage.tag.resolver.Placeholder}
+     * @return A first line of translated strings with plugin's placeholders
+     */
+    public String getSingleString(LanguageLevel languageLevel, String code, TagResolver... placeholders) {
+        return this.getString(languageLevel, code, placeholders).get(0);
     }
 }

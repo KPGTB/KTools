@@ -16,6 +16,8 @@
 
 package com.github.kpgtb.ktools.manager.updater;
 
+import com.github.kpgtb.ktools.manager.updater.version.KVersion;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -31,13 +33,14 @@ public class SpigotUpdater implements IUpdater {
     }
 
     @Override
-    public boolean hasUpdate(double version) {
+    public boolean hasUpdate(KVersion version) {
         try {
             URL url = new URL("https://api.spigotmc.org/legacy/update.php?resource="+resourceID);
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(url.openStream()));
             String line = bufferedReader.readLine();
-            double newVersion = Double.parseDouble(line);
-            return newVersion > version;
+
+            KVersion newVersion = new KVersion(line);
+            return newVersion.isNewerThan(version);
         } catch (Exception e) {
             return false;
         }

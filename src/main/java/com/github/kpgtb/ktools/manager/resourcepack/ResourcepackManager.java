@@ -135,10 +135,10 @@ public class ResourcepackManager {
 
     /**
      * Register plugin in resourcepack manager to check updates
-     * @param pluginName
-     * @param version
+     * @param pluginName Name of plugin
+     * @param version Version of plugin
      */
-    public void registerPlugin(String pluginName, double version) {
+    public void registerPlugin(String pluginName, String version) {
         this.plugins.add(pluginName+"["+version+"]");
     }
 
@@ -157,7 +157,7 @@ public class ResourcepackManager {
     }
 
     /**
-     * Check if resourcepack has latest version
+     * Check if resourcepack has the latest version
      * @return true if is latest
      */
     private boolean isResourcepackLatest() {

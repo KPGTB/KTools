@@ -91,7 +91,6 @@ public class ItemBuilder {
     /** Initalizes the ItemBuilder with a {@link org.bukkit.inventory.ItemStack} */
     public ItemBuilder(ItemStack item) {
         Validate.notNull(item, "The Item is null.");
-        if(item.hasItemMeta())
         this.material = item.getType();
         this.amount = item.getAmount();
         this.enchantments = item.getEnchantments();

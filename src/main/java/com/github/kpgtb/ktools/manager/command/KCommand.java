@@ -268,12 +268,18 @@ public abstract class KCommand extends Command {
                         .append(argName)
                         .append(end);
             });
+
+
+            boolean hidden = method.getDeclaredAnnotation(Hidden.class) != null;
+            this.debug.sendInfo(DebugType.COMMAND, "This command is hidden: " + ((hidden) ? "yes" : "no"));
+
             commandsConfig.set(cmdName+".variants."+subName+".command", cmdString.toString());
             commandsConfig.set(cmdName+".variants."+subName+".description", subDescription);
             commandsConfig.set(cmdName+".variants."+subName+".permissions", permissions);
             commandsConfig.set(cmdName+".variants."+subName+".onlyPlayer", playerRequired);
+            commandsConfig.set(cmdName+".variants."+subName+".hidden", hidden);
 
-            Subcommand subcommand = new Subcommand(subName, subDescription, permissions,playerRequired, senderOrFilters, senderAndFilters, parameters,method, endless);
+            Subcommand subcommand = new Subcommand(subName, subDescription, permissions,playerRequired, senderOrFilters, senderAndFilters, parameters,method, endless, hidden);
             if(isMain) {
                 this.debug.sendInfo(DebugType.COMMAND, "This command is main command!");
                 this.mainCommands.add(subcommand);
@@ -475,6 +481,9 @@ public abstract class KCommand extends Command {
             if(!hasPermission(sender,command)) {
                 return;
             }
+            if(command.isHidden()) {
+                return;
+            }
 
             StringBuilder cmdLine = subName.startsWith("mcmd_") ? new StringBuilder(cmdName + " ") : new StringBuilder(cmdName + " " + subName + " ");
             AtomicInteger i = new AtomicInteger(1);
@@ -496,7 +505,7 @@ public abstract class KCommand extends Command {
             ArrayList<TagResolver> placeholders = new ArrayList<>();
             placeholders.add(Placeholder.parsed("command", cmdLine.toString()));
             placeholders.add(Placeholder.parsed("description", command.getDescription()));
-            toSend.addAll(language.getComponent(LanguageLevel.GLOBAL, "helpLine", placeholders));
+            toSend.addAll(language.getComponent(LanguageLevel.GLOBAL, "helpLine", placeholders.toArray(new TagResolver[0])));
         });
 
         toSend.add(Component.text(" "));
@@ -521,6 +530,7 @@ public abstract class KCommand extends Command {
                     subcommands.values()
                         .stream()
                         .filter(cmd -> hasPermission(sender,cmd))
+                        .filter(cmd -> !cmd.isHidden())
                         .map(Subcommand::getName)
                         .filter(s -> s.startsWith(lastArg))
                         .collect(Collectors.toList())
@@ -533,12 +543,16 @@ public abstract class KCommand extends Command {
                 if(!hasPermission(sender,cmd)) {
                     return;
                 }
+                if(cmd.isHidden()) {
+                    return;
+                }
                 Optional<CommandArgument> clazz = cmd.getArgsType().values().stream().findFirst();
                 if(!clazz.isPresent()) {
                     return;
                 }
 
                 List<String> complete = parser.complete(lastArg,sender,clazz.get().getClazz(),wrapper);
+                result.add("<" + clazz.get().getName() + ">");
                 result.addAll(getCompleterThatPass(complete,clazz.get(),sender));
             });
 
@@ -556,6 +570,9 @@ public abstract class KCommand extends Command {
             if(!hasPermission(sender,cmd)) {
                 return;
             }
+            if(cmd.isHidden()) {
+                return;
+            }
             boolean mainCmd = subName.startsWith("mcmd_");
 
             List<String> trueArgs = Arrays.stream(args).collect(Collectors.toList());
@@ -567,25 +584,44 @@ public abstract class KCommand extends Command {
             }
             int trueLastIdx = trueArgs.size() -1;
 
-            if(cmd.getArgsType().size() < trueArgs.size()) {
-                return;
-            }
-            boolean isIt = true;
-            for (int i = 0; i < trueLastIdx; i++) {
-                CommandArgument argument = (CommandArgument) cmd.getArgsType().values().toArray()[i];
-                Class<?> clazz = argument.getClazz();
-                if(!parser.canConvert(trueArgs.get(i), clazz,wrapper)) {
-                    isIt = false;
-                    break;
+            if(cmd.getArgsType().size() >= trueArgs.size()) {
+                boolean isIt = true;
+                for (int i = 0; i < trueLastIdx; i++) {
+                    CommandArgument argument = (CommandArgument) cmd.getArgsType().values().toArray()[i];
+                    Class<?> clazz = argument.getClazz();
+                    if(!parser.canConvert(trueArgs.get(i), clazz,wrapper)) {
+                        isIt = false;
+                        break;
+                    }
                 }
+                if(!isIt) {
+                    return;
+                }
+                CommandArgument argument = (CommandArgument) cmd.getArgsType().values().toArray()[trueLastIdx];
+                Class<?> clazz = argument.getClazz();
+                List<String> complete = parser.complete(lastArg,sender,clazz,wrapper);
+                result.add("<" + argument.getName() + ">");
+                result.addAll(getCompleterThatPass(complete,argument,sender));
+            } else {
+                if(!cmd.isEndless()) {
+                    return;
+                }
+
+                boolean isIt = true;
+                for (int i = 0; i < cmd.getArgsType().size(); i++) {
+                    CommandArgument argument = (CommandArgument) cmd.getArgsType().values().toArray()[i];
+                    Class<?> clazz = argument.getClazz();
+                    if(!parser.canConvert(trueArgs.get(i), clazz,wrapper)) {
+                        isIt = false;
+                        break;
+                    }
+                }
+                if(!isIt) {
+                    return;
+                }
+                CommandArgument argument = (CommandArgument) cmd.getArgsType().values().toArray()[cmd.getArgsType().size() - 1];
+                result.add("[<" + argument.getName() + ">]");
             }
-            if(!isIt) {
-                return;
-            }
-            CommandArgument argument = (CommandArgument) cmd.getArgsType().values().toArray()[trueLastIdx];
-            Class<?> clazz = argument.getClazz();
-            List<String> complete = parser.complete(lastArg,sender,clazz,wrapper);
-            result.addAll(getCompleterThatPass(complete,argument,sender));
         });
 
         return result;
@@ -671,7 +707,7 @@ public abstract class KCommand extends Command {
                 break;
             }
             if(filter.weight() > lastWeight) {
-                message = filter.notPassMessage(obj,wrapper);
+                message = filter.notPassMessage(obj,wrapper,sender);
                 lastWeight = filter.weight();
             }
         }
@@ -684,7 +720,7 @@ public abstract class KCommand extends Command {
         for (IFilter<T> filter : andFilters) {
             if (!filter.filter(obj, wrapper,sender)) {
                 if(filter.weight() > lastWeight) {
-                    message = filter.notPassMessage(obj,wrapper);
+                    message = filter.notPassMessage(obj,wrapper,sender);
                     lastWeight = filter.weight();
                 }
             }

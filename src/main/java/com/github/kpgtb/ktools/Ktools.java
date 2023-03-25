@@ -93,6 +93,8 @@ public final class Ktools extends JavaPlugin {
             @Override
             public void run() {
                 if(resourcepackManager.isEnabled()) {
+                    resourcepackManager.registerPlugin("ktools", getDescription().getVersion());
+
                     //NegativeSpaces
                     resourcepackManager.registerCustomChar("space", "\uF801", "space_split", getResource("txt/space_split.png"), -3, -32768, -1);
                     resourcepackManager.registerCustomChar("space", "\uF802", "space_split", getResource("txt/space_split.png"), -4, -32768, -2);
