@@ -39,8 +39,9 @@ public class ToolsObjectWrapper {
     private final DataManager dataManager;
     private final ResourcepackManager resourcepackManager;
     private final UiManager uiManager;
+    private final boolean legacy;
 
-    public ToolsObjectWrapper(CacheManager cacheManager, DebugManager debugManager, LanguageManager languageManager, JavaPlugin plugin, BukkitAudiences adventure, ParamParserManager paramParserManager, DataManager dataManager, ResourcepackManager resourcepackManager, UiManager uiManager) {
+    public ToolsObjectWrapper(CacheManager cacheManager, DebugManager debugManager, LanguageManager languageManager, JavaPlugin plugin, BukkitAudiences adventure, ParamParserManager paramParserManager, DataManager dataManager, ResourcepackManager resourcepackManager, UiManager uiManager, boolean legacy) {
         this.cacheManager = cacheManager;
         this.debugManager = debugManager;
         this.languageManager = languageManager;
@@ -50,6 +51,7 @@ public class ToolsObjectWrapper {
         this.dataManager = dataManager;
         this.resourcepackManager = resourcepackManager;
         this.uiManager = uiManager;
+        this.legacy = legacy;
     }
 
     public ToolsObjectWrapper(GlobalManagersWrapper globalManagersWrapper, LanguageManager languageManager, JavaPlugin plugin, BukkitAudiences adventure) {
@@ -59,6 +61,7 @@ public class ToolsObjectWrapper {
         this.dataManager = globalManagersWrapper.getDataManager();
         this.resourcepackManager = globalManagersWrapper.getResourcepackManager();
         this.uiManager = globalManagersWrapper.getUiManager();
+        this.legacy = globalManagersWrapper.isLegacy();
 
         this.languageManager = languageManager;
         this.plugin = plugin;
@@ -99,5 +102,9 @@ public class ToolsObjectWrapper {
 
     public UiManager getUiManager() {
         return uiManager;
+    }
+
+    public boolean isLegacy() {
+        return legacy;
     }
 }

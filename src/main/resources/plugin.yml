@@ -1,7 +1,6 @@
 name: Ktools
 version: '${project.version}'
 main: com.github.kpgtb.ktools.Ktools
-api-version: 1.14
 authors: [ KPG_TB ]
 description: An advenced, reloaded version of my tools to Spigot and Paper plugins
 website: kpgtb.github.io

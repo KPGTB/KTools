@@ -17,102 +17,105 @@ package com.github.kpgtb.ktools.util;
 
 import com.google.gson.Gson;
 import org.apache.commons.lang.Validate;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.material.MaterialData;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * ItemBuilder - API Class to create a {@link org.bukkit.inventory.ItemStack} with just one line of Code
+ * ItemBuilder - API Class to create a {@link ItemStack} with just one line of Code
+ * Legacy version 1.8 - 1.13
  * @version 1.8
  * @author Acquized
  * @contributor Kev575
  * @contributor KPG-TB
  */
-public class ItemBuilder {
+public class LegacyItemBuilder {
 
     private Material material;
+    private MaterialData data;
     private int amount = 1;
     private int damage = 0;
     private Map<Enchantment, Integer> enchantments = new HashMap<>();
     private String displayName;
-    private int model = 0;
     private List<String> lore = new ArrayList<>();
     private List<ItemFlag> flags = new ArrayList<>();
-
-    private boolean unbreakable = false;
-    private OfflinePlayer owner;
 
 
     private boolean unsafeStackSize = false;
 
-    /** Initalizes the ItemBuilder with {@link org.bukkit.Material} */
-    public ItemBuilder(Material material) {
+    /** Initalizes the ItemBuilder with {@link Material} */
+    public LegacyItemBuilder(Material material) {
         if(material == null) material = Material.AIR;
         this.material = material;
+        this.data = new MaterialData(material);
     }
 
-    /** Initalizes the ItemBuilder with {@link org.bukkit.Material} and Amount */
-    public ItemBuilder(Material material, int amount) {
+    /** Initalizes the ItemBuilder with {@link MaterialData} */
+    public LegacyItemBuilder(MaterialData matData) {
+        if(matData == null) material = Material.AIR;
+        this.material = matData.getItemType();
+        this.data = matData;
+    }
+
+    /** Initalizes the ItemBuilder with {@link Material} and Amount */
+    public LegacyItemBuilder(Material material, int amount) {
         if(material == null) material = Material.AIR;
         if(((amount > material.getMaxStackSize()) || (amount <= 0)) && (!unsafeStackSize)) amount = 1;
         this.amount = amount;
         this.material = material;
+        this.data = new MaterialData(material);
     }
 
-    /** Initalizes the ItemBuilder with {@link org.bukkit.Material}, Amount and Displayname */
-    public ItemBuilder(Material material, int amount, String displayname) {
+    /** Initalizes the ItemBuilder with {@link Material}, Amount and Displayname */
+    public LegacyItemBuilder(Material material, int amount, String displayname) {
         if(material == null) material = Material.AIR;
         Validate.notNull(displayname, "The Displayname is null.");
         this.material = material;
         if(((amount > material.getMaxStackSize()) || (amount <= 0)) && (!unsafeStackSize)) amount = 1;
         this.amount = amount;
+        this.data = new MaterialData(material);
         this.displayName = displayname;
     }
 
-    /** Initalizes the ItemBuilder with {@link org.bukkit.Material} and Displayname */
-    public ItemBuilder(Material material, String displayname) {
+    /** Initalizes the ItemBuilder with {@link Material} and Displayname */
+    public LegacyItemBuilder(Material material, String displayname) {
         if(material == null) material = Material.AIR;
         Validate.notNull(displayname, "The Displayname is null.");
         this.material = material;
+        this.data = new MaterialData(material);
         this.displayName = displayname;
     }
 
-    /** Initalizes the ItemBuilder with a {@link org.bukkit.inventory.ItemStack} */
-    public ItemBuilder(ItemStack item) {
+    /** Initalizes the ItemBuilder with a {@link ItemStack} */
+    public LegacyItemBuilder(ItemStack item) {
         Validate.notNull(item, "The Item is null.");
         this.material = item.getType();
+        this.data = item.getData();
         this.amount = item.getAmount();
         this.enchantments = item.getEnchantments();
+        this.damage = item.getDurability();
         if(item.hasItemMeta()) {
             ItemMeta meta = item.getItemMeta();
             this.displayName = meta.getDisplayName();
-            this.model = meta.getCustomModelData();
             this.lore = meta.getLore();
-            this.unbreakable = meta.isUnbreakable();
             for (ItemFlag f : meta.getItemFlags()) {
                 flags.add(f);
-            }
-            this.damage = 0;
-            if(meta instanceof Damageable) {
-                this.damage = ((Damageable) meta).getDamage();
-            }
-            if(this.material.equals(Material.PLAYER_HEAD)) {
-                this.owner = ((SkullMeta)meta).getOwningPlayer();
             }
         }
     }
 
-    /** Initalizes the ItemBuilder with a {@link org.bukkit.configuration.file.FileConfiguration} ItemStack in Path */
-    public ItemBuilder(FileConfiguration cfg, String path) {
+    /** Initalizes the ItemBuilder with a {@link FileConfiguration} ItemStack in Path */
+    public LegacyItemBuilder(FileConfiguration cfg, String path) {
         this(cfg.getItemStack(path));
     }
 
@@ -121,7 +124,7 @@ public class ItemBuilder {
      * @deprecated Use the already initalized {@code ItemBuilder} Instance to improve performance
      */
     @Deprecated
-    public ItemBuilder(ItemBuilder builder) {
+    public LegacyItemBuilder(LegacyItemBuilder builder) {
         Validate.notNull(builder, "The ItemBuilder is null.");
         this.material = builder.material;
         this.amount = builder.amount;
@@ -130,27 +133,26 @@ public class ItemBuilder {
         this.displayName = builder.displayName;
         this.lore = builder.lore;
         this.flags = builder.flags;
-        this.model = builder.model;
-        this.unbreakable = builder.unbreakable;
-        this.owner = builder.owner;
+        this.data = builder.data;
     }
 
     /**
      * Sets the Amount of the ItemStack
      * @param amount Amount for the ItemStack
      */
-    public ItemBuilder amount(int amount) {
+    public LegacyItemBuilder amount(int amount) {
         if(((amount > material.getMaxStackSize()) || (amount <= 0)) && (!unsafeStackSize)) amount = 1;
         this.amount = amount;
         return this;
     }
 
     /**
-     * Sets custom model data of the ItemStack
-     * @param model Custom model data value
+     * Sets the data of the ItemStack
+     * @param matData Data for the ItemStack
      */
-    public ItemBuilder model(int model) {
-        this.model = model;
+    public LegacyItemBuilder data(MaterialData matData) {
+        this.material = matData.getItemType();
+        this.data = matData;
         return this;
     }
 
@@ -160,7 +162,7 @@ public class ItemBuilder {
      * @deprecated Use {@code ItemBuilder#durability}
      */
     @Deprecated
-    public ItemBuilder damage(short damage) {
+    public LegacyItemBuilder damage(short damage) {
         this.damage = damage;
         return this;
     }
@@ -169,37 +171,38 @@ public class ItemBuilder {
      * Sets the Durability (Damage) of the ItemStack
      * @param damage Damage for the ItemStack
      */
-    public ItemBuilder durability(short damage) {
+    public LegacyItemBuilder durability(short damage) {
         this.damage = damage;
         return this;
     }
 
     /**
-     * Sets the {@link org.bukkit.Material} of the ItemStack
+     * Sets the {@link Material} of the ItemStack
      * @param material Material for the ItemStack
      */
-    public ItemBuilder material(Material material) {
+    public LegacyItemBuilder material(Material material) {
         Validate.notNull(material, "The Material is null.");
         this.material = material;
+        this.data = new MaterialData(material);
         return this;
     }
 
     /**
-     * Adds a {@link org.bukkit.enchantments.Enchantment} to the ItemStack
+     * Adds a {@link Enchantment} to the ItemStack
      * @param enchant Enchantment for the ItemStack
      * @param level Level of the Enchantment
      */
-    public ItemBuilder enchant(Enchantment enchant, int level) {
+    public LegacyItemBuilder enchant(Enchantment enchant, int level) {
         Validate.notNull(enchant, "The Enchantment is null.");
         enchantments.put(enchant, level);
         return this;
     }
 
     /**
-     * Adds a list of {@link org.bukkit.enchantments.Enchantment} to the ItemStack
+     * Adds a list of {@link Enchantment} to the ItemStack
      * @param enchantments Map containing Enchantment and Level for the ItemStack
      */
-    public ItemBuilder enchant(Map<Enchantment, Integer> enchantments) {
+    public LegacyItemBuilder enchant(Map<Enchantment, Integer> enchantments) {
         Validate.notNull(enchantments, "The Enchantments are null.");
         this.enchantments = enchantments;
         return this;
@@ -209,7 +212,7 @@ public class ItemBuilder {
      * Sets the Displayname of the ItemStack
      * @param displayname Displayname for the ItemStack
      */
-    public ItemBuilder displayname(String displayname) {
+    public LegacyItemBuilder displayname(String displayname) {
         Validate.notNull(displayname, "The Displayname is null.");
         this.displayName = displayname;
         return this;
@@ -219,7 +222,7 @@ public class ItemBuilder {
      * Adds a Line to the Lore of the ItemStack
      * @param line Line of the Lore for the ItemStack
      */
-    public ItemBuilder lore(String line) {
+    public LegacyItemBuilder lore(String line) {
         Validate.notNull(line, "The Line is null.");
         lore.add(line);
         return this;
@@ -229,7 +232,7 @@ public class ItemBuilder {
      * Sets the Lore of the ItemStack
      * @param lore List containing String as Lines for the ItemStack Lore
      */
-    public ItemBuilder lore(List<String> lore) {
+    public LegacyItemBuilder lore(List<String> lore) {
         Validate.notNull(lore, "The Lores are null.");
         this.lore = lore;
         return this;
@@ -241,7 +244,7 @@ public class ItemBuilder {
      * @deprecated Use {@code ItemBuilder#lore}
      */
     @Deprecated
-    public ItemBuilder lores(String... lines) {
+    public LegacyItemBuilder lores(String... lines) {
         Validate.notNull(lines, "The Lines are null.");
         for (String line : lines) {
             lore(line);
@@ -253,7 +256,7 @@ public class ItemBuilder {
      * Adds one or more Lines to the Lore of the ItemStack
      * @param lines One or more Strings for the ItemStack Lore
      */
-    public ItemBuilder lore(String... lines) {
+    public LegacyItemBuilder lore(String... lines) {
         Validate.notNull(lines, "The Lines are null.");
         for (String line : lines) {
             lore(line);
@@ -266,58 +269,36 @@ public class ItemBuilder {
      * @param line Line of the Lore for the ItemStack
      * @param index Position in the Lore for the ItemStack
      */
-    public ItemBuilder lore(String line, int index) {
+    public LegacyItemBuilder lore(String line, int index) {
         Validate.notNull(line, "The Line is null.");
         lore.set(index, line);
         return this;
     }
 
     /**
-     * Adds a {@link org.bukkit.inventory.ItemFlag} to the ItemStack
+     * Adds a {@link ItemFlag} to the ItemStack
      * @param flag ItemFlag for the ItemStack
      */
-    public ItemBuilder flag(ItemFlag flag) {
+    public LegacyItemBuilder flag(ItemFlag flag) {
         Validate.notNull(flag, "The Flag is null.");
         flags.add(flag);
         return this;
     }
 
     /**
-     * Adds more than one {@link org.bukkit.inventory.ItemFlag} to the ItemStack
+     * Adds more than one {@link ItemFlag} to the ItemStack
      * @param flags List containing all ItemFlags
      */
-    public ItemBuilder flag(List<ItemFlag> flags) {
+    public LegacyItemBuilder flag(List<ItemFlag> flags) {
         Validate.notNull(flags, "The Flags are null.");
         this.flags = flags;
         return this;
     }
 
-    /**
-     * Makes or removes the Unbreakable Flag from the ItemStack
-     * @param unbreakable If it should be unbreakable
-     */
-    public ItemBuilder unbreakable(boolean unbreakable) {
-        this.unbreakable = unbreakable;
-        return this;
-    }
-
     /** Makes the ItemStack Glow like it had a Enchantment */
-    public ItemBuilder glow() {
+    public LegacyItemBuilder glow() {
         enchant(material != Material.BOW ? Enchantment.ARROW_INFINITE : Enchantment.LUCK, 10);
         flag(ItemFlag.HIDE_ENCHANTS);
-        return this;
-    }
-
-    /**
-     * Sets the Skin for the Skull
-     * @param user Username of the Skull
-     */
-    public ItemBuilder owner(String user) {
-        Validate.notNull(user, "The Username is null.");
-        if(material == Material.PLAYER_HEAD) {
-            OfflinePlayer op = Bukkit.getOfflinePlayer(user);
-            this.owner = op;
-        }
         return this;
     }
 
@@ -325,13 +306,13 @@ public class ItemBuilder {
      * Allows / Disallows Stack Sizes under 1 and above 64
      * @param allow Determinates if it should be allowed or not
      */
-    public ItemBuilder unsafeStackSize(boolean allow) {
+    public LegacyItemBuilder unsafeStackSize(boolean allow) {
         this.unsafeStackSize = allow;
         return this;
     }
 
     /** Toggles allowment of stack sizes under 1 and above 64*/
-    public ItemBuilder toggleUnsafeStackSize() {
+    public LegacyItemBuilder toggleUnsafeStackSize() {
         unsafeStackSize(!unsafeStackSize);
         return this;
     }
@@ -385,12 +366,16 @@ public class ItemBuilder {
         return lore;
     }
 
+    public MaterialData getData() {
+        return data;
+    }
+
     /**
      * Converts the Item to a ConfigStack and writes it to path
      * @param cfg Configuration File to which it should be writed
      * @param path Path to which the ConfigStack should be writed
      */
-    public ItemBuilder toConfig(FileConfiguration cfg, String path) {
+    public LegacyItemBuilder toConfig(FileConfiguration cfg, String path) {
         cfg.set(path, build());
         return this;
     }
@@ -400,8 +385,8 @@ public class ItemBuilder {
      * @param cfg Configuration File from which it should be read
      * @param path Path from which the ConfigStack should be read
      */
-    public ItemBuilder fromConfig(FileConfiguration cfg, String path) {
-        return new ItemBuilder(cfg, path);
+    public LegacyItemBuilder fromConfig(FileConfiguration cfg, String path) {
+        return new LegacyItemBuilder(cfg, path);
     }
 
     /**
@@ -410,7 +395,7 @@ public class ItemBuilder {
      * @param path Path to which the ConfigStack should be writed
      * @param builder Which ItemBuilder should be writed
      */
-    public static void toConfig(FileConfiguration cfg, String path, ItemBuilder builder) {
+    public static void toConfig(FileConfiguration cfg, String path, LegacyItemBuilder builder) {
         cfg.set(path, builder.build());
     }
 
@@ -427,7 +412,7 @@ public class ItemBuilder {
      * @param builder Which ItemBuilder should be converted
      * @return The ItemBuilder as JSON String
      */
-    public static String toJson(ItemBuilder builder) {
+    public static String toJson(LegacyItemBuilder builder) {
         return new Gson().toJson(builder);
     }
 
@@ -435,8 +420,8 @@ public class ItemBuilder {
      * Converts the JsonItemBuilder back to a ItemBuilder
      * @param json Which JsonItemBuilder should be converted
      */
-    public static ItemBuilder fromJson(String json) {
-        return new Gson().fromJson(json, ItemBuilder.class);
+    public static LegacyItemBuilder fromJson(String json) {
+        return new Gson().fromJson(json, LegacyItemBuilder.class);
     }
 
     /**
@@ -444,14 +429,16 @@ public class ItemBuilder {
      * @param json Already existing JsonItemBuilder
      * @param overwrite Should the JsonItemBuilder used now
      */
-    public ItemBuilder applyJson(String json, boolean overwrite) {
-        ItemBuilder b = new Gson().fromJson(json, ItemBuilder.class);
+    public LegacyItemBuilder applyJson(String json, boolean overwrite) {
+        LegacyItemBuilder b = new Gson().fromJson(json, LegacyItemBuilder.class);
         if(overwrite)
             return b;
         if(b.displayName != null)
             displayName = b.displayName;
         if(b.material != null)
             material = b.material;
+        if(b.data != null)
+            data = b.data;
         if(b.lore != null)
             lore = b.lore;
         if(b.enchantments != null)
@@ -460,29 +447,29 @@ public class ItemBuilder {
             flags = b.flags;
         damage = b.damage;
         amount = b.amount;
-        model = b.model;
-        owner = b.owner;
-        unbreakable = b.unbreakable;
         return this;
     }
 
-    /** Converts the ItemBuilder to a {@link org.bukkit.inventory.ItemStack} */
+    /** Converts the ItemBuilder to a {@link ItemStack} */
     public ItemStack build() {
+        if(material == null) {
+            material = Material.AIR;
+        }
+        if(data == null) {
+            data = new MaterialData(material);
+        }
         ItemStack item = new ItemStack(material, amount);
         item.setType(material);
         item.setAmount(amount);
+        item.setData(data);
+        item.setDurability((short) damage);
         ItemMeta meta = item.getItemMeta();
-        if(meta instanceof Damageable) {
-            ((Damageable) meta).setDamage(damage);
-        }
-        meta.setUnbreakable(unbreakable);
         if(enchantments.size() > 0) {
             item.addUnsafeEnchantments(enchantments);
         }
         if(displayName != null) {
             meta.setDisplayName(displayName);
         }
-        meta.setCustomModelData(model);
         if(lore.size() > 0) {
             meta.setLore(lore);
         }
@@ -491,13 +478,7 @@ public class ItemBuilder {
                 meta.addItemFlags(f);
             }
         }
-        if(material.equals(Material.PLAYER_HEAD)) {
-            SkullMeta skullMeta = (SkullMeta) meta;
-            skullMeta.setOwningPlayer(owner);
-            item.setItemMeta(skullMeta);
-        } else {
-            item.setItemMeta(meta);
-        }
+        item.setItemMeta(meta);
         return item;
     }
 }

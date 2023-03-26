@@ -35,8 +35,9 @@ public class GlobalManagersWrapper {
     private final DataManager dataManager;
     private final UiManager uiManager;
     private final ResourcepackManager resourcepackManager;
+    private final boolean legacy;
 
-    public GlobalManagersWrapper(DebugManager debugManager, LanguageManager globalLanguageManager, CacheManager cacheManager, ParamParserManager paramParserManager, DataManager dataManager, UiManager uiManager, ResourcepackManager resourcepackManager) {
+    public GlobalManagersWrapper(DebugManager debugManager, LanguageManager globalLanguageManager, CacheManager cacheManager, ParamParserManager paramParserManager, DataManager dataManager, UiManager uiManager, ResourcepackManager resourcepackManager, boolean legacy) {
         this.debugManager = debugManager;
         this.globalLanguageManager = globalLanguageManager;
         this.cacheManager = cacheManager;
@@ -44,6 +45,7 @@ public class GlobalManagersWrapper {
         this.dataManager = dataManager;
         this.uiManager = uiManager;
         this.resourcepackManager = resourcepackManager;
+        this.legacy = legacy;
     }
 
     public DebugManager getDebugManager() {
@@ -72,5 +74,9 @@ public class GlobalManagersWrapper {
 
     public ResourcepackManager getResourcepackManager() {
         return resourcepackManager;
+    }
+
+    public boolean isLegacy() {
+        return legacy;
     }
 }

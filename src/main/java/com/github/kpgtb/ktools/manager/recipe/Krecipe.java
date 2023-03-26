@@ -33,7 +33,6 @@ import java.util.Iterator;
  */
 public abstract class Krecipe implements Listener {
     private final NamespacedKey recipeKey;
-    private final ToolsObjectWrapper toolsObjectWrapper;
     private Recipe recipe;
     private boolean isRegistered;
 
@@ -44,7 +43,6 @@ public abstract class Krecipe implements Listener {
      */
     public Krecipe(NamespacedKey recipeKey, ToolsObjectWrapper toolsObjectWrapper) {
         this.recipeKey = recipeKey;
-        this.toolsObjectWrapper = toolsObjectWrapper;
 
         this.recipe = null;
         this.isRegistered = false;

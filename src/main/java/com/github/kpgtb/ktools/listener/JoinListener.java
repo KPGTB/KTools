@@ -33,6 +33,7 @@ public class JoinListener extends Klistener {
     private final CacheManager cacheManager;
     private final ResourcepackManager resourcepackManager;
     private final JavaPlugin plugin;
+    private final boolean legacy;
     /**
      * Constructor of listener.
      *
@@ -43,11 +44,12 @@ public class JoinListener extends Klistener {
         this.cacheManager = toolsObjectWrapper.getCacheManager();
         this.resourcepackManager = toolsObjectWrapper.getResourcepackManager();
         this.plugin = toolsObjectWrapper.getPlugin();
+        this.legacy = toolsObjectWrapper.isLegacy();
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        if(!this.resourcepackManager.isEnabled()) {
+        if(legacy || !this.resourcepackManager.isEnabled()) {
             return;
         }
         new BukkitRunnable() {

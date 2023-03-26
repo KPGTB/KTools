@@ -683,7 +683,6 @@ public abstract class KCommand extends Command {
      * @param obj Object that should pass the test
      * @return true if object pass tests
      */
-    @SuppressWarnings("unchecked")
     protected <T> boolean passFilters(CommandArgument argument, T obj, CommandSender sender){
         Class<? extends IFilter<?>>[] orFilterClasses = argument.getOrFilters();
         Class<? extends IFilter<?>>[] andFilterClasses = argument.getAndFilters();
@@ -729,7 +728,6 @@ public abstract class KCommand extends Command {
         message.forEach(audience::sendMessage);
     }
 
-    @SuppressWarnings("unchecked")
     protected <T> void sendFilterMessages(CommandArgument argument, T obj, CommandSender sender, Audience audience) {
         Class<? extends IFilter<?>>[] orFilterClasses = argument.getOrFilters();
         Class<? extends IFilter<?>>[] andFilterClasses = argument.getAndFilters();
