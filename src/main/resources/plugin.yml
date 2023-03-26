@@ -5,3 +5,4 @@ authors: [ KPG_TB ]
 description: An advenced, reloaded version of my tools to Spigot and Paper plugins
 website: kpgtb.github.io
 softdepend: [PlaceholderAPI, ProtocolLib]
+api-version: 1.13

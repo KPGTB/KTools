@@ -108,7 +108,7 @@ public final class Ktools extends JavaPlugin {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (finalResourcepackManager.isEnabled()) {
+                    if (!legacy && finalResourcepackManager.isEnabled()) {
                         finalResourcepackManager.registerPlugin("ktools", getDescription().getVersion());
 
                         //NegativeSpaces
