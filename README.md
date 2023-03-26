@@ -1,7 +1,7 @@
 # Ktools
 
 [![](https://jitpack.io/v/KPGTB/Ktools.svg)](https://jitpack.io/#KPGTB/Ktools)
-![Spigot](https://img.shields.io/badge/Spigot-1.14--1.19-yellow)
+![Spigot](https://img.shields.io/badge/Spigot-1.8--1.19-yellow)
 ![License](https://img.shields.io/badge/License-Apache%202.0-orange)
 ![Author](https://img.shields.io/badge/Author-KPG--TB-green)
 ------------------------------------------------------------
@@ -12,7 +12,9 @@ An advenced, reloaded version of my tools to Spigot and Paper plugins
 
 ---
 
-Spigot 1.14 - 1.19
+Spigot 1.8 - 1.19
+
+**! Versions from 1.8 to 1.13 are LEGACY !**
 
 ### Maven
 

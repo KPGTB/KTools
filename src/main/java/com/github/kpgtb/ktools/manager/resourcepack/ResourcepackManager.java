@@ -45,7 +45,7 @@ public class ResourcepackManager {
     private final DebugManager debug;
     private final CacheManager cache;
 
-    private final File texturesFolder;
+    private File texturesFolder;
     private boolean required;
 
     private final ArrayList<CustomChar> customChars;
@@ -63,11 +63,6 @@ public class ResourcepackManager {
         this.debug = debug;
         this.cache = cache;
         this.required = false;
-
-        File dataFolder = plugin.getDataFolder();
-        dataFolder.mkdirs();
-        this.texturesFolder = new File(dataFolder, "textures");
-        this.texturesFolder.mkdirs();
 
         this.customChars = new ArrayList<>();
         this.customModels = new ArrayList<>();
@@ -88,6 +83,12 @@ public class ResourcepackManager {
      */
     public void setRequired(boolean required) {
         this.required = required;
+        if(required) {
+            File dataFolder = plugin.getDataFolder();
+            dataFolder.mkdirs();
+            this.texturesFolder = new File(dataFolder, "textures");
+            this.texturesFolder.mkdirs();
+        }
     }
 
     /**
