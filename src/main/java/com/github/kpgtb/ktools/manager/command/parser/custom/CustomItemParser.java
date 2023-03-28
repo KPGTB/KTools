@@ -14,35 +14,32 @@
  *    limitations under the License.
  */
 
-package com.github.kpgtb.ktools.manager.command.parser.spigot;
+package com.github.kpgtb.ktools.manager.command.parser.custom;
 
 import com.github.kpgtb.ktools.manager.command.parser.IParamParser;
+import com.github.kpgtb.ktools.manager.item.Kitem;
 import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class OfflinePlayerParser implements IParamParser<OfflinePlayer> {
+public class CustomItemParser implements IParamParser<Kitem> {
     @Override
-    public OfflinePlayer convert(String param, ToolsObjectWrapper wrapper) {
-        return Bukkit.getOfflinePlayer(param);
+    public Kitem convert(String param, ToolsObjectWrapper wrapper) {
+        return wrapper.getItemManager().getCustomItems().get(param);
     }
 
     @Override
     public boolean canConvert(String param, ToolsObjectWrapper wrapper) {
-        return convert(param, wrapper) != null;
+        return wrapper.getItemManager().getCustomItems().containsKey(param);
     }
 
     @Override
     public @NotNull List<String> complete(String arg, CommandSender sender, ToolsObjectWrapper wrapper) {
-        return Arrays.stream(Bukkit.getOfflinePlayers())
-                .map(OfflinePlayer::getName)
-                .filter(s -> s.startsWith(arg))
+        return wrapper.getItemManager().getCustomItems().keySet().stream()
+                .filter(item -> item.startsWith(arg))
                 .limit(30)
                 .collect(Collectors.toList());
     }

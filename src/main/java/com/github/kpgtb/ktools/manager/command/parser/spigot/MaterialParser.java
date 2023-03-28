@@ -47,7 +47,7 @@ public class MaterialParser implements IParamParser<Material> {
         return Arrays.stream(Material.values())
                 .map(Material::name)
                 .filter(s -> s.startsWith(arg.toUpperCase()))
-                .limit(10)
+                .limit(30)
                 .collect(Collectors.toList());
     }
 }

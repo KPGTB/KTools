@@ -20,6 +20,7 @@ import com.github.kpgtb.ktools.manager.cache.CacheManager;
 import com.github.kpgtb.ktools.manager.command.parser.ParamParserManager;
 import com.github.kpgtb.ktools.manager.data.DataManager;
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
+import com.github.kpgtb.ktools.manager.item.ItemManager;
 import com.github.kpgtb.ktools.manager.language.LanguageManager;
 import com.github.kpgtb.ktools.manager.resourcepack.ResourcepackManager;
 import com.github.kpgtb.ktools.manager.ui.UiManager;
@@ -35,9 +36,10 @@ public class GlobalManagersWrapper {
     private final DataManager dataManager;
     private final UiManager uiManager;
     private final ResourcepackManager resourcepackManager;
+    private final ItemManager itemManager;
     private final boolean legacy;
 
-    public GlobalManagersWrapper(DebugManager debugManager, LanguageManager globalLanguageManager, CacheManager cacheManager, ParamParserManager paramParserManager, DataManager dataManager, UiManager uiManager, ResourcepackManager resourcepackManager, boolean legacy) {
+    public GlobalManagersWrapper(DebugManager debugManager, LanguageManager globalLanguageManager, CacheManager cacheManager, ParamParserManager paramParserManager, DataManager dataManager, UiManager uiManager, ResourcepackManager resourcepackManager, ItemManager itemManager, boolean legacy) {
         this.debugManager = debugManager;
         this.globalLanguageManager = globalLanguageManager;
         this.cacheManager = cacheManager;
@@ -45,6 +47,7 @@ public class GlobalManagersWrapper {
         this.dataManager = dataManager;
         this.uiManager = uiManager;
         this.resourcepackManager = resourcepackManager;
+        this.itemManager = itemManager;
         this.legacy = legacy;
     }
 
@@ -74,6 +77,10 @@ public class GlobalManagersWrapper {
 
     public ResourcepackManager getResourcepackManager() {
         return resourcepackManager;
+    }
+
+    public ItemManager getItemManager() {
+        return itemManager;
     }
 
     public boolean isLegacy() {

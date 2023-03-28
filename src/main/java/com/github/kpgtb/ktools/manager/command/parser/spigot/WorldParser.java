@@ -42,7 +42,7 @@ public class WorldParser implements IParamParser<World> {
         return Bukkit.getWorlds().stream()
                 .map(World::getName)
                 .filter(s -> s.startsWith(arg))
-                .limit(10)
+                .limit(30)
                 .collect(Collectors.toList());
     }
 }

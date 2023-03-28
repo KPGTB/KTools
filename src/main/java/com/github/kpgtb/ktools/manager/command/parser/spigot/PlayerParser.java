@@ -43,7 +43,7 @@ public class PlayerParser implements IParamParser<Player> {
         return Bukkit.getOnlinePlayers().stream()
                 .map(HumanEntity::getName)
                 .filter(s -> s.startsWith(arg))
-                .limit(10)
+                .limit(30)
                 .collect(Collectors.toList());
     }
 }

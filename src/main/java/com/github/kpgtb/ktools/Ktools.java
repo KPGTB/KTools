@@ -19,10 +19,12 @@ package com.github.kpgtb.ktools;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.github.kpgtb.ktools.manager.cache.CacheManager;
+import com.github.kpgtb.ktools.manager.command.CommandManager;
 import com.github.kpgtb.ktools.manager.command.parser.ParamParserManager;
 import com.github.kpgtb.ktools.manager.data.DataManager;
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
+import com.github.kpgtb.ktools.manager.item.ItemManager;
 import com.github.kpgtb.ktools.manager.language.LanguageManager;
 import com.github.kpgtb.ktools.manager.listener.ListenerManager;
 import com.github.kpgtb.ktools.manager.resourcepack.ResourcepackManager;
@@ -44,6 +46,8 @@ public final class Ktools extends JavaPlugin {
     private ToolsObjectWrapper toolsObjectWrapper;
     private GlobalManagersWrapper globalManagersWrapper;
     private boolean legacy;
+
+    public static boolean NEWEST_VERSION;
 
     @Override
     public void onEnable() {
@@ -183,9 +187,18 @@ public final class Ktools extends JavaPlugin {
             debug.sendInfo(DebugType.START, "Loaded resourcepack.");
         }
 
+        debug.sendInfo(DebugType.START, "Loading items...");
+        ItemManager itemManager = new ItemManager();
+        debug.sendInfo(DebugType.START, "Loaded items.");
+
         debug.sendInfo(DebugType.START, "Loading tools object wrapper...");
-        this.toolsObjectWrapper = new ToolsObjectWrapper(cacheManager,debug,globalLanguageManager,this,adventure,paramParserManager, dataManager, resourcepackManager, uiManager, legacy);
+        this.toolsObjectWrapper = new ToolsObjectWrapper(cacheManager,debug,globalLanguageManager,this,adventure,paramParserManager, dataManager, resourcepackManager, uiManager, itemManager, legacy);
         debug.sendInfo(DebugType.START, "Loaded tools object wrapper.");
+
+        debug.sendInfo(DebugType.START, "Loading commands...");
+        CommandManager commandManager = new CommandManager(toolsObjectWrapper, getFile(), "ktools");
+        commandManager.registerCommands("com.github.kpgtb.ktools.command");
+        debug.sendInfo(DebugType.START, "Loaded commands.");
 
         debug.sendInfo(DebugType.START, "Loading listeners...");
         ListenerManager listenerManager = new ListenerManager(toolsObjectWrapper, getFile());
@@ -193,12 +206,12 @@ public final class Ktools extends JavaPlugin {
         debug.sendInfo(DebugType.START, "Loaded listeners.");
 
         debug.sendInfo(DebugType.START, "Loading global managers wrapper...");
-        this.globalManagersWrapper = new GlobalManagersWrapper(debug, globalLanguageManager,cacheManager,paramParserManager,dataManager,uiManager,resourcepackManager, legacy);
+        this.globalManagersWrapper = new GlobalManagersWrapper(debug, globalLanguageManager,cacheManager,paramParserManager,dataManager,uiManager,resourcepackManager, itemManager, legacy);
         debug.sendInfo(DebugType.START, "Loaded global managers wrapper.");
 
         debug.sendInfo(DebugType.START, "Checking updates...");
         UpdaterManager updaterManager = new UpdaterManager(getDescription(), new SpigotUpdater("108301"),debug);
-        updaterManager.checkUpdate();
+        NEWEST_VERSION = updaterManager.checkUpdate();
 
         debug.sendInfo(DebugType.START, "Enabled plugin in " + (System.currentTimeMillis() - startMillis) + "ms.");
     }

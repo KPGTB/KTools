@@ -47,6 +47,7 @@ public class LanguageManager {
     private final LanguageManager globalManager;
     private final HashMap<String, String> pluginMessages;
     private final HashMap<String, ArrayList<String>> pluginMessagesLong;
+    private final ArrayList<LanguageManager> hookedManagers;
 
     /**
      * Constructor of Global LanguageManager. Use only in Ktools!
@@ -61,6 +62,7 @@ public class LanguageManager {
         this.globalManager = this;
         this.pluginMessages = new HashMap<>();
         this.pluginMessagesLong = new HashMap<>();
+        this.hookedManagers = new ArrayList<>();
     }
 
     /**
@@ -77,6 +79,9 @@ public class LanguageManager {
         this.globalManager = globalManager;
         this.pluginMessages = new HashMap<>();
         this.pluginMessagesLong = new HashMap<>();
+        this.hookedManagers = new ArrayList<>();
+
+        globalManager.getHookedManagers().add(this);
     }
 
     /**
@@ -305,5 +310,13 @@ public class LanguageManager {
      */
     public String getSingleString(LanguageLevel languageLevel, String code, TagResolver... placeholders) {
         return this.getString(languageLevel, code, placeholders).get(0);
+    }
+
+    /**
+     * Get list of hooked language managers. ! Only global manager has filled list !
+     * @return List of hooked managers
+     */
+    public ArrayList<LanguageManager> getHookedManagers() {
+        return hookedManagers;
     }
 }

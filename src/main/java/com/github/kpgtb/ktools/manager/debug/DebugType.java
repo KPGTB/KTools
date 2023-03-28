@@ -31,7 +31,8 @@ public enum DebugType {
     GUI("debug.gui"),
     DATA("debug.data"),
     UPDATER("debug.updater"),
-    RESOURCEPACK("debug.resourcepack");
+    RESOURCEPACK("debug.resourcepack"),
+    ITEM("debug.item");
 
     private final String configStr;
 

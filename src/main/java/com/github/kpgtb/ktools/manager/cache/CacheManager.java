@@ -199,6 +199,113 @@ public class CacheManager {
     }
 
     /**
+     * With this method you can remove data from cache
+     * @param cacheSource {@link com.github.kpgtb.ktools.manager.cache.CacheSource}
+     * @param target Object where you want to save data (or null if cacheSource is SERVER)
+     * @param pluginName Name of plugin that save this data
+     * @param key Key of data
+     * @since 1.3.0
+     */
+    public void removeData(CacheSource cacheSource, Object target, String pluginName, String key) {
+        String finalKey = pluginName + "-" + key;
+        debug.sendInfo(DebugType.CACHE, "Removing cache with type " + cacheSource.name() + " key: " + finalKey + "...");
+
+        switch (cacheSource) {
+            case SERVER:
+                cacheConfiguration.set("server."+finalKey, null);
+                try {
+                    cacheConfiguration.save(cacheFile);
+                    debug.sendInfo(DebugType.CACHE, "Removed server cache!");
+                } catch (IOException e) {
+                    debug.sendWarning(DebugType.CACHE, "Error while removing server cache!");
+                    throw new RuntimeException(e);
+                }
+                break;
+            case PLAYER:
+                if(!(target instanceof Player)) {
+                    debug.sendWarning(DebugType.CACHE, "Target isn't a player!");
+                    return;
+                }
+                Player player = (Player) target;
+                boolean playerSaveMeta = config.getString("cache.player").equalsIgnoreCase("metadata");
+
+                if(playerSaveMeta) {
+                    PersistentDataContainer playerPDC = player.getPersistentDataContainer();
+                    NamespacedKey playerKey = new NamespacedKey(pluginName,key);
+                    playerPDC.remove(playerKey);
+                    debug.sendInfo(DebugType.CACHE, "Removed player cache from metadata.");
+                    return;
+                }
+
+                cacheConfiguration.set("player." + player.getUniqueId().toString() + "." + finalKey, null);
+                try {
+                    cacheConfiguration.save(cacheFile);
+                    debug.sendInfo(DebugType.CACHE, "Removed player cache from files.");
+                } catch (IOException e) {
+                    debug.sendWarning(DebugType.CACHE, "Error while removing player cache from files.");
+                    throw new RuntimeException(e);
+                }
+                break;
+            case ENTITY:
+                if(!(target instanceof Entity)) {
+                    debug.sendWarning(DebugType.CACHE, "Target isn't an entity.");
+                    return;
+                }
+                Entity entity = (Entity) target;
+                boolean entitySaveMeta = config.getString("cache.entity").equalsIgnoreCase("metadata");
+
+                if(entitySaveMeta) {
+                    PersistentDataContainer entityPDC = entity.getPersistentDataContainer();
+                    NamespacedKey entityKey = new NamespacedKey(pluginName,key);
+                    entityPDC.remove(entityKey);
+                    debug.sendInfo(DebugType.CACHE, "Removing entity cache from metadata.");
+                    return;
+                }
+
+                cacheConfiguration.set("entity." + entity.getUniqueId() + "." + finalKey, null);
+                try {
+                    cacheConfiguration.save(cacheFile);
+                    debug.sendInfo(DebugType.CACHE, "Removed entity cache from files.");
+                } catch (IOException e) {
+                    debug.sendWarning(DebugType.CACHE, "Error while removing entity cache from files.");
+                    throw new RuntimeException(e);
+                }
+                break;
+            case ITEMSTACK:
+                if(!(target instanceof ItemStack)) {
+                    debug.sendWarning(DebugType.CACHE, "Target isn't an item stack.");
+                    return;
+                }
+                ItemStack itemStack = (ItemStack) target;
+
+                if(itemStack == null || itemStack.getType().equals(Material.AIR)) {
+                    debug.sendWarning(DebugType.CACHE, "Item stack is empty.");
+                    return;
+                }
+
+                ItemMeta meta = itemStack.getItemMeta();
+                PersistentDataContainer itemPDC = meta.getPersistentDataContainer();
+                NamespacedKey itemKey = new NamespacedKey(pluginName,key);
+                itemPDC.remove(itemKey);
+                itemStack.setItemMeta(meta);
+
+                debug.sendInfo(DebugType.CACHE, "Removed item stack cache from metadata.");
+
+                break;
+        }
+    }
+
+    /**
+     * With this method you can remove data from server's cache
+     * @param pluginName Name of plugin that save this data
+     * @param key Key of data
+     * @since 1.3.0
+     */
+    public void removeServerData( String pluginName, String key) {
+        this.removeData(CacheSource.SERVER, null, pluginName,key);
+    }
+
+    /**
      * This method returns data from cache
      * @param cacheSource {@link com.github.kpgtb.ktools.manager.cache.CacheSource}
      * @param target Object from you want to get data (or null if cacheSource is SERVER)
@@ -278,8 +385,45 @@ public class CacheManager {
      * @param expected Class that is expected in return
      * @return Object with data or null if there isn't any data
      */
+    @Nullable
     public <T> T getServerData(String pluginName, String key, Class<T> expected) {
         return this.getData(CacheSource.SERVER, null,pluginName,key, expected);
+    }
+
+    /**
+     * This method checks if cache contains data
+     * @param cacheSource {@link com.github.kpgtb.ktools.manager.cache.CacheSource}
+     * @param target Object from you want to get data (or null if cacheSource is SERVER)
+     * @param pluginName Name of plugin that saves this data
+     * @param key Key of data
+     * @param expected Class that should be checked
+     * @return true if exists
+     * @since 1.3.0
+     */
+    public <T> boolean hasData(CacheSource cacheSource, Object target, String pluginName, String key, Class<T> expected) {
+        try {
+            T data = getData(cacheSource,target,pluginName,key,expected);
+
+            if(data == null) {
+                return false;
+            }
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * This method checks if server's cache contains data
+     * @param pluginName Name of plugin that saves this data
+     * @param key Key of data
+     * @param expected Class that should be checked
+     * @return true if exists
+     * @since 1.3.0
+     */
+    public <T> boolean hasServerData(String pluginName, String key, Class<T> expected) {
+        return this.hasData(CacheSource.SERVER, null,pluginName,key,expected);
     }
 
     /**

@@ -19,6 +19,7 @@ package com.github.kpgtb.ktools.util;
 import com.github.kpgtb.ktools.manager.cache.CacheManager;
 import com.github.kpgtb.ktools.manager.data.DataManager;
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
+import com.github.kpgtb.ktools.manager.item.ItemManager;
 import com.github.kpgtb.ktools.manager.language.LanguageManager;
 import com.github.kpgtb.ktools.manager.command.parser.ParamParserManager;
 import com.github.kpgtb.ktools.manager.resourcepack.ResourcepackManager;
@@ -39,9 +40,10 @@ public class ToolsObjectWrapper {
     private final DataManager dataManager;
     private final ResourcepackManager resourcepackManager;
     private final UiManager uiManager;
+    private final ItemManager itemManager;
     private final boolean legacy;
 
-    public ToolsObjectWrapper(CacheManager cacheManager, DebugManager debugManager, LanguageManager languageManager, JavaPlugin plugin, BukkitAudiences adventure, ParamParserManager paramParserManager, DataManager dataManager, ResourcepackManager resourcepackManager, UiManager uiManager, boolean legacy) {
+    public ToolsObjectWrapper(CacheManager cacheManager, DebugManager debugManager, LanguageManager languageManager, JavaPlugin plugin, BukkitAudiences adventure, ParamParserManager paramParserManager, DataManager dataManager, ResourcepackManager resourcepackManager, UiManager uiManager, ItemManager itemManager, boolean legacy) {
         this.cacheManager = cacheManager;
         this.debugManager = debugManager;
         this.languageManager = languageManager;
@@ -51,6 +53,7 @@ public class ToolsObjectWrapper {
         this.dataManager = dataManager;
         this.resourcepackManager = resourcepackManager;
         this.uiManager = uiManager;
+        this.itemManager = itemManager;
         this.legacy = legacy;
     }
 
@@ -61,6 +64,7 @@ public class ToolsObjectWrapper {
         this.dataManager = globalManagersWrapper.getDataManager();
         this.resourcepackManager = globalManagersWrapper.getResourcepackManager();
         this.uiManager = globalManagersWrapper.getUiManager();
+        this.itemManager = globalManagersWrapper.getItemManager();
         this.legacy = globalManagersWrapper.isLegacy();
 
         this.languageManager = languageManager;
@@ -102,6 +106,10 @@ public class ToolsObjectWrapper {
 
     public UiManager getUiManager() {
         return uiManager;
+    }
+
+    public ItemManager getItemManager() {
+        return itemManager;
     }
 
     public boolean isLegacy() {

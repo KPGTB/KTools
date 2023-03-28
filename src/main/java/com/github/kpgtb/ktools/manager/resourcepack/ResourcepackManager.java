@@ -250,8 +250,8 @@ public class ResourcepackManager {
                         JsonObject overrideObj = new JsonObject();
                         JsonObject predicateObj = new JsonObject();
                         predicateObj.addProperty("custom_model_data", model);
-                        predicateObj.addProperty("model", "item/" + mat.name().toLowerCase() + "/" + model);
                         overrideObj.add("predicate", predicateObj);
+                        overrideObj.addProperty("model", "item/" + mat.name().toLowerCase() + "/" + model);
                         overridesArr.add(overrideObj);
                     });
                     modelObj.add("overrides", overridesArr);

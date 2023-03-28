@@ -44,20 +44,21 @@ public class UpdaterManager {
     /**
      * Check if there are some updates
      */
-    public void checkUpdate() {
+    public boolean checkUpdate() {
         KVersion version;
         try {
             String versionName = description.getVersion();
             version = new KVersion(versionName.split("-")[0]);
         } catch (Exception e) {
             this.debug.sendWarning(DebugType.UPDATER, "Error while checking plugin version");
-            return;
+            return false;
         }
         if(this.updater.hasUpdate(version)) {
             String url = this.updater.getDownloadLink();
             this.debug.sendWarning(DebugType.UPDATER, "Detected new version of this plugin! Download it here -> " + url, true);
-            return;
+            return true;
         }
         this.debug.sendInfo(DebugType.UPDATER, "You have the newest version of this plugin");
+        return false;
     }
 }

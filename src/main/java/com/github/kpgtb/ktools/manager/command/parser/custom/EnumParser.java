@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.github.kpgtb.ktools.manager.command.parser.cusotm;
+package com.github.kpgtb.ktools.manager.command.parser.custom;
 
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
@@ -47,7 +47,7 @@ public class EnumParser<T extends Enum<T>> {
         return Arrays.stream(enumClass.getEnumConstants())
                 .map(Enum::name)
                 .filter(s -> s.startsWith(arg.toUpperCase()))
-                .limit(10)
+                .limit(30)
                 .collect(Collectors.toList());
     }
 }
