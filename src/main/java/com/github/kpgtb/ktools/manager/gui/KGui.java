@@ -74,6 +74,15 @@ public class KGui implements Listener {
         Bukkit.getPluginManager().registerEvents(this,tools.getPlugin());
     }
 
+    /**
+     * Block global click and drag
+     * @since 1.3.0
+     */
+    public void blockClick() {
+        this.setGlobalClickAction(e -> e.setCancelled(true));
+        this.setGlobalDragAction(e -> e.setCancelled(true));
+    }
+
     public String getName() {
         return name;
     }

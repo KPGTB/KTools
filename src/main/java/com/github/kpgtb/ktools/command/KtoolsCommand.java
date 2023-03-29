@@ -79,7 +79,7 @@ public class KtoolsCommand extends KCommand {
                                 .color(TextColor.color(202, 249, 161))
                 );
 
-        if(!Ktools.NEWEST_VERSION) {
+        if(Ktools.HAS_UPDATE) {
             version = version.hoverEvent(
                         Component.text("Server has outdated version of tools!")
                                 .color(TextColor.color(255, 132, 130))

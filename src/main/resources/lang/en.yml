@@ -5,3 +5,5 @@ message:
   givenCustomItem: "<gray>>> <yellow>You given <gold><item><gray>x<gold><amount> <yellow>to <gold><target>"
   getCustomItem: "<gray>>> <yellow>You get <gold><item><gray>x<gold><amount> <yellow>from <gold><player>"
   reloadedMessages: "<gray>>> <green>Reloaded all messages from <dark_green><plugins> <green>hooked plugins!"
+  writeGuiName: "<white><b><u>Write text"
+  writeGuiPlaceholder: "Write text here"

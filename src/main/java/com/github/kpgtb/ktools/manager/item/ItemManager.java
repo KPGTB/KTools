@@ -83,6 +83,27 @@ public class ItemManager {
     }
 
     /**
+     * Register item
+     * @param toolsObjectWrapper Instance of ToolsObjectWrapper
+     * @param item Instance of Kitem
+     */
+    public void registerItem(ToolsObjectWrapper toolsObjectWrapper, Kitem item) {
+        PluginManager pluginManager = Bukkit.getPluginManager();
+        DebugManager debug = toolsObjectWrapper.getDebugManager();
+
+        debug.sendInfo(DebugType.ITEM, "Registering item " + item.getFullItemTag());
+        ItemStack bukkitItem = item.getItem();
+        if(bukkitItem == null) {
+            debug.sendWarning(DebugType.ITEM, "Item is null! Cancelling!");
+            return;
+        }
+        pluginManager.registerEvents(item, toolsObjectWrapper.getPlugin());
+
+        this.customItems.put(item.getFullItemTag(), item);
+        debug.sendInfo(DebugType.ITEM, "Registered item " + item.getFullItemTag());
+    }
+
+    /**
      * Get custom item
      * @param fullItemName Name of registered item (plugin:item)
      * @return ItemStack or null when not exists

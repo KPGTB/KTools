@@ -47,7 +47,7 @@ public final class Ktools extends JavaPlugin {
     private GlobalManagersWrapper globalManagersWrapper;
     private boolean legacy;
 
-    public static boolean NEWEST_VERSION;
+    public static boolean HAS_UPDATE;
 
     @Override
     public void onEnable() {
@@ -211,7 +211,7 @@ public final class Ktools extends JavaPlugin {
 
         debug.sendInfo(DebugType.START, "Checking updates...");
         UpdaterManager updaterManager = new UpdaterManager(getDescription(), new SpigotUpdater("108301"),debug);
-        NEWEST_VERSION = updaterManager.checkUpdate();
+        HAS_UPDATE = updaterManager.checkUpdate();
 
         debug.sendInfo(DebugType.START, "Enabled plugin in " + (System.currentTimeMillis() - startMillis) + "ms.");
     }

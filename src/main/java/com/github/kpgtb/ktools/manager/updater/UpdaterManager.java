@@ -43,6 +43,7 @@ public class UpdaterManager {
 
     /**
      * Check if there are some updates
+     * @return true when there is update to this plugin
      */
     public boolean checkUpdate() {
         KVersion version;
