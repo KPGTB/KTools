@@ -7,3 +7,9 @@ message:
   reloadedMessages: "<gray>>> <green>Reloaded all messages from <dark_green><plugins> <green>hooked plugins!"
   writeGuiName: "<white><b><u>Write text"
   writeGuiPlaceholder: "Write text here"
+  countGuiName: "<red><b><u>Count"
+  countPlus: "<dark_green>+<green><value>"
+  countMinus: "<dark_red>-<red><value>"
+  countInfo: "<gold><u><value>"
+  countInfoLore:
+    - "<green><b>Click to accept"
