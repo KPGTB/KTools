@@ -26,6 +26,9 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+/**
+ * Count GUI is a gui with response where you can count sth
+ */
 public class KCountGui {
     private final ToolsObjectWrapper wrapper;
     private final KGui lastGui;
@@ -57,6 +60,9 @@ public class KCountGui {
         this.responsed = false;
     }
 
+    /**
+     * Open GUI to player
+     */
     public void open() {
         int rows = this.decimals ? 3 : 1;
         KGui gui = new KGui(

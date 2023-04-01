@@ -27,6 +27,9 @@ import org.bukkit.event.Listener;
 
 import java.util.Arrays;
 
+/**
+ * Write GUI is a gui with response when you can write sth
+ */
 public class KWriteGui implements Listener {
     private final IWriteResponse response;
     private final KGui lastGui;
@@ -42,6 +45,9 @@ public class KWriteGui implements Listener {
         this.responsed = false;
     }
 
+    /**
+     * Open GUI to player
+     */
     public void open() {
         new AnvilGUI.Builder()
                 .onClose(p -> {
