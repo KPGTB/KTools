@@ -6,12 +6,12 @@
 
     <groupId>com.github.kpgtb</groupId>
     <artifactId>Ktools</artifactId>
-    <version>1.3.1-SNAPSHOT</version>
+    <version>1.3.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Ktools</name>
 
-    <description>An advenced, reloaded version of my tools to Spigot and Paper plugins</description>
+    <description>An advanced, reloaded version of my tools to Spigot and Paper plugins</description>
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

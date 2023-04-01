@@ -50,17 +50,17 @@ public class GiveCustomCommand extends KCommand {
         wrapper.getLanguageManager().getComponent(
             LanguageLevel.PLUGIN,
             "givenCustomItem",
-            Placeholder.parsed("item", name),
-            Placeholder.parsed("amount", amount+""),
-            Placeholder.parsed("target", target.getName())
+            Placeholder.unparsed("item", name),
+            Placeholder.unparsed("amount", amount+""),
+            Placeholder.unparsed("target", target.getName())
         ).forEach(msg -> wrapper.getAdventure().player(player).sendMessage(msg));
 
         wrapper.getLanguageManager().getComponent(
                 LanguageLevel.PLUGIN,
                 "getCustomItem",
-                Placeholder.parsed("item", name),
-                Placeholder.parsed("amount", amount+""),
-                Placeholder.parsed("player", player.getName())
+                Placeholder.unparsed("item", name),
+                Placeholder.unparsed("amount", amount+""),
+                Placeholder.unparsed("player", player.getName())
         ).forEach(msg -> wrapper.getAdventure().player(target).sendMessage(msg));
     }
 
