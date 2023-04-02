@@ -18,8 +18,8 @@ package com.github.kpgtb.ktools.manager.command;
 
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
-import com.github.kpgtb.ktools.util.ReflectionUtil;
-import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
+import com.github.kpgtb.ktools.util.file.ReflectionUtil;
+import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 

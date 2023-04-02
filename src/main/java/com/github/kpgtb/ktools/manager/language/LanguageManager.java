@@ -100,9 +100,9 @@ public class LanguageManager {
         ));
 
         AtomicBoolean changed = new AtomicBoolean(false);
-        pluginLangConfig.getConfigurationSection("message").getKeys(false).forEach(langKey -> {
+        pluginLangConfig.getConfigurationSection("message").getKeys(true).forEach(langKey -> {
             if(!langConfig.getConfigurationSection("message").contains(langKey)) {
-                langConfig.set("message."+langKey, pluginLangConfig.getString("message."+langKey));
+                langConfig.set("message."+langKey, pluginLangConfig.get("message."+langKey));
                 changed.set(true);
             }
         });
@@ -140,10 +140,13 @@ public class LanguageManager {
         }
 
         messagesSection
-                .getKeys(false)
+                .getKeys(true)
                 .forEach(msgCode -> {
                     debug.sendInfo(DebugType.LANGUAGE, "Loading "+msgCode+"...");
                     Object msg = messagesSection.get(msgCode);
+
+                    String[] codeTemp = msgCode.split("\\.");
+                    msgCode = codeTemp[codeTemp.length-1];
 
                     if(msg instanceof String) {
                         this.pluginMessages.put(msgCode, (String) msg);
@@ -159,6 +162,10 @@ public class LanguageManager {
                         ArrayList<String> msgStringList = (ArrayList<String>) msgList;
                         this.pluginMessagesLong.put(msgCode, msgStringList);
                         debug.sendInfo(DebugType.LANGUAGE, "Loaded "+msgCode+" as multiple lines.");
+                        return;
+                    }
+                    if(msg instanceof ConfigurationSection) {
+                        debug.sendInfo(DebugType.LANGUAGE, "It's a section. Ignoring");
                         return;
                     }
                     debug.sendWarning(DebugType.LANGUAGE, "Could not load "+msgCode+"!");

@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.github.kpgtb.ktools.util;
+package com.github.kpgtb.ktools.util.file;
 
 import java.io.File;
 import java.util.Enumeration;

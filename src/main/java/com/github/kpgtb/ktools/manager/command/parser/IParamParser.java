@@ -16,7 +16,7 @@
 
 package com.github.kpgtb.ktools.manager.command.parser;
 
-import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
+import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 

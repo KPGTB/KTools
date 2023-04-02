@@ -18,7 +18,7 @@ package com.github.kpgtb.ktools.listener;
 
 import com.github.kpgtb.ktools.manager.listener.Klistener;
 import com.github.kpgtb.ktools.manager.ui.UiManager;
-import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
+import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;

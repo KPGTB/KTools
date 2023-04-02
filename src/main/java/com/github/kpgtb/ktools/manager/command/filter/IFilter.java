@@ -16,7 +16,7 @@
 
 package com.github.kpgtb.ktools.manager.command.filter;
 
-import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
+import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 

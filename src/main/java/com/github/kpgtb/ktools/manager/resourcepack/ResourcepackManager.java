@@ -19,7 +19,7 @@ package com.github.kpgtb.ktools.manager.resourcepack;
 import com.github.kpgtb.ktools.manager.cache.CacheManager;
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
-import com.github.kpgtb.ktools.util.FontWidth;
+import com.github.kpgtb.ktools.util.ui.FontWidth;
 import com.google.gson.*;
 import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;

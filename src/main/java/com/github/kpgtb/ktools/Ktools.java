@@ -31,8 +31,9 @@ import com.github.kpgtb.ktools.manager.resourcepack.ResourcepackManager;
 import com.github.kpgtb.ktools.manager.ui.UiManager;
 import com.github.kpgtb.ktools.manager.updater.SpigotUpdater;
 import com.github.kpgtb.ktools.manager.updater.UpdaterManager;
-import com.github.kpgtb.ktools.util.GlobalManagersWrapper;
-import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
+import com.github.kpgtb.ktools.util.file.PackageUtil;
+import com.github.kpgtb.ktools.util.wrapper.GlobalManagersWrapper;
+import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -66,6 +67,10 @@ public final class Ktools extends JavaPlugin {
             debug.sendWarning(DebugType.START, "You are using legacy version! Not everything can be available!", true);
         }
 
+        debug.sendInfo(DebugType.START, "Loading packages...");
+        PackageUtil packageUtil = new PackageUtil("com.github.kpgtb.ktools");
+        debug.sendInfo(DebugType.START, "Loaded packages.");
+
         debug.sendInfo(DebugType.START, "Loading audience...");
         BukkitAudiences adventure = BukkitAudiences.create(this);
         debug.sendInfo(DebugType.START, "Loaded audience.");
@@ -88,12 +93,12 @@ public final class Ktools extends JavaPlugin {
 
         debug.sendInfo(DebugType.START, "Loading command param parsers...");
         ParamParserManager paramParserManager = new ParamParserManager(debug);
-        paramParserManager.registerParsers("com.github.kpgtb.ktools.manager.command.parser", getFile());
+        paramParserManager.registerParsers(packageUtil.get("manager.command.parser"), getFile());
         debug.sendInfo(DebugType.START, "Loaded command param parsers.");
 
         debug.sendInfo(DebugType.START, "Loading database...");
-        DataManager dataManager = new DataManager(debug,getConfig(),getDataFolder());
-        dataManager.registerTables("com.github.kpgtb.ktools.database", getFile());
+        DataManager dataManager = new DataManager(debug,getConfig(),getDataFolder(), this);
+        dataManager.registerPersisters(packageUtil.get("manager.data.persister"), getFile());
         debug.sendInfo(DebugType.START, "Loaded database.");
 
         UiManager uiManager = null;
@@ -197,12 +202,12 @@ public final class Ktools extends JavaPlugin {
 
         debug.sendInfo(DebugType.START, "Loading commands...");
         CommandManager commandManager = new CommandManager(toolsObjectWrapper, getFile(), "ktools");
-        commandManager.registerCommands("com.github.kpgtb.ktools.command");
+        commandManager.registerCommands(packageUtil.get("command"));
         debug.sendInfo(DebugType.START, "Loaded commands.");
 
         debug.sendInfo(DebugType.START, "Loading listeners...");
         ListenerManager listenerManager = new ListenerManager(toolsObjectWrapper, getFile());
-        listenerManager.registerListeners("com.github.kpgtb.ktools.listener");
+        listenerManager.registerListeners(packageUtil.get("listener"));
         debug.sendInfo(DebugType.START, "Loaded listeners.");
 
         debug.sendInfo(DebugType.START, "Loading global managers wrapper...");

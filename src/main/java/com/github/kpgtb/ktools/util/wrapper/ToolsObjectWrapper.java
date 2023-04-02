@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.github.kpgtb.ktools.util;
+package com.github.kpgtb.ktools.util.wrapper;
 
 import com.github.kpgtb.ktools.manager.cache.CacheManager;
 import com.github.kpgtb.ktools.manager.data.DataManager;

@@ -52,7 +52,7 @@ Wiki -> https://wiki.kpgtb.pl/
 - To manage UI, this plugin uses [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/) License: [GPL-2.0](https://github.com/dmulloy2/ProtocolLib/blob/master/License.txt)
 - To handle database connection, this plugin uses [OrmLite](https://ormlite.com/) License: [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
 - To make write GUI, this plugin uses [AnvilGUI](https://github.com/WesJD/AnvilGUI) License: [MIT](https://github.com/WesJD/AnvilGUI/blob/master/LICENSE)
-- Resourcepacks are uploded to https://transfer.sh/
+- Resource packs are uploading to https://transfer.sh/
 
 ### License
 

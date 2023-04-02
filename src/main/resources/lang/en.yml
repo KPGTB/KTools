@@ -1,15 +1,25 @@
 message:
-  onlyPlayer: "<gray>>></gray> <red>This command is only for players!"
-  noPermission: "<gray>>></gray> <red>You don't have permissions to use this command!"
-  helpLine: "<gray>>> /</gray><gold><command></gold> <gray>-</gray> <yellow><description>"
-  givenCustomItem: "<gray>>> <yellow>You given <gold><item><gray>x<gold><amount> <yellow>to <gold><target>"
-  getCustomItem: "<gray>>> <yellow>You get <gold><item><gray>x<gold><amount> <yellow>from <gold><player>"
-  reloadedMessages: "<gray>>> <green>Reloaded all messages from <dark_green><plugins> <green>hooked plugins!"
-  writeGuiName: "<white><b><u>Write text"
-  writeGuiPlaceholder: "Write text here"
-  countGuiName: "<red><b><u>Count"
-  countPlus: "<dark_green>+<green><value>"
-  countMinus: "<dark_red>-<red><value>"
-  countInfo: "<gold><u><value>"
-  countInfoLore:
+  global_command:
+    onlyPlayer: "<gray>>></gray> <red>This command is only for players!"
+    noPermission: "<gray>>></gray> <red>You don't have permissions to use this command!"
+    helpLine: "<gray>>> /</gray><gold><command></gold> <gray>-</gray> <yellow><description>"
+  util_command:
+    givenCustomItem: "<gray>>> <yellow>You given <gold><item><gray>x<gold><amount> <yellow>to <gold><target>"
+    getCustomItem: "<gray>>> <yellow>You get <gold><item><gray>x<gold><amount> <yellow>from <gold><player>"
+    reloadedMessages: "<gray>>> <green>Reloaded all messages from <dark_green><plugins> <green>hooked plugins!"
+  write_gui:
+    writeGuiName: "<white><b><u>Write text"
+    writeGuiPlaceholder: "Write text here"
+  count_gui:
+    countGuiName: "<red><b><u>Count"
+    countPlus: "<dark_green>+<green><value>"
+    countMinus: "<dark_red>-<red><value>"
+    countInfo: "<gold><u><value>"
+    countInfoLore:
     - "<green><b>Click to accept"
+  resourcePackDeny:
+    - ""
+    - "<red><b>To play on this server, you need to accept the resource pack!"
+    - ""
+    - "<red>Can't download the resource pack?"
+    - "<red>Go to the server list -> Click on this server -> Click 'Edit' -> Change 'Server Resource Packs' to 'Enabled'"

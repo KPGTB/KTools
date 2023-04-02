@@ -14,19 +14,28 @@
  *    limitations under the License.
  */
 
-package com.github.kpgtb.ktools.manager.listener;
-
-import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
-import org.bukkit.event.Listener;
+package com.github.kpgtb.ktools.util.file;
 
 /**
- * Abstract class that handles process of preparing listener
+ * Package util helps to provide package name to methods of API
  */
-public abstract class Klistener implements Listener {
+public class PackageUtil {
+    private final String mainPackage;
 
     /**
-     * Constructor of listener.
-     * @param toolsObjectWrapper ToolsObjectWrapper or object that extends it.
+     * Constructor of util
+     * @param mainPackage Name of main package (where is main class)
      */
-    public Klistener(ToolsObjectWrapper toolsObjectWrapper) {}
+    public PackageUtil(String mainPackage) {
+        this.mainPackage = mainPackage;
+    }
+
+    /**
+     * Get sub package
+     * @param sub Name of sub package
+     * @return full path to sub package
+     */
+    public String get(String sub) {
+        return String.format(mainPackage+".%s", sub);
+    }
 }

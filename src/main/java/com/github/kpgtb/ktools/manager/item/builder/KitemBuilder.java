@@ -19,7 +19,7 @@ package com.github.kpgtb.ktools.manager.item.builder;
 import com.github.kpgtb.ktools.manager.item.Kitem;
 import com.github.kpgtb.ktools.manager.item.builder.action.ItemBuilderAction;
 import com.github.kpgtb.ktools.manager.item.builder.action.ItemBuilderHeldAction;
-import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
+import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;

@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.github.kpgtb.ktools.util;
+package com.github.kpgtb.ktools.util.item;
 
 import org.bukkit.Location;
 import org.bukkit.Material;

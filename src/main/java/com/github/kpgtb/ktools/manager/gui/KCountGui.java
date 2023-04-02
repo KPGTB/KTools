@@ -20,8 +20,8 @@ import com.github.kpgtb.ktools.manager.gui.container.GuiContainer;
 import com.github.kpgtb.ktools.manager.gui.item.GuiItem;
 import com.github.kpgtb.ktools.manager.gui.write.ICountResponse;
 import com.github.kpgtb.ktools.manager.language.LanguageLevel;
-import com.github.kpgtb.ktools.util.ItemBuilder;
-import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
+import com.github.kpgtb.ktools.util.item.ItemBuilder;
+import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -81,7 +81,7 @@ public class KCountGui {
             }
         });
 
-        GuiContainer container = new GuiContainer(wrapper.getDebugManager(),gui, 0,0,9,rows);
+        GuiContainer container = new GuiContainer(gui, 0,0,9,rows);
 
         changeValue(gui,container,0.0);
 

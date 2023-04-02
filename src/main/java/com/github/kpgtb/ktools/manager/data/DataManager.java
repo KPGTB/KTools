@@ -18,9 +18,12 @@ package com.github.kpgtb.ktools.manager.data;
 
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
-import com.github.kpgtb.ktools.util.ReflectionUtil;
+import com.github.kpgtb.ktools.util.file.ReflectionUtil;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.dao.LruObjectCache;
+import com.j256.ormlite.field.DataPersister;
+import com.j256.ormlite.field.DataPersisterManager;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
 import com.j256.ormlite.jdbc.db.MysqlDatabaseType;
@@ -28,11 +31,13 @@ import com.j256.ormlite.jdbc.db.SqliteDatabaseType;
 import com.j256.ormlite.table.DatabaseTable;
 import com.j256.ormlite.table.TableUtils;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.HashMap;
 
@@ -42,17 +47,21 @@ import java.util.HashMap;
 public class DataManager {
     private @Nullable JdbcPooledConnectionSource connectionSource;
     private final DebugManager debug;
+    private final JavaPlugin plugin;
 
     private final HashMap<Class<?>, Dao<?, ?>> daosMap;
 
     /**
      * Constructor of DataManager. It also handles connection to database
-     * @param debug Instance of DebugManager
-     * @param config Plugin config
+     *
+     * @param debug      Instance of DebugManager
+     * @param config     Plugin config
      * @param dataFolder Plugin data folder
+     * @param plugin     Instance of plugin
      */
-    public DataManager(DebugManager debug, FileConfiguration config, File dataFolder) {
+    public DataManager(DebugManager debug, FileConfiguration config, File dataFolder, JavaPlugin plugin) {
         this.debug = debug;
+        this.plugin = plugin;
         this.daosMap = new HashMap<>();
 
         this.debug.sendInfo(DebugType.DATA, "Connecting to database...");
@@ -109,6 +118,33 @@ public class DataManager {
     }
 
     /**
+     * Register all OrmLite persisters from specified package
+     * @param packageName Package where are stored all persisters
+     * @param jarFile JAR file of this plugin
+     */
+    public void registerPersisters(String packageName, File jarFile) {
+        if(this.connectionSource == null) {
+            this.debug.sendWarning(DebugType.DATA, "There isn't any connection source!");
+            return;
+        }
+        for(Class<?> clazz : ReflectionUtil.getAllClassesInPackage(jarFile, packageName)) {
+            if(!DataPersister.class.isAssignableFrom(clazz)) {
+                continue;
+            }
+            this.debug.sendInfo(DebugType.DATA, "Loading " + clazz.getSimpleName());
+            try {
+                DataPersister persister = (DataPersister) clazz.getDeclaredConstructor().newInstance();
+                DataPersisterManager.registerDataPersisters(persister);
+                this.debug.sendInfo(DebugType.DATA, "Loaded " + clazz.getSimpleName());
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                     NoSuchMethodException e) {
+                e.printStackTrace();
+                this.debug.sendWarning(DebugType.DATA,"Error while loading persister!");
+            }
+        }
+    }
+
+    /**
      * Register all OrmLite tables from specified package
      * @param packageName Package where are stored all tables
      * @param jarFile JAR file of this plugin
@@ -152,6 +188,14 @@ public class DataManager {
             Dao<?,?> dao;
             try {
                  dao = DaoManager.createDao(this.connectionSource, clazz);
+                if(plugin.getConfig().getBoolean("data.cache.enabled")) {
+                    int capacity = plugin.getConfig().getInt("data.cache.capacity");
+                    if(capacity == 0) {
+                        dao.setObjectCache(true);
+                    } else {
+                        dao.setObjectCache(new LruObjectCache(capacity));
+                    }
+                }
             } catch (SQLException e) {
                 this.debug.sendWarning(DebugType.DATA,"Error while creating DAO!");
                 e.printStackTrace();

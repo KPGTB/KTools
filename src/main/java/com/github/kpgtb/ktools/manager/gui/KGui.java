@@ -23,7 +23,7 @@ import com.github.kpgtb.ktools.manager.gui.action.CloseAction;
 import com.github.kpgtb.ktools.manager.gui.action.DragAction;
 import com.github.kpgtb.ktools.manager.gui.container.GuiContainer;
 import com.github.kpgtb.ktools.manager.gui.item.GuiItem;
-import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
+import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -89,6 +89,10 @@ public class KGui implements Listener {
 
     public int getRows() {
         return rows;
+    }
+
+    public DebugManager getDebug() {
+        return debug;
     }
 
     public ArrayList<GuiContainer> getContainers() {

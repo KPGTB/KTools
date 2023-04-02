@@ -20,8 +20,8 @@ import com.github.kpgtb.ktools.manager.command.KCommand;
 import com.github.kpgtb.ktools.manager.command.annotation.Description;
 import com.github.kpgtb.ktools.manager.item.Kitem;
 import com.github.kpgtb.ktools.manager.language.LanguageLevel;
-import com.github.kpgtb.ktools.util.ItemUtil;
-import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
+import com.github.kpgtb.ktools.util.item.ItemUtil;
+import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -48,7 +48,7 @@ public class GiveCustomCommand extends KCommand {
         ItemUtil.giveItemToPlayer(target, result);
 
         wrapper.getLanguageManager().getComponent(
-            LanguageLevel.PLUGIN,
+            LanguageLevel.GLOBAL,
             "givenCustomItem",
             Placeholder.unparsed("item", name),
             Placeholder.unparsed("amount", amount+""),
@@ -56,7 +56,7 @@ public class GiveCustomCommand extends KCommand {
         ).forEach(msg -> wrapper.getAdventure().player(player).sendMessage(msg));
 
         wrapper.getLanguageManager().getComponent(
-                LanguageLevel.PLUGIN,
+                LanguageLevel.GLOBAL,
                 "getCustomItem",
                 Placeholder.unparsed("item", name),
                 Placeholder.unparsed("amount", amount+""),

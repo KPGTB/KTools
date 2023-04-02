@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.github.kpgtb.ktools.util;
+package com.github.kpgtb.ktools.util.ui;
 
 import com.google.gson.JsonElement;
 

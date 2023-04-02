@@ -23,7 +23,7 @@ import com.github.kpgtb.ktools.manager.command.annotation.MainCommand;
 import com.github.kpgtb.ktools.manager.command.annotation.WithoutPermission;
 import com.github.kpgtb.ktools.manager.language.LanguageLevel;
 import com.github.kpgtb.ktools.manager.language.LanguageManager;
-import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
+import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -107,7 +107,7 @@ public class KtoolsCommand extends KCommand {
 
         Audience audience = wrapper.getAdventure().sender(sender);
         global.getComponent(
-                LanguageLevel.PLUGIN,
+                LanguageLevel.GLOBAL,
                 "reloadedMessages",
                 Placeholder.parsed("plugins", (global.getHookedManagers().size() + 1)+"")
         ).forEach(audience::sendMessage);

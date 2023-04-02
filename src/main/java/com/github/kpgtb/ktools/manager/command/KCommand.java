@@ -23,7 +23,7 @@ import com.github.kpgtb.ktools.manager.language.LanguageManager;
 import com.github.kpgtb.ktools.manager.command.annotation.*;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.manager.language.LanguageLevel;
-import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
+import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
@@ -57,8 +57,8 @@ public abstract class KCommand extends Command {
     private final BukkitAudiences adventure;
     private final ParamParserManager parser;
 
-    private final ArrayList<Subcommand> mainCommands;
-    private final HashMap<String, Subcommand> subcommands;
+    private final LinkedList<Subcommand> mainCommands;
+    private final LinkedHashMap<String, Subcommand> subcommands;
 
     /**
      * Constructor of command. It also handles getting information about command
@@ -104,8 +104,8 @@ public abstract class KCommand extends Command {
         super.setDescription(description);
         super.setAliases(Arrays.asList(aliases));
 
-        this.mainCommands = new ArrayList<>();
-        this.subcommands = new HashMap<>();
+        this.mainCommands = new LinkedList<>();
+        this.subcommands = new LinkedHashMap<>();
 
         String customCommandPermission = "";
         boolean commandWithoutPermission = getClass().getDeclaredAnnotation(WithoutPermission.class) != null;
@@ -475,7 +475,6 @@ public abstract class KCommand extends Command {
         commands.putAll(subcommands);
 
         ArrayList<Component> toSend = new ArrayList<>();
-        toSend.add(Component.text(" "));
 
         commands.forEach((subName, command) -> {
             if(!hasPermission(sender,command)) {
@@ -508,7 +507,10 @@ public abstract class KCommand extends Command {
             toSend.addAll(language.getComponent(LanguageLevel.GLOBAL, "helpLine", placeholders.toArray(new TagResolver[0])));
         });
 
-        toSend.add(Component.text(" "));
+        if(toSend.size() > 0) {
+            toSend.add(0,Component.text(" "));
+            toSend.add(Component.text(" "));
+        }
 
         toSend.forEach(audience::sendMessage);
     }

@@ -46,15 +46,14 @@ public class GuiContainer {
 
     /**
      * Constructor for container that is part of GUI
-     * @param debug Instance of DebugManager
      * @param gui Instance of KGui
      * @param x X position in KGui (0-8)
      * @param y Y position in KGui (0-[KGui rows - 1])
      * @param width Width of container (1-9)
      * @param height Height of container (1-[KGui rows])
      */
-    public GuiContainer(DebugManager debug, @NotNull KGui gui, int x, int y, int width, int height) {
-        this.debug = debug;
+    public GuiContainer(@NotNull KGui gui, int x, int y, int width, int height) {
+        this.debug = gui.getDebug();
         this.gui = gui;
         this.pagedGuiContainer = null;
         this.x = x;
@@ -85,11 +84,10 @@ public class GuiContainer {
 
     /**
      * Constructor for container that is part of PagedGuiContainer
-     * @param debug Instance of DebugManager
      * @param pagedGuiContainer Instance of PagedGuiContainer
      */
-    public GuiContainer(DebugManager debug, @NotNull  PagedGuiContainer pagedGuiContainer) {
-        this.debug = debug;
+    public GuiContainer(@NotNull PagedGuiContainer pagedGuiContainer) {
+        this.debug = pagedGuiContainer.getDebug();
         this.gui = null;
         this.pagedGuiContainer = pagedGuiContainer;
         this.x = pagedGuiContainer.getX();
@@ -99,9 +97,9 @@ public class GuiContainer {
         this.items = new HashMap<>();
 
         this.fill(
-            new GuiItem(
-                    new ItemStack(Material.AIR)
-            )
+                new GuiItem(
+                        new ItemStack(Material.AIR)
+                )
         );
     }
 
@@ -124,6 +122,10 @@ public class GuiContainer {
     }
     public int getHeight() {
         return height;
+    }
+
+    public DebugManager getDebug() {
+        return debug;
     }
 
     public HashMap<GuiItemLocation, GuiItem> getItems() {

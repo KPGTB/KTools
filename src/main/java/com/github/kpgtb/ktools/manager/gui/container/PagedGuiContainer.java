@@ -34,16 +34,15 @@ public class PagedGuiContainer extends GuiContainer {
 
     /**
      * Constructor for container that is part of GUI
-     * @param debug Instance of DebugManager
      * @param gui Instance of KGui
      * @param x X position in KGui (0-8)
      * @param y Y position in KGui (0-[KGui rows - 1])
      * @param width Width of container (1-9)
      * @param height Height of container (1-[KGui rows])
      */
-    public PagedGuiContainer(DebugManager debug, @NotNull KGui gui, int x, int y, int width, int height) {
-        super(debug, gui, x, y, width, height);
-        this.debug = debug;
+    public PagedGuiContainer(@NotNull KGui gui, int x, int y, int width, int height) {
+        super(gui, x, y, width, height);
+        this.debug = gui.getDebug();
         this.containers = new ArrayList<>();
         this.page = 0;
     }

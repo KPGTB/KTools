@@ -17,7 +17,7 @@
 package com.github.kpgtb.ktools.manager.ui;
 
 import com.comphenix.protocol.ProtocolManager;
-import com.github.kpgtb.ktools.util.FontWidth;
+import com.github.kpgtb.ktools.util.ui.FontWidth;
 import com.google.gson.JsonParser;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;

@@ -16,7 +16,7 @@
 
 package com.github.kpgtb.ktools.manager.ui;
 
-import com.github.kpgtb.ktools.util.FontWidth;
+import com.github.kpgtb.ktools.util.ui.FontWidth;
 import org.bukkit.Bukkit;
 
 import java.util.regex.Matcher;

@@ -18,8 +18,8 @@ package com.github.kpgtb.ktools.manager.gui;
 
 import com.github.kpgtb.ktools.manager.gui.write.IWriteResponse;
 import com.github.kpgtb.ktools.manager.language.LanguageLevel;
-import com.github.kpgtb.ktools.util.ItemBuilder;
-import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
+import com.github.kpgtb.ktools.util.item.ItemBuilder;
+import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

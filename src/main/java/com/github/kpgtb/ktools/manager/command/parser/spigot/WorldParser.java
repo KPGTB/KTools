@@ -17,7 +17,7 @@
 package com.github.kpgtb.ktools.manager.command.parser.spigot;
 
 import com.github.kpgtb.ktools.manager.command.parser.IParamParser;
-import com.github.kpgtb.ktools.util.ToolsObjectWrapper;
+import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
