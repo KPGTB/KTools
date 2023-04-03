@@ -25,6 +25,7 @@ import com.github.kpgtb.ktools.manager.data.DataManager;
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.manager.item.ItemManager;
+import com.github.kpgtb.ktools.manager.item.builder.KitemBuilder;
 import com.github.kpgtb.ktools.manager.language.LanguageManager;
 import com.github.kpgtb.ktools.manager.listener.ListenerManager;
 import com.github.kpgtb.ktools.manager.resourcepack.ResourcepackManager;
@@ -32,10 +33,12 @@ import com.github.kpgtb.ktools.manager.ui.UiManager;
 import com.github.kpgtb.ktools.manager.updater.SpigotUpdater;
 import com.github.kpgtb.ktools.manager.updater.UpdaterManager;
 import com.github.kpgtb.ktools.util.file.PackageUtil;
+import com.github.kpgtb.ktools.util.item.ItemBuilder;
 import com.github.kpgtb.ktools.util.wrapper.GlobalManagersWrapper;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -193,7 +196,7 @@ public final class Ktools extends JavaPlugin {
         }
 
         debug.sendInfo(DebugType.START, "Loading items...");
-        ItemManager itemManager = new ItemManager();
+        ItemManager itemManager = new ItemManager(debug,this);
         debug.sendInfo(DebugType.START, "Loaded items.");
 
         debug.sendInfo(DebugType.START, "Loading tools object wrapper...");

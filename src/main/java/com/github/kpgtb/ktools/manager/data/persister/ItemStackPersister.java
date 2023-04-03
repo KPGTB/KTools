@@ -29,7 +29,7 @@ import java.sql.SQLException;
 public class ItemStackPersister extends StringType {
     private static final ItemStackPersister SINGLETON = new ItemStackPersister();
 
-    protected ItemStackPersister() {
+    public ItemStackPersister() {
         super(SqlType.STRING, new Class[]{ItemStack.class});
     }
 

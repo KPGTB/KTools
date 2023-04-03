@@ -27,7 +27,7 @@ import java.sql.SQLException;
 public class WorldPersister extends StringType {
     private static final WorldPersister SINGLETON = new WorldPersister();
 
-    protected WorldPersister() {
+    public WorldPersister() {
         super(SqlType.STRING, new Class[]{World.class});
     }
 

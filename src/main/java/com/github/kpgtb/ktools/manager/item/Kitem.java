@@ -16,8 +16,10 @@
 
 package com.github.kpgtb.ktools.manager.item;
 
+import com.github.kpgtb.ktools.util.item.ItemBuilder;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
@@ -27,6 +29,9 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -45,6 +50,36 @@ public abstract class Kitem implements Listener {
     public Kitem(ToolsObjectWrapper wrapper, String fullItemTag) {
         this.wrapper = wrapper;
         this.fullItemTag = fullItemTag;
+
+        File itemsFile = wrapper.getItemManager().getItemsFile();
+        YamlConfiguration itemsConfig = YamlConfiguration.loadConfiguration(itemsFile);
+
+        String[] itemTag = fullItemTag.split(":");
+        String plugin = itemTag[0];
+        String itemName = itemTag[1];
+
+        itemsConfig.set(plugin+"."+itemName+".tag", fullItemTag);
+
+        ItemBuilder item = new ItemBuilder(getItem());
+
+        itemsConfig.set(plugin+"."+itemName+".displayName", item.getDisplayName());
+        itemsConfig.set(plugin+"."+itemName+".lore", item.getLore());
+
+        itemsConfig.set(plugin+"."+itemName+".material", item.getMaterial().name());
+        itemsConfig.set(plugin+"."+itemName+".model", item.getModel());
+        itemsConfig.set(plugin+"."+itemName+".unbreakable", item.isUnbreakable());
+
+        ArrayList<String> enchantments = new ArrayList<>();
+        item.getEnchantments().forEach((ench, power) -> {
+            enchantments.add(ench.getName() + " " + power);
+        });
+        itemsConfig.set(plugin+"."+itemName+".enchants", enchantments);
+
+        try {
+            itemsConfig.save(itemsFile);
+        } catch (IOException e) {
+            return;
+        }
     }
 
     /**

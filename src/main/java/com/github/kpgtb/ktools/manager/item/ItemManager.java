@@ -23,9 +23,11 @@ import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 
 /**
@@ -34,12 +36,14 @@ import java.util.HashMap;
  */
 public class ItemManager {
     private final HashMap<String, Kitem> customItems;
+    private final File itemsFile;
 
     /**
      * Constructor of ItemManager
      */
-    public ItemManager() {
+    public ItemManager(DebugManager debug, JavaPlugin plugin) {
         this.customItems = new HashMap<>();
+        this.itemsFile = loadFile(debug,plugin);
     }
 
     /**
@@ -103,6 +107,22 @@ public class ItemManager {
         debug.sendInfo(DebugType.ITEM, "Registered item " + item.getFullItemTag());
     }
 
+    private File loadFile(DebugManager debug, JavaPlugin plugin) {
+        File dataFolder = plugin.getDataFolder();
+        dataFolder.mkdirs();
+        File itemsFile = new File(dataFolder, "items.yml");
+        if(itemsFile.exists()) {
+            itemsFile.delete();
+        }
+        try {
+            itemsFile.createNewFile();
+        } catch (IOException e) {
+            debug.sendWarning(DebugType.ITEM, "Error while creating file...");
+        }
+        debug.sendInfo(DebugType.COMMAND, "Loaded items list file.");
+        return itemsFile;
+    }
+
     /**
      * Get custom item
      * @param fullItemName Name of registered item (plugin:item)
@@ -144,5 +164,13 @@ public class ItemManager {
      */
     public HashMap<String, Kitem> getCustomItems() {
         return customItems;
+    }
+
+    /**
+     * Get file with items
+     * @return File with all items
+     */
+    public File getItemsFile() {
+        return itemsFile;
     }
 }

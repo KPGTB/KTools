@@ -31,7 +31,7 @@ import java.util.List;
 public class SerializableListPersister extends StringType {
     private static final SerializableListPersister SINGLETON = new SerializableListPersister();
 
-    protected SerializableListPersister() {
+    public SerializableListPersister() {
         super(SqlType.STRING, new Class[]{List.class, ArrayList.class, LinkedList.class});
     }
 

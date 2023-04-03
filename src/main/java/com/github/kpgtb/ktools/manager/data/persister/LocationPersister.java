@@ -31,7 +31,7 @@ import java.sql.SQLException;
 public class LocationPersister extends StringType {
     private static final LocationPersister SINGLETON = new LocationPersister();
 
-    protected LocationPersister() {
+    public LocationPersister() {
         super(SqlType.STRING, new Class[]{Location.class});
     }
 

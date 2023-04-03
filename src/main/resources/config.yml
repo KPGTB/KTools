@@ -19,6 +19,11 @@ data:
     # Test on your server which option is better for you. Disable only if you have a small amount of RAM!
     enabled: true
     capacity: 0
+gui:
+  closeItem: BARRIER
+  pages:
+    leftItem: ARROW
+    rightItem: ARROW
 debug:
   enable: false
   start: true

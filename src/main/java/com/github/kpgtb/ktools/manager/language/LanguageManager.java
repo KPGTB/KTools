@@ -100,8 +100,8 @@ public class LanguageManager {
         ));
 
         AtomicBoolean changed = new AtomicBoolean(false);
-        pluginLangConfig.getConfigurationSection("message").getKeys(true).forEach(langKey -> {
-            if(!langConfig.getConfigurationSection("message").contains(langKey)) {
+        pluginLangConfig.getConfigurationSection("").getKeys(true).forEach(langKey -> {
+            if(!langConfig.getConfigurationSection("").contains(langKey)) {
                 langConfig.set("message."+langKey, pluginLangConfig.get("message."+langKey));
                 changed.set(true);
             }
@@ -132,7 +132,7 @@ public class LanguageManager {
         }
 
         FileConfiguration configuration = YamlConfiguration.loadConfiguration(langFile);
-        ConfigurationSection messagesSection = configuration.getConfigurationSection("message");
+        ConfigurationSection messagesSection = configuration.getConfigurationSection("");
 
         if(messagesSection == null) {
             debug.sendWarning(DebugType.LANGUAGE, "Language dile doesn't have message section ["+langFile.getAbsolutePath()+"].");

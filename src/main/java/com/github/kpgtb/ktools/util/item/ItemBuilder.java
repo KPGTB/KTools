@@ -166,6 +166,14 @@ public class ItemBuilder {
         return this;
     }
 
+    public int getModel() {
+        return model;
+    }
+
+    public boolean isUnbreakable() {
+        return unbreakable;
+    }
+
     /**
      * Sets the Durability (Damage) of the ItemStack
      * @param damage Damage for the ItemStack

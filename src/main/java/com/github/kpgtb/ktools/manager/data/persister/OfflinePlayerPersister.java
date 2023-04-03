@@ -28,7 +28,7 @@ import java.util.UUID;
 public class OfflinePlayerPersister extends UuidType {
     private static final OfflinePlayerPersister SINGLETON = new OfflinePlayerPersister();
 
-    protected OfflinePlayerPersister() {
+    public OfflinePlayerPersister() {
         super(SqlType.UUID, new Class[]{OfflinePlayer.class});
     }
 
