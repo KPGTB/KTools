@@ -96,7 +96,7 @@ public class ItemBuilder {
         if(item.hasItemMeta()) {
             ItemMeta meta = item.getItemMeta();
             this.displayName = meta.getDisplayName();
-            this.model = meta.getCustomModelData();
+            this.model = meta.hasCustomModelData() ? meta.getCustomModelData() : 0;
             this.lore = meta.getLore();
             this.unbreakable = meta.isUnbreakable();
             for (ItemFlag f : meta.getItemFlags()) {

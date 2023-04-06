@@ -108,7 +108,7 @@ public abstract class Kitem implements Listener {
     public void onPickup(EntityPickupItemEvent event) {}
 
     @EventHandler
-    private void onUseListener(PlayerInteractEvent event) {
+    public final void onUseListener(PlayerInteractEvent event) {
         ItemStack is = event.getItem();
 
         if(is == null || is.getType().equals(Material.AIR)) {
@@ -121,7 +121,7 @@ public abstract class Kitem implements Listener {
     }
 
     @EventHandler
-    private void onClickListener(InventoryClickEvent event) {
+    public final void onClickListener(InventoryClickEvent event) {
         ItemStack clicked = event.getCurrentItem();
 
         if(clicked != null && !clicked.getType().equals(Material.AIR)) {
@@ -139,7 +139,7 @@ public abstract class Kitem implements Listener {
     }
 
     @EventHandler
-    private void onDropListener(PlayerDropItemEvent event) {
+    public final void onDropListener(PlayerDropItemEvent event) {
         ItemStack is = event.getItemDrop().getItemStack();;
 
         if(is == null || is.getType().equals(Material.AIR)) {
@@ -152,7 +152,7 @@ public abstract class Kitem implements Listener {
     }
 
     @EventHandler
-    private void onDeathListener(PlayerDeathEvent event) {
+    public final void onDeathListener(PlayerDeathEvent event) {
         List<ItemStack> drops = event.getDrops();
 
         for (ItemStack is : drops) {
@@ -168,7 +168,7 @@ public abstract class Kitem implements Listener {
     }
 
     @EventHandler
-    private void onBreakListener(PlayerItemBreakEvent event) {
+    public final void onBreakListener(PlayerItemBreakEvent event) {
         ItemStack is = event.getBrokenItem();
 
         if(is == null || is.getType().equals(Material.AIR)) {
@@ -181,7 +181,7 @@ public abstract class Kitem implements Listener {
     }
 
     @EventHandler
-    private void onConsumeListener(PlayerItemConsumeEvent event) {
+    public final void onConsumeListener(PlayerItemConsumeEvent event) {
         ItemStack is = event.getItem();
 
         if(is == null || is.getType().equals(Material.AIR)) {
@@ -194,7 +194,7 @@ public abstract class Kitem implements Listener {
     }
 
     @EventHandler
-    private void onHeldListener(PlayerItemHeldEvent event) {
+    public final void onHeldListener(PlayerItemHeldEvent event) {
         PlayerInventory inv = event.getPlayer().getInventory();
         ItemStack newItem = inv.getItem(event.getNewSlot());
 
@@ -214,7 +214,7 @@ public abstract class Kitem implements Listener {
     }
 
     @EventHandler
-    private void onPickupListener(EntityPickupItemEvent event) {
+    public final void onPickupListener(EntityPickupItemEvent event) {
         ItemStack is = event.getItem().getItemStack();
 
         if(is == null || is.getType().equals(Material.AIR)) {
