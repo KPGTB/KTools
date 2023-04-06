@@ -63,8 +63,8 @@ public class ItemManager {
                 debug.sendInfo(DebugType.ITEM, "Registering item " + clazz.getSimpleName() + "...");
 
                 String itemName = pluginTag + ":" + clazz.getSimpleName()
-                        .toLowerCase()
-                        .replace("Item", "");
+                        .replace("Item", "")
+                        .toLowerCase();
 
                 Kitem item = (Kitem) clazz.getDeclaredConstructor(ToolsObjectWrapper.class, String.class)
                         .newInstance(toolsObjectWrapper, itemName);
@@ -75,6 +75,7 @@ public class ItemManager {
                     continue;
                 }
                 pluginManager.registerEvents(item, toolsObjectWrapper.getPlugin());
+                item.generateItemInFile();
 
                 this.customItems.put(itemName, item);
                 debug.sendInfo(DebugType.ITEM, "Registered item " + itemName);
@@ -102,6 +103,7 @@ public class ItemManager {
             return;
         }
         pluginManager.registerEvents(item, toolsObjectWrapper.getPlugin());
+        item.generateItemInFile();
 
         this.customItems.put(item.getFullItemTag(), item);
         debug.sendInfo(DebugType.ITEM, "Registered item " + item.getFullItemTag());

@@ -50,7 +50,9 @@ public abstract class Kitem implements Listener {
     public Kitem(ToolsObjectWrapper wrapper, String fullItemTag) {
         this.wrapper = wrapper;
         this.fullItemTag = fullItemTag;
+    }
 
+    public void generateItemInFile() {
         File itemsFile = wrapper.getItemManager().getItemsFile();
         YamlConfiguration itemsConfig = YamlConfiguration.loadConfiguration(itemsFile);
 
