@@ -23,6 +23,7 @@ import com.github.kpgtb.ktools.manager.language.LanguageLevel;
 import com.github.kpgtb.ktools.util.item.ItemUtil;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -36,7 +37,7 @@ public class GiveCustomCommand extends KCommand {
     }
 
     @Description(text = "Give custom item from plugins that supports Ktools")
-    public void item(Player player, Player target, Kitem item, int amount) {
+    public void item(CommandSender sender, Player target, Kitem item, int amount) {
         ItemStack result = item.getItem();
         result.setAmount(amount);
 
@@ -53,14 +54,14 @@ public class GiveCustomCommand extends KCommand {
             Placeholder.unparsed("item", name),
             Placeholder.unparsed("amount", amount+""),
             Placeholder.unparsed("target", target.getName())
-        ).forEach(msg -> wrapper.getAdventure().player(player).sendMessage(msg));
+        ).forEach(msg -> wrapper.getAdventure().sender(sender).sendMessage(msg));
 
         wrapper.getLanguageManager().getComponent(
                 LanguageLevel.GLOBAL,
                 "getCustomItem",
                 Placeholder.unparsed("item", name),
                 Placeholder.unparsed("amount", amount+""),
-                Placeholder.unparsed("player", player.getName())
+                Placeholder.unparsed("player", sender.getName())
         ).forEach(msg -> wrapper.getAdventure().player(target).sendMessage(msg));
     }
 
