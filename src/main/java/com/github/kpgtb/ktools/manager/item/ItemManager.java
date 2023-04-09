@@ -21,6 +21,7 @@ import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.util.file.ReflectionUtil;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import org.bukkit.Bukkit;
+import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -107,6 +108,20 @@ public class ItemManager {
 
         this.customItems.put(item.getFullItemTag(), item);
         debug.sendInfo(DebugType.ITEM, "Registered item " + item.getFullItemTag());
+    }
+
+    /**
+     * Unregister item
+     * @param fullItemName Full name of item
+     * @since 1.4.4
+     */
+    public void unregisterItem(String fullItemName) {
+        if(!this.customItems.containsKey(fullItemName)) {
+            return;
+        }
+        Kitem item = this.customItems.get(fullItemName);
+        this.customItems.remove(fullItemName);
+        HandlerList.unregisterAll(item);
     }
 
     private File loadFile(DebugManager debug, JavaPlugin plugin) {
