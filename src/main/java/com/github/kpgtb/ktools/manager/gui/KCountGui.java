@@ -25,6 +25,7 @@ import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  * Count GUI is a gui with response where you can count sth
@@ -76,7 +77,12 @@ public class KCountGui {
             if(!this.responsed) {
                 this.response.response(defaultValue);
                 if(this.lastGui != null) {
-                    this.lastGui.open((Player) e.getPlayer());
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            lastGui.open((Player) e.getPlayer());
+                        }
+                    }.runTaskLater(wrapper.getPlugin(), 3);
                 }
             }
         });

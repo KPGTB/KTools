@@ -24,6 +24,7 @@ import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Arrays;
 
@@ -57,7 +58,12 @@ public class KWriteGui implements Listener {
                     response.response("");
                     responsed = true;
                     if(lastGui != null) {
-                        lastGui.open(p);
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                lastGui.open(p);
+                            }
+                        }.runTaskLater(wrapper.getPlugin(), 3);
                     }
                 })
                 .onComplete(completion -> {
