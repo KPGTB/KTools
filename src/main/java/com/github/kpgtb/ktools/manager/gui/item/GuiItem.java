@@ -17,26 +17,51 @@
 package com.github.kpgtb.ktools.manager.gui.item;
 
 import com.github.kpgtb.ktools.manager.gui.action.ClickAction;
+import com.github.kpgtb.ktools.util.item.ItemBuilder;
 import org.bukkit.inventory.ItemStack;
 
 /**
  * GuiItem represents item in KGui
  */
 public class GuiItem {
-    private final ItemStack itemStack;
+    private ItemStack itemStack;
     private ClickAction clickAction;
 
     /**
-     * Constructor of KGui
+     * Constructor of GuiItem
      * @param itemStack ItemStack instance
      */
     public GuiItem(ItemStack itemStack) {
         this.itemStack = itemStack;
     }
 
+    /**
+     * Constructor of GuiItem
+     * @param builder ItemBuilder instance
+     * @since 1.4.5
+     */
+    public GuiItem(ItemBuilder builder) {
+        itemStack = builder.build();
+    }
+
     public ItemStack getItemStack() {
         return itemStack;
     }
+    public void setItemStack(ItemStack itemStack) {
+        this.itemStack = itemStack;
+    }
+
+    /**
+     * @since 1.4.5
+     * @param builder ItemBuilder
+     */
+    public void setItemBuilder(ItemBuilder builder) {this.itemStack = builder.build();}
+
+    /**
+     * @since 1.4.5
+     * @return ItemBuilder
+     */
+    public ItemBuilder getItemBuilder() {return new ItemBuilder(itemStack);}
 
     /**
      * Get action that will be invoking, when someone clicks this item in gui
