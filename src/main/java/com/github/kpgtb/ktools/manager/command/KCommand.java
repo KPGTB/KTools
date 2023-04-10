@@ -87,7 +87,7 @@ public abstract class KCommand extends Command {
         String description = "";
         Description descriptionAnnotation = getClass().getDeclaredAnnotation(Description.class);
         if(descriptionAnnotation != null) {
-            description = descriptionAnnotation.text();
+            description = descriptionAnnotation.value();
         }
 
         commandsConfig.set(cmdName+".description", description);
@@ -95,7 +95,7 @@ public abstract class KCommand extends Command {
         String[] aliases = new String[0];
         CommandAliases commandAliases = getClass().getDeclaredAnnotation(CommandAliases.class);
         if(commandAliases != null) {
-            aliases = commandAliases.aliases();
+            aliases = commandAliases.value();
         }
 
         commandsConfig.set(cmdName+".aliases", aliases);
@@ -112,7 +112,7 @@ public abstract class KCommand extends Command {
 
         CustomPermission customCommandPermissionAnnotation = getClass().getDeclaredAnnotation(CustomPermission.class);
         if(customCommandPermissionAnnotation != null) {
-            customCommandPermission = customCommandPermissionAnnotation.permission();
+            customCommandPermission = customCommandPermissionAnnotation.value();
         }
 
         this.debug.sendInfo(DebugType.COMMAND, "Registering command " + cmdName);
@@ -136,7 +136,7 @@ public abstract class KCommand extends Command {
 
             Description subcommandDescription = method.getDeclaredAnnotation(Description.class);
             if(subcommandDescription != null) {
-                subDescription = subcommandDescription.text();
+                subDescription = subcommandDescription.value();
             }
 
             this.debug.sendInfo(DebugType.COMMAND, "Description: " + subDescription);
@@ -146,7 +146,7 @@ public abstract class KCommand extends Command {
 
             CustomPermission customPermissionAnnotation = method.getDeclaredAnnotation(CustomPermission.class);
             if(customPermissionAnnotation != null) {
-                customPermission = customPermissionAnnotation.permission();
+                customPermission = customPermissionAnnotation.value();
             }
 
             ArrayList<String> permissions = new ArrayList<>();

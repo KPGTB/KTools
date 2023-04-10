@@ -6,7 +6,7 @@
 
     <groupId>com.github.kpgtb</groupId>
     <artifactId>Ktools</artifactId>
-    <version>1.4.5-SNAPSHOT</version>
+    <version>1.5.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Ktools</name>

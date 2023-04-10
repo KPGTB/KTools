@@ -27,5 +27,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CommandAliases {
-    String[] aliases() default "";
+    String[] value() default "";
 }

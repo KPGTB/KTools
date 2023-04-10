@@ -32,7 +32,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 
-@Description(text = "Manage ktools")
+@Description("Manage ktools")
 public class KtoolsCommand extends KCommand {
     private final ToolsObjectWrapper wrapper;
 
@@ -43,7 +43,7 @@ public class KtoolsCommand extends KCommand {
 
     @MainCommand
     @WithoutPermission
-    @Description(text = "Information about plugin")
+    @Description("Information about plugin")
     public void info(CommandSender sender) {
         Component firstLine = Component.text("Some plugins on this server uses free, open-source ")
                 .color(TextColor.color(40,226,139))
@@ -99,7 +99,7 @@ public class KtoolsCommand extends KCommand {
         audience.sendMessage(thirdLine);
     }
 
-    @Description(text = "Reload all messages (Also in hooked plugins)")
+    @Description("Reload all messages (Also in hooked plugins)")
     public void reloadMessages(CommandSender sender) {
         LanguageManager global = wrapper.getLanguageManager();
         global.refreshMessages();

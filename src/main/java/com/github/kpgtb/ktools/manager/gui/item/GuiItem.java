@@ -38,7 +38,7 @@ public class GuiItem {
     /**
      * Constructor of GuiItem
      * @param builder ItemBuilder instance
-     * @since 1.4.5
+     * @since 1.5.0
      */
     public GuiItem(ItemBuilder builder) {
         itemStack = builder.build();
@@ -52,13 +52,13 @@ public class GuiItem {
     }
 
     /**
-     * @since 1.4.5
+     * @since 1.5.0
      * @param builder ItemBuilder
      */
     public void setItemBuilder(ItemBuilder builder) {this.itemStack = builder.build();}
 
     /**
-     * @since 1.4.5
+     * @since 1.5.0
      * @return ItemBuilder
      */
     public ItemBuilder getItemBuilder() {return new ItemBuilder(itemStack);}

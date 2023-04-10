@@ -27,7 +27,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-@Description(text = "Give custom items from plugins that supports Ktools")
+@Description("Give custom items from plugins that supports Ktools")
 public class GiveCustomCommand extends KCommand {
     private final ToolsObjectWrapper wrapper;
 
@@ -36,7 +36,7 @@ public class GiveCustomCommand extends KCommand {
         this.wrapper = toolsObjectWrapper;
     }
 
-    @Description(text = "Give custom item from plugins that supports Ktools")
+    @Description("Give custom item from plugins that supports Ktools")
     public void item(CommandSender sender, Player target, Kitem item, int amount) {
         ItemStack result = item.getItem();
         result.setAmount(amount);
