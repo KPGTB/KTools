@@ -73,6 +73,20 @@ public class PagedGuiContainer extends GuiContainer {
      */
     public void removePage(GuiContainer container) {
         this.containers.remove(container);
+        if(this.page >= this.containers.size()) {
+            this.page = this.containers.size() - 1;
+            if(this.page < 0) {
+                this.page = 0;
+            }
+        }
+    }
+
+    /**
+     * Clear packages from container
+     */
+    public void clearPages() {
+        this.containers.clear();
+        this.page = 0;
     }
 
     /**

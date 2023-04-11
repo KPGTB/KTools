@@ -61,25 +61,14 @@ public class BaseUiObject {
     private String fixString(String text) {
         String fixed = text;
 
-        Pattern colorPattern = Pattern.compile("§[a-fA-F0-9]");
+        Pattern colorPattern = Pattern.compile("§[xa-fA-F0-9]");
         Matcher colorMatcher = colorPattern.matcher(text);
         while (colorMatcher.find()) {
             fixed = fixed.replace(colorMatcher.group(), "");
         }
-
-        if(Integer.parseInt(
-                Bukkit.getBukkitVersion()
-                        .split("-")[0] // ex. 1.17
-                        .split("\\.")[1] // ex. 17
-        ) >= 16) {
-            Pattern hexPattern = Pattern.compile("§x§[a-fA-F0-9]§[a-fA-F0-9]§[a-fA-F0-9]§[a-fA-F0-9]§[a-fA-F0-9]§[a-fA-F0-9]");
-            Matcher hexMatcher = hexPattern.matcher(text);
-            while (hexMatcher.find()) {
-                fixed = fixed.replace(hexMatcher.group(), "");
-            }
-        }
         return fixed;
     }
+
     private Integer[] getLeftAndRightPixels() {
         int width = 0;
 

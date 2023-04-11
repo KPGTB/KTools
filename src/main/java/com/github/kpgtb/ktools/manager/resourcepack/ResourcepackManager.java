@@ -30,6 +30,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -209,6 +210,13 @@ public class ResourcepackManager {
             gson.toJson(packObj, packWriter);
             packWriter.close();
 
+            File shaderFolder = new File(tempFolder, "assets\\minecraft\\shaders\\core\\");
+            shaderFolder.mkdirs();
+            plugin.saveResource("txt/rendertype_text.vsh", true);
+            File savedShader = new File(plugin.getDataFolder(), "txt/rendertype_text.vsh");
+            File shaderInFolder = new File(shaderFolder, "rendertype_text.vsh");
+            Files.move(savedShader.toPath(), shaderInFolder.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            
             File itemFolder = new File(tempFolder, "assets\\minecraft\\textures\\item\\");
             itemFolder.mkdirs();
             File modelsFolder = new File(tempFolder, "assets\\minecraft\\models\\item\\");

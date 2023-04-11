@@ -53,6 +53,8 @@ Wiki -> https://wiki.kpgtb.pl/
 - To handle database connection, this plugin uses [OrmLite](https://ormlite.com/) License: [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
 - To make write GUI, this plugin uses [AnvilGUI](https://github.com/WesJD/AnvilGUI) License: [MIT](https://github.com/WesJD/AnvilGUI/blob/master/LICENSE)
 - Resource packs are uploading to https://transfer.sh/
+- To fix UI shadows, this plugin uses [NoShadow](https://github.com/PuckiSilver/NoShadow) License: [MIT](https://github.com/PuckiSilver/NoShadow/blob/main/LICENSE)
+- To make UI, this plugin uses [Negative Space Font](https://www.spigotmc.org/threads/negative-space-font-resource-pack.440952/) License: [CC 4.0](https://creativecommons.org/licenses/by/4.0/)
 
 ### License
 

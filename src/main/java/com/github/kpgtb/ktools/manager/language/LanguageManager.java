@@ -102,7 +102,7 @@ public class LanguageManager {
         AtomicBoolean changed = new AtomicBoolean(false);
         pluginLangConfig.getConfigurationSection("").getKeys(true).forEach(langKey -> {
             if(!langConfig.getConfigurationSection("").contains(langKey)) {
-                langConfig.set("message."+langKey, pluginLangConfig.get("message."+langKey));
+                langConfig.set(langKey, pluginLangConfig.get(langKey));
                 changed.set(true);
             }
         });
@@ -113,8 +113,9 @@ public class LanguageManager {
                 debug.sendWarning(DebugType.LANGUAGE, "Error while saving changes to default language file ["+path+"].");
             }
             debug.sendInfo(DebugType.LANGUAGE, "Saved default language file with changes ["+path+"].");
+        } else {
+            debug.sendInfo(DebugType.LANGUAGE, "Saved default language file ["+path+"].");
         }
-        debug.sendInfo(DebugType.LANGUAGE, "Saved default language file ["+path+"].");
     }
 
     /**
@@ -257,28 +258,8 @@ public class LanguageManager {
         ArrayList<Component> components = this.getComponent(languageLevel, code,player,placeholders);
         ArrayList<String> result = new ArrayList<>();
 
-        boolean isHexSupport = Integer.parseInt(
-            Bukkit.getBukkitVersion()
-                    .split("-")[0] // ex. 1.16
-                    .split("\\.")[1] // ex. 16
-        ) >= 16;
-
         components.forEach(component -> {
-            if (isHexSupport) {
-                result.add(LegacyComponentSerializer
-                        .builder()
-                        .hexColors()
-                        .useUnusualXRepeatedCharacterHexFormat()
-                        .build()
-                        .serialize(component)
-                );
-                return;
-            }
-            result.add(LegacyComponentSerializer
-                    .builder()
-                    .build()
-                    .serialize(component)
-            );
+            result.add(convertComponentToString(component));
         });
 
         return result;
@@ -317,6 +298,41 @@ public class LanguageManager {
      */
     public String getSingleString(LanguageLevel languageLevel, String code, TagResolver... placeholders) {
         return this.getString(languageLevel, code, placeholders).get(0);
+    }
+
+    /**
+     * Convert Component to String
+     * @param component Component
+     * @return String from component
+     */
+    public String convertComponentToString(Component component) {
+        boolean isHexSupport = Integer.parseInt(
+                Bukkit.getBukkitVersion()
+                        .split("-")[0] // ex. 1.16
+                        .split("\\.")[1] // ex. 16
+        ) >= 16;
+
+        if (isHexSupport) {
+            return LegacyComponentSerializer
+                    .builder()
+                    .hexColors()
+                    .useUnusualXRepeatedCharacterHexFormat()
+                    .build()
+                    .serialize(component);
+        }
+        return LegacyComponentSerializer
+                .builder()
+                .build()
+                .serialize(component);
+    }
+
+    /**
+     * Convert mini message string to formatted string
+     * @param mm Mini message string
+     * @return formatted string
+     */
+    public String convertMmToString(String mm) {
+        return convertComponentToString(MiniMessage.miniMessage().deserialize(mm));
     }
 
     /**

@@ -229,7 +229,7 @@ public class KCountGui {
     }
 
     private void changeValue(KGui gui, GuiContainer container, double addValue, GuiItem countItem) {
-        double newValue = this.value + addValue;
+        double newValue = Math.round((this.value + addValue) * 100.0) / 100.0;
 
         if(newValue < min) {
             return;

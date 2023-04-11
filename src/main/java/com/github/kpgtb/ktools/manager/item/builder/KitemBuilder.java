@@ -35,14 +35,14 @@ public class KitemBuilder {
     private final String itemName;
     private final ItemStack itemStack;
 
-    public ItemBuilderAction<PlayerInteractEvent> onUseAction;
-    public ItemBuilderAction<InventoryClickEvent> onClickAction;
-    public ItemBuilderAction<PlayerDropItemEvent> onDropAction;
-    public ItemBuilderAction<PlayerDeathEvent> onDeathAction;
-    public ItemBuilderAction<PlayerItemBreakEvent> onBreakAction;
-    public ItemBuilderAction<PlayerItemConsumeEvent> onConsumeAction;
-    public ItemBuilderHeldAction onHeldAction;
-    public ItemBuilderAction<EntityPickupItemEvent> onPickupAction;
+    private ItemBuilderAction<PlayerInteractEvent> onUseAction;
+    private ItemBuilderAction<InventoryClickEvent> onClickAction;
+    private ItemBuilderAction<PlayerDropItemEvent> onDropAction;
+    private ItemBuilderAction<PlayerDeathEvent> onDeathAction;
+    private ItemBuilderAction<PlayerItemBreakEvent> onBreakAction;
+    private ItemBuilderAction<PlayerItemConsumeEvent> onConsumeAction;
+    private ItemBuilderHeldAction onHeldAction;
+    private ItemBuilderAction<EntityPickupItemEvent> onPickupAction;
 
     public KitemBuilder(ToolsObjectWrapper wrapper, String pluginTag, String itemName, ItemStack itemStack) {
         this.wrapper = wrapper;
