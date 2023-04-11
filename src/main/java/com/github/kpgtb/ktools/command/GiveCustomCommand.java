@@ -38,7 +38,7 @@ public class GiveCustomCommand extends KCommand {
 
     @Description("Give custom item from plugins that supports Ktools")
     public void item(CommandSender sender, Player target, Kitem item, int amount) {
-        ItemStack result = item.getItem();
+        ItemStack result = item.getItem().clone();
         result.setAmount(amount);
 
         String name = item.getFullItemTag();

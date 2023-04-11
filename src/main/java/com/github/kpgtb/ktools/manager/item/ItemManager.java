@@ -147,7 +147,7 @@ public class ItemManager {
      */
     @Nullable
     public ItemStack getCustomItem(String fullItemName) {
-        return customItems.get(fullItemName).getItem();
+        return customItems.get(fullItemName).getItem().clone();
     }
 
     /**
@@ -158,7 +158,7 @@ public class ItemManager {
      */
     @Nullable
     public ItemStack getCustomItem(String pluginTag, String itemName) {
-        return customItems.get(pluginTag.toLowerCase() + ":" + itemName).getItem();
+        return customItems.get(pluginTag.toLowerCase() + ":" + itemName).getItem().clone();
     }
 
     /**
@@ -172,7 +172,7 @@ public class ItemManager {
         String itemName = pluginTag + ":" + itemClass.getSimpleName()
                 .toLowerCase()
                 .replace("Item", "");
-        return customItems.get(itemName).getItem();
+        return customItems.get(itemName).getItem().clone();
     }
 
     /**
