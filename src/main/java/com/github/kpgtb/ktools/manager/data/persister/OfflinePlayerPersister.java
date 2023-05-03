@@ -18,6 +18,7 @@ package com.github.kpgtb.ktools.manager.data.persister;
 
 import com.j256.ormlite.field.FieldType;
 import com.j256.ormlite.field.SqlType;
+import com.j256.ormlite.field.types.StringType;
 import com.j256.ormlite.field.types.UuidType;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -25,11 +26,11 @@ import org.bukkit.OfflinePlayer;
 import java.sql.SQLException;
 import java.util.UUID;
 
-public class OfflinePlayerPersister extends UuidType {
+public class OfflinePlayerPersister extends StringType {
     private static final OfflinePlayerPersister SINGLETON = new OfflinePlayerPersister();
 
     public OfflinePlayerPersister() {
-        super(SqlType.UUID, new Class[]{OfflinePlayer.class});
+        super(SqlType.STRING, new Class[]{OfflinePlayer.class});
     }
 
     public static OfflinePlayerPersister getSingleton() {
@@ -37,12 +38,12 @@ public class OfflinePlayerPersister extends UuidType {
     }
 
     @Override
-    public Object sqlArgToJava(FieldType fieldType, Object sqlArg, int columnPos) throws SQLException {
-        return Bukkit.getOfflinePlayer((UUID) sqlArg);
+    public Object sqlArgToJava(FieldType fieldType, Object sqlArg, int columnPos) {
+        return Bukkit.getOfflinePlayer(UUID.fromString((String) sqlArg));
     }
 
     @Override
     public Object javaToSqlArg(FieldType fieldType, Object obj) {
-        return ((OfflinePlayer) obj).getUniqueId();
+        return ((OfflinePlayer) obj).getUniqueId().toString();
     }
 }

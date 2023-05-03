@@ -25,7 +25,6 @@ import com.github.kpgtb.ktools.manager.data.DataManager;
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.manager.item.ItemManager;
-import com.github.kpgtb.ktools.manager.item.builder.KitemBuilder;
 import com.github.kpgtb.ktools.manager.language.LanguageManager;
 import com.github.kpgtb.ktools.manager.listener.ListenerManager;
 import com.github.kpgtb.ktools.manager.resourcepack.ResourcepackManager;
@@ -33,12 +32,10 @@ import com.github.kpgtb.ktools.manager.ui.UiManager;
 import com.github.kpgtb.ktools.manager.updater.SpigotUpdater;
 import com.github.kpgtb.ktools.manager.updater.UpdaterManager;
 import com.github.kpgtb.ktools.util.file.PackageUtil;
-import com.github.kpgtb.ktools.util.item.ItemBuilder;
 import com.github.kpgtb.ktools.util.wrapper.GlobalManagersWrapper;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -71,7 +68,7 @@ public final class Ktools extends JavaPlugin {
         }
 
         debug.sendInfo(DebugType.START, "Loading packages...");
-        PackageUtil packageUtil = new PackageUtil("com.github.kpgtb.ktools");
+        PackageUtil packageUtil = new PackageUtil("com.github.kpgtb.ktools", "ktools");
         debug.sendInfo(DebugType.START, "Loaded packages.");
 
         debug.sendInfo(DebugType.START, "Loading audience...");
@@ -117,76 +114,79 @@ public final class Ktools extends JavaPlugin {
             debug.sendInfo(DebugType.START, "Loading resourcepack...");
             resourcepackManager = new ResourcepackManager(this, debug, cacheManager);
             ResourcepackManager finalResourcepackManager = resourcepackManager;
+            UiManager finalUiManager = uiManager;
             new BukkitRunnable() {
                 @Override
                 public void run() {
                     if (!legacy && finalResourcepackManager.isEnabled()) {
-                        finalResourcepackManager.registerPlugin("ktools", getDescription().getVersion());
+                        finalResourcepackManager.registerPlugin(packageUtil.tag(), getDescription().getVersion());
 
-                        //NegativeSpaces
-                        finalResourcepackManager.registerCustomChar("space", "\uF801", "space_split", getResource("txt/space_split.png"), -3, -32768, -1);
-                        finalResourcepackManager.registerCustomChar("space", "\uF802", "space_split", getResource("txt/space_split.png"), -4, -32768, -2);
-                        finalResourcepackManager.registerCustomChar("space", "\uF803", "space_split", getResource("txt/space_split.png"), -5, -32768, -3);
-                        finalResourcepackManager.registerCustomChar("space", "\uF804", "space_split", getResource("txt/space_split.png"), -6, -32768, -4);
-                        finalResourcepackManager.registerCustomChar("space", "\uF805", "space_split", getResource("txt/space_split.png"), -7, -32768, -5);
-                        finalResourcepackManager.registerCustomChar("space", "\uF806", "space_split", getResource("txt/space_split.png"), -8, -32768, -6);
-                        finalResourcepackManager.registerCustomChar("space", "\uF807", "space_split", getResource("txt/space_split.png"), -9, -32768, -7);
-                        finalResourcepackManager.registerCustomChar("space", "\uF808", "space_split", getResource("txt/space_split.png"), -10, -32768, -8);
-                        finalResourcepackManager.registerCustomChar("space", "\uF809", "space_split", getResource("txt/space_split.png"), -18, -32768, -16);
-                        finalResourcepackManager.registerCustomChar("space", "\uF80A", "space_split", getResource("txt/space_split.png"), -34, -32768, -32);
-                        finalResourcepackManager.registerCustomChar("space", "\uF80B", "space_split", getResource("txt/space_split.png"), -66, -32768, -64);
-                        finalResourcepackManager.registerCustomChar("space", "\uF80C", "space_split", getResource("txt/space_split.png"), -130, -32768, -128);
-                        finalResourcepackManager.registerCustomChar("space", "\uF80D", "space_split", getResource("txt/space_split.png"), -258, -32768, -256);
-                        finalResourcepackManager.registerCustomChar("space", "\uF80E", "space_split", getResource("txt/space_split.png"), -514, -32768, -512);
-                        finalResourcepackManager.registerCustomChar("space", "\uF80F", "space_split", getResource("txt/space_split.png"), -1026, -32768, -1024);
+                        if(finalUiManager != null && finalUiManager.isRequired()) {
+                            //NegativeSpaces
+                            finalResourcepackManager.registerCustomChar("space", "\uF801", "space_split", getResource("txt/space_split.png"), -3, -32768, -1);
+                            finalResourcepackManager.registerCustomChar("space", "\uF802", "space_split", getResource("txt/space_split.png"), -4, -32768, -2);
+                            finalResourcepackManager.registerCustomChar("space", "\uF803", "space_split", getResource("txt/space_split.png"), -5, -32768, -3);
+                            finalResourcepackManager.registerCustomChar("space", "\uF804", "space_split", getResource("txt/space_split.png"), -6, -32768, -4);
+                            finalResourcepackManager.registerCustomChar("space", "\uF805", "space_split", getResource("txt/space_split.png"), -7, -32768, -5);
+                            finalResourcepackManager.registerCustomChar("space", "\uF806", "space_split", getResource("txt/space_split.png"), -8, -32768, -6);
+                            finalResourcepackManager.registerCustomChar("space", "\uF807", "space_split", getResource("txt/space_split.png"), -9, -32768, -7);
+                            finalResourcepackManager.registerCustomChar("space", "\uF808", "space_split", getResource("txt/space_split.png"), -10, -32768, -8);
+                            finalResourcepackManager.registerCustomChar("space", "\uF809", "space_split", getResource("txt/space_split.png"), -18, -32768, -16);
+                            finalResourcepackManager.registerCustomChar("space", "\uF80A", "space_split", getResource("txt/space_split.png"), -34, -32768, -32);
+                            finalResourcepackManager.registerCustomChar("space", "\uF80B", "space_split", getResource("txt/space_split.png"), -66, -32768, -64);
+                            finalResourcepackManager.registerCustomChar("space", "\uF80C", "space_split", getResource("txt/space_split.png"), -130, -32768, -128);
+                            finalResourcepackManager.registerCustomChar("space", "\uF80D", "space_split", getResource("txt/space_split.png"), -258, -32768, -256);
+                            finalResourcepackManager.registerCustomChar("space", "\uF80E", "space_split", getResource("txt/space_split.png"), -514, -32768, -512);
+                            finalResourcepackManager.registerCustomChar("space", "\uF80F", "space_split", getResource("txt/space_split.png"), -1026, -32768, -1024);
 
-                        finalResourcepackManager.registerCustomChar("space", "\uF811", "space_nosplit", getResource("txt/space_nosplit.png"), -3, -32768, -1);
-                        finalResourcepackManager.registerCustomChar("space", "\uF812", "space_nosplit", getResource("txt/space_nosplit.png"), -4, -32768, -2);
-                        finalResourcepackManager.registerCustomChar("space", "\uF813", "space_nosplit", getResource("txt/space_nosplit.png"), -5, -32768, -3);
-                        finalResourcepackManager.registerCustomChar("space", "\uF814", "space_nosplit", getResource("txt/space_nosplit.png"), -6, -32768, -4);
-                        finalResourcepackManager.registerCustomChar("space", "\uF815", "space_nosplit", getResource("txt/space_nosplit.png"), -7, -32768, -5);
-                        finalResourcepackManager.registerCustomChar("space", "\uF816", "space_nosplit", getResource("txt/space_nosplit.png"), -8, -32768, -6);
-                        finalResourcepackManager.registerCustomChar("space", "\uF817", "space_nosplit", getResource("txt/space_nosplit.png"), -9, -32768, -7);
-                        finalResourcepackManager.registerCustomChar("space", "\uF818", "space_nosplit", getResource("txt/space_nosplit.png"), -10, -32768, -8);
-                        finalResourcepackManager.registerCustomChar("space", "\uF819", "space_nosplit", getResource("txt/space_nosplit.png"), -18, -32768, -16);
-                        finalResourcepackManager.registerCustomChar("space", "\uF81A", "space_nosplit", getResource("txt/space_nosplit.png"), -34, -32768, -32);
-                        finalResourcepackManager.registerCustomChar("space", "\uF81B", "space_nosplit", getResource("txt/space_nosplit.png"), -66, -32768, -64);
-                        finalResourcepackManager.registerCustomChar("space", "\uF81C", "space_nosplit", getResource("txt/space_nosplit.png"), -130, -32768, -128);
-                        finalResourcepackManager.registerCustomChar("space", "\uF81D", "space_nosplit", getResource("txt/space_nosplit.png"), -258, -32768, -256);
-                        finalResourcepackManager.registerCustomChar("space", "\uF81E", "space_nosplit", getResource("txt/space_nosplit.png"), -514, -32768, -512);
-                        finalResourcepackManager.registerCustomChar("space", "\uF81F", "space_nosplit", getResource("txt/space_nosplit.png"), -1026, -32768, -1024);
+                            finalResourcepackManager.registerCustomChar("space", "\uF811", "space_nosplit", getResource("txt/space_nosplit.png"), -3, -32768, -1);
+                            finalResourcepackManager.registerCustomChar("space", "\uF812", "space_nosplit", getResource("txt/space_nosplit.png"), -4, -32768, -2);
+                            finalResourcepackManager.registerCustomChar("space", "\uF813", "space_nosplit", getResource("txt/space_nosplit.png"), -5, -32768, -3);
+                            finalResourcepackManager.registerCustomChar("space", "\uF814", "space_nosplit", getResource("txt/space_nosplit.png"), -6, -32768, -4);
+                            finalResourcepackManager.registerCustomChar("space", "\uF815", "space_nosplit", getResource("txt/space_nosplit.png"), -7, -32768, -5);
+                            finalResourcepackManager.registerCustomChar("space", "\uF816", "space_nosplit", getResource("txt/space_nosplit.png"), -8, -32768, -6);
+                            finalResourcepackManager.registerCustomChar("space", "\uF817", "space_nosplit", getResource("txt/space_nosplit.png"), -9, -32768, -7);
+                            finalResourcepackManager.registerCustomChar("space", "\uF818", "space_nosplit", getResource("txt/space_nosplit.png"), -10, -32768, -8);
+                            finalResourcepackManager.registerCustomChar("space", "\uF819", "space_nosplit", getResource("txt/space_nosplit.png"), -18, -32768, -16);
+                            finalResourcepackManager.registerCustomChar("space", "\uF81A", "space_nosplit", getResource("txt/space_nosplit.png"), -34, -32768, -32);
+                            finalResourcepackManager.registerCustomChar("space", "\uF81B", "space_nosplit", getResource("txt/space_nosplit.png"), -66, -32768, -64);
+                            finalResourcepackManager.registerCustomChar("space", "\uF81C", "space_nosplit", getResource("txt/space_nosplit.png"), -130, -32768, -128);
+                            finalResourcepackManager.registerCustomChar("space", "\uF81D", "space_nosplit", getResource("txt/space_nosplit.png"), -258, -32768, -256);
+                            finalResourcepackManager.registerCustomChar("space", "\uF81E", "space_nosplit", getResource("txt/space_nosplit.png"), -514, -32768, -512);
+                            finalResourcepackManager.registerCustomChar("space", "\uF81F", "space_nosplit", getResource("txt/space_nosplit.png"), -1026, -32768, -1024);
 
-                        finalResourcepackManager.registerCustomChar("space", "\uF821", "space_split", getResource("txt/space_split.png"), 0, -32768, 1);
-                        finalResourcepackManager.registerCustomChar("space", "\uF822", "space_split", getResource("txt/space_split.png"), 1, -32768, 2);
-                        finalResourcepackManager.registerCustomChar("space", "\uF823", "space_split", getResource("txt/space_split.png"), 2, -32768, 3);
-                        finalResourcepackManager.registerCustomChar("space", "\uF824", "space_split", getResource("txt/space_split.png"), 3, -32768, 4);
-                        finalResourcepackManager.registerCustomChar("space", "\uF825", "space_split", getResource("txt/space_split.png"), 4, -32768, 5);
-                        finalResourcepackManager.registerCustomChar("space", "\uF826", "space_split", getResource("txt/space_split.png"), 5, -32768, 6);
-                        finalResourcepackManager.registerCustomChar("space", "\uF827", "space_split", getResource("txt/space_split.png"), 6, -32768, 7);
-                        finalResourcepackManager.registerCustomChar("space", "\uF828", "space_split", getResource("txt/space_split.png"), 7, -32768, 8);
-                        finalResourcepackManager.registerCustomChar("space", "\uF829", "space_split", getResource("txt/space_split.png"), 15, -32768, 16);
-                        finalResourcepackManager.registerCustomChar("space", "\uF82A", "space_split", getResource("txt/space_split.png"), 31, -32768, 32);
-                        finalResourcepackManager.registerCustomChar("space", "\uF82B", "space_split", getResource("txt/space_split.png"), 63, -32768, 64);
-                        finalResourcepackManager.registerCustomChar("space", "\uF82C", "space_split", getResource("txt/space_split.png"), 127, -32768, 128);
-                        finalResourcepackManager.registerCustomChar("space", "\uF82D", "space_split", getResource("txt/space_split.png"), 255, -32768, 256);
-                        finalResourcepackManager.registerCustomChar("space", "\uF82E", "space_split", getResource("txt/space_split.png"), 511, -32768, 512);
-                        finalResourcepackManager.registerCustomChar("space", "\uF82F", "space_split", getResource("txt/space_split.png"), 1023, -32768, 1024);
+                            finalResourcepackManager.registerCustomChar("space", "\uF821", "space_split", getResource("txt/space_split.png"), 0, -32768, 1);
+                            finalResourcepackManager.registerCustomChar("space", "\uF822", "space_split", getResource("txt/space_split.png"), 1, -32768, 2);
+                            finalResourcepackManager.registerCustomChar("space", "\uF823", "space_split", getResource("txt/space_split.png"), 2, -32768, 3);
+                            finalResourcepackManager.registerCustomChar("space", "\uF824", "space_split", getResource("txt/space_split.png"), 3, -32768, 4);
+                            finalResourcepackManager.registerCustomChar("space", "\uF825", "space_split", getResource("txt/space_split.png"), 4, -32768, 5);
+                            finalResourcepackManager.registerCustomChar("space", "\uF826", "space_split", getResource("txt/space_split.png"), 5, -32768, 6);
+                            finalResourcepackManager.registerCustomChar("space", "\uF827", "space_split", getResource("txt/space_split.png"), 6, -32768, 7);
+                            finalResourcepackManager.registerCustomChar("space", "\uF828", "space_split", getResource("txt/space_split.png"), 7, -32768, 8);
+                            finalResourcepackManager.registerCustomChar("space", "\uF829", "space_split", getResource("txt/space_split.png"), 15, -32768, 16);
+                            finalResourcepackManager.registerCustomChar("space", "\uF82A", "space_split", getResource("txt/space_split.png"), 31, -32768, 32);
+                            finalResourcepackManager.registerCustomChar("space", "\uF82B", "space_split", getResource("txt/space_split.png"), 63, -32768, 64);
+                            finalResourcepackManager.registerCustomChar("space", "\uF82C", "space_split", getResource("txt/space_split.png"), 127, -32768, 128);
+                            finalResourcepackManager.registerCustomChar("space", "\uF82D", "space_split", getResource("txt/space_split.png"), 255, -32768, 256);
+                            finalResourcepackManager.registerCustomChar("space", "\uF82E", "space_split", getResource("txt/space_split.png"), 511, -32768, 512);
+                            finalResourcepackManager.registerCustomChar("space", "\uF82F", "space_split", getResource("txt/space_split.png"), 1023, -32768, 1024);
 
-                        finalResourcepackManager.registerCustomChar("space", "\uF831", "space_nosplit", getResource("txt/space_nosplit.png"), 0, -32768, 1);
-                        finalResourcepackManager.registerCustomChar("space", "\uF832", "space_nosplit", getResource("txt/space_nosplit.png"), 1, -32768, 2);
-                        finalResourcepackManager.registerCustomChar("space", "\uF833", "space_nosplit", getResource("txt/space_nosplit.png"), 2, -32768, 3);
-                        finalResourcepackManager.registerCustomChar("space", "\uF834", "space_nosplit", getResource("txt/space_nosplit.png"), 3, -32768, 4);
-                        finalResourcepackManager.registerCustomChar("space", "\uF835", "space_nosplit", getResource("txt/space_nosplit.png"), 4, -32768, 5);
-                        finalResourcepackManager.registerCustomChar("space", "\uF836", "space_nosplit", getResource("txt/space_nosplit.png"), 5, -32768, 6);
-                        finalResourcepackManager.registerCustomChar("space", "\uF837", "space_nosplit", getResource("txt/space_nosplit.png"), 6, -32768, 7);
-                        finalResourcepackManager.registerCustomChar("space", "\uF838", "space_nosplit", getResource("txt/space_nosplit.png"), 7, -32768, 8);
-                        finalResourcepackManager.registerCustomChar("space", "\uF839", "space_nosplit", getResource("txt/space_nosplit.png"), 15, -32768, 16);
-                        finalResourcepackManager.registerCustomChar("space", "\uF83A", "space_nosplit", getResource("txt/space_nosplit.png"), 31, -32768, 32);
-                        finalResourcepackManager.registerCustomChar("space", "\uF83B", "space_nosplit", getResource("txt/space_nosplit.png"), 63, -32768, 64);
-                        finalResourcepackManager.registerCustomChar("space", "\uF83C", "space_nosplit", getResource("txt/space_nosplit.png"), 127, -32768, 128);
-                        finalResourcepackManager.registerCustomChar("space", "\uF83D", "space_nosplit", getResource("txt/space_nosplit.png"), 255, -32768, 256);
-                        finalResourcepackManager.registerCustomChar("space", "\uF83E", "space_nosplit", getResource("txt/space_nosplit.png"), 511, -32768, 512);
-                        finalResourcepackManager.registerCustomChar("space", "\uF83F", "space_nosplit", getResource("txt/space_nosplit.png"), 1023, -32768, 1024);
+                            finalResourcepackManager.registerCustomChar("space", "\uF831", "space_nosplit", getResource("txt/space_nosplit.png"), 0, -32768, 1);
+                            finalResourcepackManager.registerCustomChar("space", "\uF832", "space_nosplit", getResource("txt/space_nosplit.png"), 1, -32768, 2);
+                            finalResourcepackManager.registerCustomChar("space", "\uF833", "space_nosplit", getResource("txt/space_nosplit.png"), 2, -32768, 3);
+                            finalResourcepackManager.registerCustomChar("space", "\uF834", "space_nosplit", getResource("txt/space_nosplit.png"), 3, -32768, 4);
+                            finalResourcepackManager.registerCustomChar("space", "\uF835", "space_nosplit", getResource("txt/space_nosplit.png"), 4, -32768, 5);
+                            finalResourcepackManager.registerCustomChar("space", "\uF836", "space_nosplit", getResource("txt/space_nosplit.png"), 5, -32768, 6);
+                            finalResourcepackManager.registerCustomChar("space", "\uF837", "space_nosplit", getResource("txt/space_nosplit.png"), 6, -32768, 7);
+                            finalResourcepackManager.registerCustomChar("space", "\uF838", "space_nosplit", getResource("txt/space_nosplit.png"), 7, -32768, 8);
+                            finalResourcepackManager.registerCustomChar("space", "\uF839", "space_nosplit", getResource("txt/space_nosplit.png"), 15, -32768, 16);
+                            finalResourcepackManager.registerCustomChar("space", "\uF83A", "space_nosplit", getResource("txt/space_nosplit.png"), 31, -32768, 32);
+                            finalResourcepackManager.registerCustomChar("space", "\uF83B", "space_nosplit", getResource("txt/space_nosplit.png"), 63, -32768, 64);
+                            finalResourcepackManager.registerCustomChar("space", "\uF83C", "space_nosplit", getResource("txt/space_nosplit.png"), 127, -32768, 128);
+                            finalResourcepackManager.registerCustomChar("space", "\uF83D", "space_nosplit", getResource("txt/space_nosplit.png"), 255, -32768, 256);
+                            finalResourcepackManager.registerCustomChar("space", "\uF83E", "space_nosplit", getResource("txt/space_nosplit.png"), 511, -32768, 512);
+                            finalResourcepackManager.registerCustomChar("space", "\uF83F", "space_nosplit", getResource("txt/space_nosplit.png"), 1023, -32768, 1024);
+                        }
 
                         finalResourcepackManager.prepareResourcepack();
                     }
@@ -204,7 +204,7 @@ public final class Ktools extends JavaPlugin {
         debug.sendInfo(DebugType.START, "Loaded tools object wrapper.");
 
         debug.sendInfo(DebugType.START, "Loading commands...");
-        CommandManager commandManager = new CommandManager(toolsObjectWrapper, getFile(), "ktools");
+        CommandManager commandManager = new CommandManager(toolsObjectWrapper, getFile(), packageUtil.tag());
         commandManager.registerCommands(packageUtil.get("command"));
         debug.sendInfo(DebugType.START, "Loaded commands.");
 

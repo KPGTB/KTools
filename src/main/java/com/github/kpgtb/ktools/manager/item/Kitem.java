@@ -20,11 +20,14 @@ import com.github.kpgtb.ktools.util.item.ItemBuilder;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -32,7 +35,9 @@ import org.bukkit.inventory.PlayerInventory;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Abstract class that handles process of preparing custom item
@@ -41,6 +46,7 @@ import java.util.List;
 public abstract class Kitem implements Listener {
     private final ToolsObjectWrapper wrapper;
     private final String fullItemTag;
+    private final List<Player> deathPlayers;
 
     /**
      * Constructor of Kitem
@@ -50,9 +56,10 @@ public abstract class Kitem implements Listener {
     public Kitem(ToolsObjectWrapper wrapper, String fullItemTag) {
         this.wrapper = wrapper;
         this.fullItemTag = fullItemTag;
+        this.deathPlayers = new ArrayList<>();
     }
 
-    public void generateItemInFile() {
+    public final void generateItemInFile() {
         File itemsFile = wrapper.getItemManager().getItemsFile();
         YamlConfiguration itemsConfig = YamlConfiguration.loadConfiguration(itemsFile);
 
@@ -88,7 +95,7 @@ public abstract class Kitem implements Listener {
      * Get full item tag
      * @return full item name (plugin:item)
      */
-    public String getFullItemTag() {
+    public final String getFullItemTag() {
         return fullItemTag;
     }
 
@@ -106,6 +113,9 @@ public abstract class Kitem implements Listener {
     public void onConsume(PlayerItemConsumeEvent event) {}
     public void onHeld(PlayerItemHeldEvent event, boolean old) {}
     public void onPickup(EntityPickupItemEvent event) {}
+    public void onDrag(InventoryDragEvent event) {}
+    public void onDamage(EntityDamageByEntityEvent event, boolean off) {}
+    public void onRespawn(PlayerRespawnEvent event) {}
 
     @EventHandler
     public final void onUseListener(PlayerInteractEvent event) {
@@ -161,6 +171,7 @@ public abstract class Kitem implements Listener {
             }
 
             if(is.isSimilar(this.getItem())) {
+                this.deathPlayers.add(event.getEntity());
                 this.onDeath(event);
                 break;
             }
@@ -223,6 +234,55 @@ public abstract class Kitem implements Listener {
 
         if(is.isSimilar(this.getItem())) {
             this.onPickup(event);
+        }
+    }
+
+    @EventHandler
+    public final void onDragListener(InventoryDragEvent event) {
+        Collection<ItemStack> items = event.getNewItems().values();
+
+        for (ItemStack is : items) {
+            if(is == null || is.getType().equals(Material.AIR)) {
+                continue;
+            }
+
+            if(is.isSimilar(this.getItem())) {
+                this.onDrag(event);
+                break;
+            }
+        }
+    }
+
+    @EventHandler
+    public final void onDamageListener(EntityDamageByEntityEvent event) {
+        if(!(event.getDamager() instanceof Player)) {
+            return;
+        }
+        Player player = (Player) event.getDamager();
+        PlayerInventory inv = player.getInventory();
+
+        ItemStack main = inv.getItemInMainHand();
+        ItemStack off = inv.getItemInOffHand();
+
+        if(main != null && !main.getType().equals(Material.AIR)) {
+            if(main.isSimilar(this.getItem())) {
+                this.onDamage(event, false);
+            }
+        }
+
+        if(off != null && !off.getType().equals(Material.AIR)) {
+            if(off.isSimilar(this.getItem())) {
+                this.onDamage(event, true);
+            }
+        }
+    }
+
+    @EventHandler
+    public final void onRespawnListener(PlayerRespawnEvent event) {
+        Player player = event.getPlayer();
+        if(this.deathPlayers.contains(player)) {
+            this.deathPlayers.remove(player);
+            this.onRespawn(event);
         }
     }
 }

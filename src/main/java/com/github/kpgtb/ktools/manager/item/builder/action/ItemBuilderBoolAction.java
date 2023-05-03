@@ -16,8 +16,8 @@
 
 package com.github.kpgtb.ktools.manager.item.builder.action;
 
-import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.Event;
 
-public interface ItemBuilderHeldAction {
-    void onEvent(PlayerItemHeldEvent event, boolean old);
+public interface ItemBuilderBoolAction<T extends Event> {
+    void onEvent(T event, boolean bool);
 }

@@ -31,6 +31,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,6 +48,7 @@ public class KGui implements Listener {
     private ClickAction globalClickAction;
     private DragAction globalDragAction;
     private CloseAction closeAction;
+    private boolean cancelShift;
 
     private final Inventory bukkitInventory;
 
@@ -63,6 +65,7 @@ public class KGui implements Listener {
         this.rows = rows;
         this.containers = new ArrayList<>();
         this.debug = tools.getDebugManager();
+        this.cancelShift = false;
 
         if(rows > 6 || rows < 1) {
             this.debug.sendWarning(DebugType.GUI, "Gui rows must be a value between 1 and 6");
@@ -81,6 +84,7 @@ public class KGui implements Listener {
     public void blockClick() {
         this.setGlobalClickAction(e -> e.setCancelled(true));
         this.setGlobalDragAction(e -> e.setCancelled(true));
+        this.setCancelShift(true);
     }
 
     public String getName() {
@@ -217,6 +221,24 @@ public class KGui implements Listener {
         this.closeAction = closeAction;
     }
 
+    /**
+     * Check if shift click TO inv is cancelled
+     * @return true if cancelled
+     * @since 1.6.0
+     */
+    public boolean isCancelShift() {
+        return cancelShift;
+    }
+
+    /**
+     * Set if shift click TO inv should be cancelled
+     * @param cancelShift true if cancel
+     * @since 1.6.0
+     */
+    public void setCancelShift(boolean cancelShift) {
+        this.cancelShift = cancelShift;
+    }
+
     @EventHandler
     public void onGlobalClick(InventoryClickEvent event) {
         Inventory inv = event.getClickedInventory();
@@ -251,6 +273,30 @@ public class KGui implements Listener {
 
         if(item.getClickAction() != null) {
             item.getClickAction().run(event);
+        }
+    }
+
+    @EventHandler
+    public void onShift(InventoryClickEvent event) {
+        Inventory inv = event.getInventory();
+
+        if(inv != this.bukkitInventory) {
+            return;
+        }
+
+        Inventory clicked = event.getClickedInventory();
+
+        if(clicked == null || !clicked.getType().equals(InventoryType.PLAYER)) {
+            return;
+        }
+
+        if(!event.isShiftClick()) {
+            return;
+        }
+
+
+        if(this.cancelShift) {
+            event.setCancelled(true);
         }
     }
 

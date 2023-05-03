@@ -480,14 +480,14 @@ public class ItemBuilder {
         ItemStack item = new ItemStack(material, amount);
         item.setType(material);
         item.setAmount(amount);
+        if(enchantments.size() > 0) {
+            item.addUnsafeEnchantments(enchantments);
+        }
         ItemMeta meta = item.getItemMeta();
         if(meta instanceof Damageable) {
             ((Damageable) meta).setDamage(damage);
         }
         meta.setUnbreakable(unbreakable);
-        if(enchantments.size() > 0) {
-            item.addUnsafeEnchantments(enchantments);
-        }
         if(displayName != null) {
             meta.setDisplayName(displayName);
         }

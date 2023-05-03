@@ -17,12 +17,15 @@
 package com.github.kpgtb.ktools.manager.data.persister;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.j256.ormlite.field.FieldType;
 import com.j256.ormlite.field.SqlType;
 import com.j256.ormlite.field.types.StringType;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -30,6 +33,8 @@ import java.util.List;
 
 public class SerializableListPersister extends StringType {
     private static final SerializableListPersister SINGLETON = new SerializableListPersister();
+    private final String FORMAT = "%s %s";
+    private final String NONE_TAG = "NONE";
 
     public SerializableListPersister() {
         super(SqlType.STRING, new Class[]{List.class, ArrayList.class, LinkedList.class});
@@ -41,11 +46,38 @@ public class SerializableListPersister extends StringType {
 
     @Override
     public Object javaToSqlArg(FieldType fieldType, Object javaObject) throws SQLException {
-        return new Gson().toJson(javaObject);
+        List<?> list = (List<?>) javaObject;
+        String listJson = new Gson().toJson(javaObject);
+        String clazz = NONE_TAG;
+
+        if(!list.isEmpty()) {
+            clazz = list.get(0).getClass().getName();
+        }
+        return String.format(FORMAT,clazz,listJson);
     }
 
     @Override
     public Object sqlArgToJava(FieldType fieldType, Object sqlArg, int columnPos) throws SQLException {
-        return new Gson().fromJson((String) sqlArg, List.class);
+        String[] data = ((String) sqlArg).split(" ", 2);
+
+        if(data.length < 2) {
+            return new ArrayList<>();
+        }
+
+        if(data[0].equals(NONE_TAG)) {
+            return new ArrayList<>();
+        }
+
+        try {
+            Class<?> type = Class.forName(data[0]);
+            return getList(data[1], type);
+        } catch (ClassNotFoundException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    private <T> List<T> getList(String jsonArray, Class<T> clazz) {
+        Type typeOfT = TypeToken.getParameterized(List.class, clazz).getType();
+        return new Gson().fromJson(jsonArray, typeOfT);
     }
 }

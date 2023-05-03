@@ -18,11 +18,13 @@ package com.github.kpgtb.ktools.manager.item.builder;
 
 import com.github.kpgtb.ktools.manager.item.Kitem;
 import com.github.kpgtb.ktools.manager.item.builder.action.ItemBuilderAction;
-import com.github.kpgtb.ktools.manager.item.builder.action.ItemBuilderHeldAction;
+import com.github.kpgtb.ktools.manager.item.builder.action.ItemBuilderBoolAction;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 
@@ -36,13 +38,16 @@ public class KitemBuilder {
     private final ItemStack itemStack;
 
     private ItemBuilderAction<PlayerInteractEvent> onUseAction;
-    private ItemBuilderAction<InventoryClickEvent> onClickAction;
+    private ItemBuilderBoolAction<InventoryClickEvent> onClickAction;
     private ItemBuilderAction<PlayerDropItemEvent> onDropAction;
     private ItemBuilderAction<PlayerDeathEvent> onDeathAction;
     private ItemBuilderAction<PlayerItemBreakEvent> onBreakAction;
     private ItemBuilderAction<PlayerItemConsumeEvent> onConsumeAction;
-    private ItemBuilderHeldAction onHeldAction;
+    private ItemBuilderBoolAction<PlayerItemHeldEvent> onHeldAction;
     private ItemBuilderAction<EntityPickupItemEvent> onPickupAction;
+    private ItemBuilderAction<InventoryDragEvent> onDragAction;
+    private ItemBuilderBoolAction<EntityDamageByEntityEvent> onDamageAction;
+    private ItemBuilderAction<PlayerRespawnEvent> onRespawnAction;
 
     public KitemBuilder(ToolsObjectWrapper wrapper, String pluginTag, String itemName, ItemStack itemStack) {
         this.wrapper = wrapper;
@@ -63,11 +68,11 @@ public class KitemBuilder {
         return itemStack;
     }
 
-    public ItemBuilderHeldAction getOnHeldAction() {
+    public ItemBuilderBoolAction<PlayerItemHeldEvent> getOnHeldAction() {
         return onHeldAction;
     }
 
-    public void setOnHeldAction(ItemBuilderHeldAction onHeldAction) {
+    public void setOnHeldAction(ItemBuilderBoolAction<PlayerItemHeldEvent> onHeldAction) {
         this.onHeldAction = onHeldAction;
     }
 
@@ -79,11 +84,11 @@ public class KitemBuilder {
         this.onUseAction = onUseAction;
     }
 
-    public ItemBuilderAction<InventoryClickEvent> getOnClickAction() {
+    public ItemBuilderBoolAction<InventoryClickEvent> getOnClickAction() {
         return onClickAction;
     }
 
-    public void setOnClickAction(ItemBuilderAction<InventoryClickEvent> onClickAction) {
+    public void setOnClickAction(ItemBuilderBoolAction<InventoryClickEvent> onClickAction) {
         this.onClickAction = onClickAction;
     }
 
@@ -127,6 +132,30 @@ public class KitemBuilder {
         this.onPickupAction = onPickupAction;
     }
 
+    public ItemBuilderAction<InventoryDragEvent> getOnDragAction() {
+        return onDragAction;
+    }
+
+    public void setOnDragAction(ItemBuilderAction<InventoryDragEvent> onDragAction) {
+        this.onDragAction = onDragAction;
+    }
+
+    public ItemBuilderBoolAction<EntityDamageByEntityEvent> getOnDamageAction() {
+        return onDamageAction;
+    }
+
+    public void setOnDamageAction(ItemBuilderBoolAction<EntityDamageByEntityEvent> onDamageAction) {
+        this.onDamageAction = onDamageAction;
+    }
+
+    public ItemBuilderAction<PlayerRespawnEvent> getOnRespawnAction() {
+        return onRespawnAction;
+    }
+
+    public void setOnRespawnAction(ItemBuilderAction<PlayerRespawnEvent> onRespawnAction) {
+        this.onRespawnAction = onRespawnAction;
+    }
+
     /**
      * Register custom item
      * @return Kitem instance
@@ -148,7 +177,7 @@ public class KitemBuilder {
             @Override
             public void onClick(InventoryClickEvent event, boolean cursor) {
                 if(onClickAction != null) {
-                    onClickAction.onEvent(event);
+                    onClickAction.onEvent(event,cursor);
                 }
             }
 
@@ -191,6 +220,27 @@ public class KitemBuilder {
             public void onPickup(EntityPickupItemEvent event) {
                 if(onPickupAction != null) {
                     onPickupAction.onEvent(event);
+                }
+            }
+
+            @Override
+            public void onDrag(InventoryDragEvent event) {
+                if(onDragAction != null) {
+                    onDragAction.onEvent(event);
+                }
+            }
+
+            @Override
+            public void onDamage(EntityDamageByEntityEvent event, boolean off) {
+                if(onDamageAction != null) {
+                    onDamageAction.onEvent(event, off);
+                }
+            }
+
+            @Override
+            public void onRespawn(PlayerRespawnEvent event) {
+                if(onRespawnAction != null) {
+                    onRespawnAction.onEvent(event);
                 }
             }
         };

@@ -22,6 +22,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.NotNull;
@@ -58,13 +59,20 @@ public abstract class Krecipe implements Listener {
      * Auto discover recipe when player joins
      * @return true if recipe should be discovered when player joins, or false if not
      */
-    public abstract boolean autoDiscover();
+    public boolean autoDiscover() {
+        return true;
+    }
+
+    /**
+     * @since 1.6.0
+     */
+    public void onCraft(CraftItemEvent event) {}
 
     /**
      * Register recipe in bukkit
      * @param recipe Recipe instance
      */
-    public void register(@NotNull Recipe recipe) {
+    public final void register(@NotNull Recipe recipe) {
         if(this.recipe != null || this.isRegistered) {
             return;
         }
@@ -94,7 +102,7 @@ public abstract class Krecipe implements Listener {
     }
 
     @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
+    public final void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         if(!isRegistered || !autoDiscover()) {
             return;
@@ -103,4 +111,13 @@ public abstract class Krecipe implements Listener {
         player.discoverRecipe(recipeKey);
     }
 
+    @EventHandler
+    public final void onCraftListener(CraftItemEvent event) {
+        if(!isRegistered) {
+            return;
+        }
+        if(event.getRecipe().equals(this.recipe)) {
+            onCraft(event);
+        }
+    }
 }

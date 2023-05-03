@@ -78,8 +78,8 @@ public class RecipeManager {
                     continue;
                 }
                 recipe.register(bukkitRecipe);
+                pluginManager.registerEvents(recipe, toolsObjectWrapper.getPlugin());
                 if(recipe.autoDiscover()) {
-                    pluginManager.registerEvents(recipe, toolsObjectWrapper.getPlugin());
                     debug.sendInfo(DebugType.RECIPE, "Auto discover enabled");
                 }
 

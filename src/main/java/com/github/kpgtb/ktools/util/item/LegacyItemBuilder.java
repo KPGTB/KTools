@@ -463,10 +463,10 @@ public class LegacyItemBuilder {
         item.setAmount(amount);
         item.setData(data);
         item.setDurability((short) damage);
-        ItemMeta meta = item.getItemMeta();
         if(enchantments.size() > 0) {
             item.addUnsafeEnchantments(enchantments);
         }
+        ItemMeta meta = item.getItemMeta();
         if(displayName != null) {
             meta.setDisplayName(displayName);
         }

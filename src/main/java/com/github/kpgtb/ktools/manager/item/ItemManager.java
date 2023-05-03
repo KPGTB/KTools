@@ -29,6 +29,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -53,19 +54,23 @@ public class ItemManager {
      * @param jarFile File of plugin
      * @param pluginTag Tag of plugin
      * @param itemsPackage Package that should be scanned
+     * @return List of items tag
      */
-    public void registerItems(ToolsObjectWrapper toolsObjectWrapper, File jarFile, String pluginTag, String itemsPackage) {
+    public ArrayList<String> registerItems(ToolsObjectWrapper toolsObjectWrapper, File jarFile, String pluginTag, String itemsPackage) {
         PluginManager pluginManager = Bukkit.getPluginManager();
         DebugManager debug = toolsObjectWrapper.getDebugManager();
+
+        ArrayList<String> tags = new ArrayList<>();
 
         for(Class<?> clazz : ReflectionUtil.getAllClassesInPackage(jarFile,itemsPackage, Kitem.class)) {
             try {
 
                 debug.sendInfo(DebugType.ITEM, "Registering item " + clazz.getSimpleName() + "...");
 
-                String itemName = pluginTag + ":" + clazz.getSimpleName()
+                String itemName = pluginTag + ":" + camelToSnake(
+                        clazz.getSimpleName()
                         .replace("Item", "")
-                        .toLowerCase();
+                );
 
                 Kitem item = (Kitem) clazz.getDeclaredConstructor(ToolsObjectWrapper.class, String.class)
                         .newInstance(toolsObjectWrapper, itemName);
@@ -79,6 +84,7 @@ public class ItemManager {
                 item.generateItemInFile();
 
                 this.customItems.put(itemName, item);
+                tags.add(itemName);
                 debug.sendInfo(DebugType.ITEM, "Registered item " + itemName);
 
             } catch (Exception e) {
@@ -86,14 +92,17 @@ public class ItemManager {
                 e.printStackTrace();
             }
         }
+
+        return tags;
     }
 
     /**
      * Register item
      * @param toolsObjectWrapper Instance of ToolsObjectWrapper
      * @param item Instance of Kitem
+     * @return tag of item
      */
-    public void registerItem(ToolsObjectWrapper toolsObjectWrapper, Kitem item) {
+    public String registerItem(ToolsObjectWrapper toolsObjectWrapper, Kitem item) {
         PluginManager pluginManager = Bukkit.getPluginManager();
         DebugManager debug = toolsObjectWrapper.getDebugManager();
 
@@ -101,13 +110,15 @@ public class ItemManager {
         ItemStack bukkitItem = item.getItem();
         if(bukkitItem == null) {
             debug.sendWarning(DebugType.ITEM, "Item is null! Cancelling!");
-            return;
+            return "";
         }
         pluginManager.registerEvents(item, toolsObjectWrapper.getPlugin());
         item.generateItemInFile();
 
         this.customItems.put(item.getFullItemTag(), item);
         debug.sendInfo(DebugType.ITEM, "Registered item " + item.getFullItemTag());
+
+        return item.getFullItemTag();
     }
 
     /**
@@ -169,9 +180,10 @@ public class ItemManager {
      */
     @Nullable
     public ItemStack getCustomItem(String pluginTag, Class<? extends Kitem> itemClass) {
-        String itemName = pluginTag + ":" + itemClass.getSimpleName()
-                .toLowerCase()
-                .replace("Item", "");
+        String itemName = pluginTag + ":" + camelToSnake(
+                itemClass.getSimpleName()
+                .replace("Item", "")
+        );
         return customItems.get(itemName).getItem().clone();
     }
 
@@ -189,5 +201,12 @@ public class ItemManager {
      */
     public File getItemsFile() {
         return itemsFile;
+    }
+
+    private String camelToSnake(String str) {
+        String regex = "([a-z])([A-Z]+)";
+        String replacement = "$1_$2";
+        str = str.replaceAll(regex, replacement).toLowerCase();
+        return str;
     }
 }

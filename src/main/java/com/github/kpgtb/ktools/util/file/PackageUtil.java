@@ -21,13 +21,16 @@ package com.github.kpgtb.ktools.util.file;
  */
 public class PackageUtil {
     private final String mainPackage;
+    private final String tag;
 
     /**
      * Constructor of util
      * @param mainPackage Name of main package (where is main class)
+     * @param tag Tag of plugin
      */
-    public PackageUtil(String mainPackage) {
+    public PackageUtil(String mainPackage, String tag) {
         this.mainPackage = mainPackage;
+        this.tag = tag.toLowerCase();
     }
 
     /**
@@ -37,5 +40,14 @@ public class PackageUtil {
      */
     public String get(String sub) {
         return String.format(mainPackage+".%s", sub);
+    }
+
+    /**
+     * Get tag of plugin
+     * @return tag of plugin
+     * @since 1.6.0
+     */
+    public String tag() {
+        return tag;
     }
 }
