@@ -27,10 +27,22 @@ public class PackageUtil {
      * Constructor of util
      * @param mainPackage Name of main package (where is main class)
      * @param tag Tag of plugin
+     * @since 1.6.0
      */
     public PackageUtil(String mainPackage, String tag) {
         this.mainPackage = mainPackage;
         this.tag = tag.toLowerCase();
+    }
+
+    /**
+     * Constructor of util
+     * @param mainPackage Name of main package (where is main class)
+     * @deprecated Use PackageUtil(String mainPackage, String tag)
+     */
+    @Deprecated
+    public PackageUtil(String mainPackage) {
+        this.mainPackage = mainPackage;
+        this.tag = "";
     }
 
     /**
