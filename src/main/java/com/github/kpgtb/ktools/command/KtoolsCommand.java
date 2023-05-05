@@ -109,7 +109,7 @@ public class KtoolsCommand extends KCommand {
         global.getComponent(
                 LanguageLevel.GLOBAL,
                 "reloadedMessages",
-                Placeholder.parsed("plugins", (global.getHookedManagers().size() + 1)+"")
+                Placeholder.unparsed("plugins", String.valueOf(global.getHookedManagers().size() + 1))
         ).forEach(audience::sendMessage);
     }
 

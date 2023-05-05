@@ -36,6 +36,10 @@ public class KVersion {
      */
     public KVersion(String version) {
         String[] versionNumbers = version.split("\\.");
+
+        if(versionNumbers.length == 2) {
+            versionNumbers = new String[]{versionNumbers[0], versionNumbers[1], "0"};
+        }
         if(versionNumbers.length != 3) {
             throw new IllegalArgumentException("Wrong version format! Required MAJOR.MINOR.PATCH");
         }
@@ -85,5 +89,35 @@ public class KVersion {
         if(version.minor < this.minor) return true;
         if(version.minor > this.minor) return false;
         return version.patch < this.patch;
+    }
+
+    /**
+     * Check if version is newer than or equals
+     * @param version Version that should be checked
+     * @return True if this object is newer than or equals version from params
+     * @since 1.6.0
+     */
+    public boolean isNewerOrEquals(KVersion version) {
+        return isNewerThan(version) || this.equals(version);
+    }
+
+    /**
+     * Check if version is newer than
+     * @param version Version that should be checked
+     * @return True if this object is newer than version from params
+     * @since 1.6.0
+     */
+    public boolean isNewerThan(String version) {
+        return isNewerThan(new KVersion(version));
+    }
+
+    /**
+     * Check if version is newer than or equals
+     * @param version Version that should be checked
+     * @return True if this object is newer than or equals version from params
+     * @since 1.6.0
+     */
+    public boolean isNewerOrEquals(String version) {
+        return isNewerOrEquals(new KVersion(version));
     }
 }

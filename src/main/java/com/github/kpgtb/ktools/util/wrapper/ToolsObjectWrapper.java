@@ -24,6 +24,7 @@ import com.github.kpgtb.ktools.manager.language.LanguageManager;
 import com.github.kpgtb.ktools.manager.command.parser.ParamParserManager;
 import com.github.kpgtb.ktools.manager.resourcepack.ResourcepackManager;
 import com.github.kpgtb.ktools.manager.ui.UiManager;
+import com.github.kpgtb.ktools.util.file.PackageUtil;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -42,8 +43,9 @@ public class ToolsObjectWrapper {
     private final UiManager uiManager;
     private final ItemManager itemManager;
     private final boolean legacy;
+    private final PackageUtil packageUtil;
 
-    public ToolsObjectWrapper(CacheManager cacheManager, DebugManager debugManager, LanguageManager languageManager, JavaPlugin plugin, BukkitAudiences adventure, ParamParserManager paramParserManager, DataManager dataManager, ResourcepackManager resourcepackManager, UiManager uiManager, ItemManager itemManager, boolean legacy) {
+    public ToolsObjectWrapper(CacheManager cacheManager, DebugManager debugManager, LanguageManager languageManager, JavaPlugin plugin, BukkitAudiences adventure, ParamParserManager paramParserManager, DataManager dataManager, ResourcepackManager resourcepackManager, UiManager uiManager, ItemManager itemManager, boolean legacy, PackageUtil packageUtil) {
         this.cacheManager = cacheManager;
         this.debugManager = debugManager;
         this.languageManager = languageManager;
@@ -55,8 +57,26 @@ public class ToolsObjectWrapper {
         this.uiManager = uiManager;
         this.itemManager = itemManager;
         this.legacy = legacy;
+        this.packageUtil = packageUtil;
     }
 
+    public ToolsObjectWrapper(GlobalManagersWrapper globalManagersWrapper, LanguageManager languageManager, JavaPlugin plugin, BukkitAudiences adventure, PackageUtil packageUtil) {
+        this.cacheManager = globalManagersWrapper.getCacheManager();
+        this.debugManager = globalManagersWrapper.getDebugManager();
+        this.paramParserManager = globalManagersWrapper.getParamParserManager();
+        this.dataManager = globalManagersWrapper.getDataManager();
+        this.resourcepackManager = globalManagersWrapper.getResourcepackManager();
+        this.uiManager = globalManagersWrapper.getUiManager();
+        this.itemManager = globalManagersWrapper.getItemManager();
+        this.legacy = globalManagersWrapper.isLegacy();
+
+        this.languageManager = languageManager;
+        this.plugin = plugin;
+        this.adventure = adventure;
+        this.packageUtil = packageUtil;
+    }
+
+    @Deprecated
     public ToolsObjectWrapper(GlobalManagersWrapper globalManagersWrapper, LanguageManager languageManager, JavaPlugin plugin, BukkitAudiences adventure) {
         this.cacheManager = globalManagersWrapper.getCacheManager();
         this.debugManager = globalManagersWrapper.getDebugManager();
@@ -70,6 +90,7 @@ public class ToolsObjectWrapper {
         this.languageManager = languageManager;
         this.plugin = plugin;
         this.adventure = adventure;
+        this.packageUtil = new PackageUtil("", "");
     }
 
     public CacheManager getCacheManager() {
@@ -114,5 +135,9 @@ public class ToolsObjectWrapper {
 
     public boolean isLegacy() {
         return legacy;
+    }
+
+    public PackageUtil getPackageUtil() {
+        return packageUtil;
     }
 }

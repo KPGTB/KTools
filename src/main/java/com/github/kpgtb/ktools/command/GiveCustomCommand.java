@@ -22,6 +22,8 @@ import com.github.kpgtb.ktools.manager.item.Kitem;
 import com.github.kpgtb.ktools.manager.language.LanguageLevel;
 import com.github.kpgtb.ktools.util.item.ItemUtil;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -41,9 +43,11 @@ public class GiveCustomCommand extends KCommand {
         ItemStack result = item.getItem().clone();
         result.setAmount(amount);
 
-        String name = item.getFullItemTag();
+        TextComponent name = Component.text(item.getFullItemTag());
         if(result.getItemMeta().hasDisplayName()) {
-            name = result.getItemMeta().getDisplayName();
+            name = wrapper.getLanguageManager().convertLegacyStringToComponent(
+                    result.getItemMeta().getDisplayName()
+            );
         }
 
         ItemUtil.giveItemToPlayer(target, result);
@@ -51,16 +55,16 @@ public class GiveCustomCommand extends KCommand {
         wrapper.getLanguageManager().getComponent(
             LanguageLevel.GLOBAL,
             "givenCustomItem",
-            Placeholder.unparsed("item", name),
-            Placeholder.unparsed("amount", amount+""),
+            Placeholder.component("item", name),
+            Placeholder.unparsed("amount", String.valueOf(amount)),
             Placeholder.unparsed("target", target.getName())
         ).forEach(msg -> wrapper.getAdventure().sender(sender).sendMessage(msg));
 
         wrapper.getLanguageManager().getComponent(
                 LanguageLevel.GLOBAL,
                 "getCustomItem",
-                Placeholder.unparsed("item", name),
-                Placeholder.unparsed("amount", amount+""),
+                Placeholder.component("item", name),
+                Placeholder.unparsed("amount", String.valueOf(amount)),
                 Placeholder.unparsed("player", sender.getName())
         ).forEach(msg -> wrapper.getAdventure().player(target).sendMessage(msg));
     }

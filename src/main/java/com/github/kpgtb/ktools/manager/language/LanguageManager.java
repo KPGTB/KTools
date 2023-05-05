@@ -18,8 +18,10 @@ package com.github.kpgtb.ktools.manager.language;
 
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
+import com.github.kpgtb.ktools.manager.updater.version.KVersion;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -306,11 +308,10 @@ public class LanguageManager {
      * @return String from component
      */
     public String convertComponentToString(Component component) {
-        boolean isHexSupport = Integer.parseInt(
+        boolean isHexSupport = new KVersion(
                 Bukkit.getBukkitVersion()
-                        .split("-")[0] // ex. 1.16
-                        .split("\\.")[1] // ex. 16
-        ) >= 16;
+                        .split("-")[0]
+        ).isNewerOrEquals("1.16");
 
         if (isHexSupport) {
             return LegacyComponentSerializer
@@ -333,6 +334,31 @@ public class LanguageManager {
      */
     public String convertMmToString(String mm) {
         return convertComponentToString(MiniMessage.miniMessage().deserialize(mm));
+    }
+
+    /**
+     * Convert legacy string to component
+     * @param s Legacy string
+     * @return TextComponent from string
+     */
+    public TextComponent convertLegacyStringToComponent(String s) {
+        boolean isHexSupport = new KVersion(
+                Bukkit.getBukkitVersion()
+                        .split("-")[0]
+        ).isNewerOrEquals("1.16");
+
+        if (isHexSupport) {
+            return LegacyComponentSerializer
+                    .builder()
+                    .hexColors()
+                    .useUnusualXRepeatedCharacterHexFormat()
+                    .build()
+                    .deserialize(s);
+        }
+        return LegacyComponentSerializer
+                .builder()
+                .build()
+                .deserialize(s);
     }
 
     /**

@@ -25,17 +25,21 @@ import com.github.kpgtb.ktools.manager.data.DataManager;
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.manager.item.ItemManager;
+import com.github.kpgtb.ktools.manager.item.builder.KitemBuilder;
 import com.github.kpgtb.ktools.manager.language.LanguageManager;
 import com.github.kpgtb.ktools.manager.listener.ListenerManager;
 import com.github.kpgtb.ktools.manager.resourcepack.ResourcepackManager;
 import com.github.kpgtb.ktools.manager.ui.UiManager;
 import com.github.kpgtb.ktools.manager.updater.SpigotUpdater;
 import com.github.kpgtb.ktools.manager.updater.UpdaterManager;
+import com.github.kpgtb.ktools.manager.updater.version.KVersion;
 import com.github.kpgtb.ktools.util.file.PackageUtil;
+import com.github.kpgtb.ktools.util.item.ItemBuilder;
 import com.github.kpgtb.ktools.util.wrapper.GlobalManagersWrapper;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -58,11 +62,10 @@ public final class Ktools extends JavaPlugin {
         long startMillis = System.currentTimeMillis();
         debug.sendInfo(DebugType.START, "Enabling plugin...");
 
-        legacy = Integer.parseInt(
+        legacy = !new KVersion(
                 Bukkit.getBukkitVersion()
-                        .split("-")[0] // ex. 1.16
-                        .split("\\.")[1] // ex. 16
-        ) < 14;
+                .split("-")[0]
+        ).isNewerOrEquals("1.14");
         if(legacy) {
             debug.sendWarning(DebugType.START, "You are using legacy version! Not everything can be available!", true);
         }
@@ -200,7 +203,7 @@ public final class Ktools extends JavaPlugin {
         debug.sendInfo(DebugType.START, "Loaded items.");
 
         debug.sendInfo(DebugType.START, "Loading tools object wrapper...");
-        this.toolsObjectWrapper = new ToolsObjectWrapper(cacheManager,debug,globalLanguageManager,this,adventure,paramParserManager, dataManager, resourcepackManager, uiManager, itemManager, legacy);
+        this.toolsObjectWrapper = new ToolsObjectWrapper(cacheManager,debug,globalLanguageManager,this,adventure,paramParserManager, dataManager, resourcepackManager, uiManager, itemManager, legacy, packageUtil);
         debug.sendInfo(DebugType.START, "Loaded tools object wrapper.");
 
         debug.sendInfo(DebugType.START, "Loading commands...");
@@ -220,6 +223,8 @@ public final class Ktools extends JavaPlugin {
         debug.sendInfo(DebugType.START, "Checking updates...");
         UpdaterManager updaterManager = new UpdaterManager(getDescription(), new SpigotUpdater("108301"),debug);
         HAS_UPDATE = updaterManager.checkUpdate();
+
+        new KitemBuilder(toolsObjectWrapper,packageUtil.tag(), "test", new ItemBuilder(Material.STONE).displayname(globalLanguageManager.convertMmToString("<gradient:red:blue>BAaarrakeopjaedmaeodmae[")).build()).register();
 
         debug.sendInfo(DebugType.START, "Enabled plugin in " + (System.currentTimeMillis() - startMillis) + "ms.");
     }
