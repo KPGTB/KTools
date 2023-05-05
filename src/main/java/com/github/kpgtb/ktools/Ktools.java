@@ -224,8 +224,6 @@ public final class Ktools extends JavaPlugin {
         UpdaterManager updaterManager = new UpdaterManager(getDescription(), new SpigotUpdater("108301"),debug);
         HAS_UPDATE = updaterManager.checkUpdate();
 
-        new KitemBuilder(toolsObjectWrapper,packageUtil.tag(), "test", new ItemBuilder(Material.STONE).displayname(globalLanguageManager.convertMmToString("<gradient:red:blue>BAaarrakeopjaedmaeodmae[")).build()).register();
-
         debug.sendInfo(DebugType.START, "Enabled plugin in " + (System.currentTimeMillis() - startMillis) + "ms.");
     }
 
