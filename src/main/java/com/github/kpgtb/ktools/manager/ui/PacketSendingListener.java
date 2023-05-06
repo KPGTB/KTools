@@ -23,7 +23,9 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.utility.MinecraftVersion;
 import com.comphenix.protocol.wrappers.EnumWrappers;
+import com.github.kpgtb.ktools.manager.updater.version.KVersion;
 import net.md_5.bungee.chat.ComponentSerializer;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -35,7 +37,8 @@ public class PacketSendingListener {
 
     public PacketSendingListener(JavaPlugin plugin, UiManager uiManager, ProtocolManager protocolManager) {
         this.protocolManager = protocolManager;
-        if (MinecraftVersion.atOrAbove(new MinecraftVersion("1.17"))) {
+        if(new KVersion(Bukkit.getBukkitVersion().split("-")[0])
+                .isNewerOrEquals("1.17")) {
             packetAdapter = new Manager_1_17(plugin, uiManager);
         } else {
             packetAdapter = new Manager_1_16(plugin, uiManager);
