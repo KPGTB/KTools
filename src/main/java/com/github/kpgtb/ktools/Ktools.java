@@ -33,13 +33,12 @@ import com.github.kpgtb.ktools.manager.ui.UiManager;
 import com.github.kpgtb.ktools.manager.updater.SpigotUpdater;
 import com.github.kpgtb.ktools.manager.updater.UpdaterManager;
 import com.github.kpgtb.ktools.manager.updater.version.KVersion;
+import com.github.kpgtb.ktools.util.bstats.Metrics;
 import com.github.kpgtb.ktools.util.file.PackageUtil;
-import com.github.kpgtb.ktools.util.item.ItemBuilder;
 import com.github.kpgtb.ktools.util.wrapper.GlobalManagersWrapper;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -223,6 +222,8 @@ public final class Ktools extends JavaPlugin {
         debug.sendInfo(DebugType.START, "Checking updates...");
         UpdaterManager updaterManager = new UpdaterManager(getDescription(), new SpigotUpdater("108301"),debug);
         HAS_UPDATE = updaterManager.checkUpdate();
+
+        Metrics metrics = new Metrics(this, 18408);
 
         debug.sendInfo(DebugType.START, "Enabled plugin in " + (System.currentTimeMillis() - startMillis) + "ms.");
     }
