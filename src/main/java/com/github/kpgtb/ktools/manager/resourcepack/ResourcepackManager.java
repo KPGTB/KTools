@@ -103,9 +103,6 @@ public class ResourcepackManager {
      * @param width Width of char
      */
     public void registerCustomChar(String pluginName, String character, String imageName, InputStream image, int height, int ascent, int width) {
-        if(!isEnabled()) {
-            return;
-        }
         File imageFile = this.saveImage(image,imageName,pluginName);
         if(imageFile == null) {
             return;
@@ -124,9 +121,6 @@ public class ResourcepackManager {
      * @param material Material that will have custom model data
      */
     public void registerCustomModelData(String pluginName, int model, String imageName, InputStream image, Material material) {
-        if(!isEnabled()) {
-            return;
-        }
         File imageFile = this.saveImage(image,imageName,pluginName);
         if(imageFile == null) {
             return;
