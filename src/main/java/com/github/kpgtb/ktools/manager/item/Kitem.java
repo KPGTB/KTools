@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Abstract class that handles process of preparing custom item
@@ -116,6 +115,7 @@ public abstract class Kitem implements Listener {
     public void onDrag(InventoryDragEvent event) {}
     public void onDamage(EntityDamageByEntityEvent event, boolean off) {}
     public void onRespawn(PlayerRespawnEvent event) {}
+    public void onSwap(PlayerSwapHandItemsEvent event, boolean toOff) {}
 
     @EventHandler
     public final void onUseListener(PlayerInteractEvent event) {
@@ -283,6 +283,25 @@ public abstract class Kitem implements Listener {
         if(this.deathPlayers.contains(player)) {
             this.deathPlayers.remove(player);
             this.onRespawn(event);
+        }
+    }
+
+    @EventHandler
+    public final void onSwapListener(PlayerSwapHandItemsEvent event) {
+        ItemStack mainItem = event.getMainHandItem();
+
+        if(mainItem != null && !mainItem.getType().equals(Material.AIR)) {
+            if(mainItem.isSimilar(this.getItem())) {
+                this.onSwap(event,false);
+            }
+        }
+
+        ItemStack offItem = event.getOffHandItem();
+
+        if(offItem != null && !offItem.getType().equals(Material.AIR)) {
+            if(offItem.isSimilar(this.getItem())) {
+                this.onSwap(event,true);
+            }
         }
     }
 }

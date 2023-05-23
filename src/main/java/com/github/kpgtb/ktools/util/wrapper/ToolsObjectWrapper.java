@@ -76,21 +76,20 @@ public class ToolsObjectWrapper {
         this.packageUtil = packageUtil;
     }
 
-    @Deprecated
-    public ToolsObjectWrapper(GlobalManagersWrapper globalManagersWrapper, LanguageManager languageManager, JavaPlugin plugin, BukkitAudiences adventure) {
-        this.cacheManager = globalManagersWrapper.getCacheManager();
-        this.debugManager = globalManagersWrapper.getDebugManager();
-        this.paramParserManager = globalManagersWrapper.getParamParserManager();
-        this.dataManager = globalManagersWrapper.getDataManager();
-        this.resourcepackManager = globalManagersWrapper.getResourcepackManager();
-        this.uiManager = globalManagersWrapper.getUiManager();
-        this.itemManager = globalManagersWrapper.getItemManager();
-        this.legacy = globalManagersWrapper.isLegacy();
+    public ToolsObjectWrapper(ToolsInitializer initializer) {
+        this.cacheManager = initializer.getGlobalManagersWrapper().getCacheManager();
+        this.debugManager = initializer.getGlobalManagersWrapper().getDebugManager();
+        this.paramParserManager = initializer.getGlobalManagersWrapper().getParamParserManager();
+        this.dataManager = initializer.getGlobalManagersWrapper().getDataManager();
+        this.resourcepackManager = initializer.getGlobalManagersWrapper().getResourcepackManager();
+        this.uiManager = initializer.getGlobalManagersWrapper().getUiManager();
+        this.itemManager = initializer.getGlobalManagersWrapper().getItemManager();
+        this.legacy = initializer.getGlobalManagersWrapper().isLegacy();
 
-        this.languageManager = languageManager;
-        this.plugin = plugin;
-        this.adventure = adventure;
-        this.packageUtil = new PackageUtil("", "");
+        this.languageManager = initializer.getLanguageManager();
+        this.plugin = initializer.getPlugin();
+        this.adventure = initializer.getAdventure();
+        this.packageUtil = initializer.getPackageUtil();
     }
 
     public CacheManager getCacheManager() {

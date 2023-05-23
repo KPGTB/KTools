@@ -28,6 +28,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -85,14 +86,15 @@ public class CacheManager {
 
     /**
      * With this method you can save data to cache
-     * @param cacheSource {@link com.github.kpgtb.ktools.manager.cache.CacheSource}
      * @param target Object where you want to save data (or null if cacheSource is SERVER)
      * @param pluginName Name of plugin that save this data
      * @param key Key of data
      * @param data Object with data
      */
     @SuppressWarnings("unchecked")
-    public <T> void setData(CacheSource cacheSource, Object target, String pluginName, String key, T data) {
+    public <T> void setData(Object target, String pluginName, String key, T data) {
+        CacheSource cacheSource = getSource(target);
+
         String finalKey = pluginName + "-" + key;
         debug.sendInfo(DebugType.CACHE, "Saving cache with type " + cacheSource.name() + " key: " + finalKey + " data ("+data.getClass().getSimpleName()+"): " + data+ "...");
 
@@ -115,10 +117,6 @@ public class CacheManager {
                 }
                 break;
             case PLAYER:
-                if(!(target instanceof Player)) {
-                    debug.sendWarning(DebugType.CACHE, "Target isn't a player!");
-                    return;
-                }
                 Player player = (Player) target;
                 boolean playerSaveMeta = config.getString("cache.player").equalsIgnoreCase("metadata");
 
@@ -140,10 +138,6 @@ public class CacheManager {
                 }
                 break;
             case ENTITY:
-                if(!(target instanceof Entity)) {
-                    debug.sendWarning(DebugType.CACHE, "Target isn't an entity.");
-                    return;
-                }
                 Entity entity = (Entity) target;
                 boolean entitySaveMeta = config.getString("cache.entity").equalsIgnoreCase("metadata");
 
@@ -165,10 +159,6 @@ public class CacheManager {
                 }
                 break;
             case ITEMSTACK:
-                if(!(target instanceof ItemStack)) {
-                    debug.sendWarning(DebugType.CACHE, "Target isn't an item stack.");
-                    return;
-                }
                 ItemStack itemStack = (ItemStack) target;
 
                 if(itemStack == null || itemStack.getType().equals(Material.AIR)) {
@@ -195,18 +185,18 @@ public class CacheManager {
      * @param data Object with data
      */
     public <T> void setServerData(String pluginName, String key, T data) {
-        this.setData(CacheSource.SERVER, null, pluginName,key,data);
+        this.setData(null, pluginName,key,data);
     }
 
     /**
      * With this method you can remove data from cache
-     * @param cacheSource {@link com.github.kpgtb.ktools.manager.cache.CacheSource}
      * @param target Object where you want to save data (or null if cacheSource is SERVER)
      * @param pluginName Name of plugin that save this data
      * @param key Key of data
      * @since 1.3.0
      */
-    public void removeData(CacheSource cacheSource, Object target, String pluginName, String key) {
+    public void removeData( Object target, String pluginName, String key) {
+        CacheSource cacheSource = getSource(target);
         String finalKey = pluginName + "-" + key;
         debug.sendInfo(DebugType.CACHE, "Removing cache with type " + cacheSource.name() + " key: " + finalKey + "...");
 
@@ -222,10 +212,6 @@ public class CacheManager {
                 }
                 break;
             case PLAYER:
-                if(!(target instanceof Player)) {
-                    debug.sendWarning(DebugType.CACHE, "Target isn't a player!");
-                    return;
-                }
                 Player player = (Player) target;
                 boolean playerSaveMeta = config.getString("cache.player").equalsIgnoreCase("metadata");
 
@@ -247,10 +233,6 @@ public class CacheManager {
                 }
                 break;
             case ENTITY:
-                if(!(target instanceof Entity)) {
-                    debug.sendWarning(DebugType.CACHE, "Target isn't an entity.");
-                    return;
-                }
                 Entity entity = (Entity) target;
                 boolean entitySaveMeta = config.getString("cache.entity").equalsIgnoreCase("metadata");
 
@@ -272,10 +254,6 @@ public class CacheManager {
                 }
                 break;
             case ITEMSTACK:
-                if(!(target instanceof ItemStack)) {
-                    debug.sendWarning(DebugType.CACHE, "Target isn't an item stack.");
-                    return;
-                }
                 ItemStack itemStack = (ItemStack) target;
 
                 if(itemStack == null || itemStack.getType().equals(Material.AIR)) {
@@ -302,12 +280,11 @@ public class CacheManager {
      * @since 1.3.0
      */
     public void removeServerData( String pluginName, String key) {
-        this.removeData(CacheSource.SERVER, null, pluginName,key);
+        this.removeData(null, pluginName,key);
     }
 
     /**
      * This method returns data from cache
-     * @param cacheSource {@link com.github.kpgtb.ktools.manager.cache.CacheSource}
      * @param target Object from you want to get data (or null if cacheSource is SERVER)
      * @param pluginName Name of plugin that saves this data
      * @param key Key of data
@@ -316,7 +293,8 @@ public class CacheManager {
      */
     @Nullable
     @SuppressWarnings("unchecked")
-    public <T> T getData(CacheSource cacheSource, Object target, String pluginName, String key, Class<T> expected) {
+    public <T> T getData(Object target, String pluginName, String key, Class<T> expected) {
+        CacheSource cacheSource = getSource(target);
         PersistentDataType<T,T> pdcType = getPdcType(expected);
 
         if(pdcType == null) {
@@ -329,10 +307,6 @@ public class CacheManager {
             case SERVER:
                 return (T) cacheConfiguration.get("server."+finalKey);
             case PLAYER:
-                if(!(target instanceof Player)) {
-                    debug.sendWarning(DebugType.CACHE, "Target isn't a player!");
-                    return null;
-                }
                 Player player = (Player) target;
                 boolean playerSaveMeta = config.getString("cache.player").equalsIgnoreCase("metadata");
 
@@ -344,10 +318,6 @@ public class CacheManager {
 
                 return (T) cacheConfiguration.get("player." + player.getUniqueId().toString() + "." + finalKey);
             case ENTITY:
-                if(!(target instanceof Entity)) {
-                    debug.sendWarning(DebugType.CACHE, "Target isn't an entity.");
-                    return null;
-                }
                 Entity entity = (Entity) target;
                 boolean entitySaveMeta = config.getString("cache.entity").equalsIgnoreCase("metadata");
 
@@ -359,10 +329,6 @@ public class CacheManager {
 
                 return (T) cacheConfiguration.get("entity." + entity.getUniqueId() + "." + finalKey);
             case ITEMSTACK:
-                if(!(target instanceof ItemStack)) {
-                    debug.sendWarning(DebugType.CACHE, "Target isn't an item stack.");
-                    return null;
-                }
                 ItemStack itemStack = (ItemStack) target;
 
                 if(itemStack == null || itemStack.getType().equals(Material.AIR)) {
@@ -387,12 +353,47 @@ public class CacheManager {
      */
     @Nullable
     public <T> T getServerData(String pluginName, String key, Class<T> expected) {
-        return this.getData(CacheSource.SERVER, null,pluginName,key, expected);
+        return this.getData(null,pluginName,key, expected);
+    }
+
+    /**
+     * This method returns data from cache or defined data
+     * @param target Object from you want to get data (or null if cacheSource is SERVER)
+     * @param pluginName Name of plugin that saves this data
+     * @param key Key of data
+     * @param or Data that should be returned when data is null
+     * @return Object with data
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public <T> T getDataOr(Object target, String pluginName, String key, T or) {
+        Class<T> expected = (Class<T>) or.getClass();
+        if(!hasData(target, pluginName,key,expected)) {
+            return or;
+        }
+
+        T result = getData(target,pluginName,key,expected);
+        if(result == null) {
+            return or;
+        }
+
+        return result;
+    }
+
+    /**
+     * This method returns data from server's cache or defined data
+     * @param pluginName Name of plugin that saves this data
+     * @param key Key of data
+     * @param or Data that should be returned when data is null
+     * @return Object with data
+     */
+    @NotNull
+    public <T> T getServerDataOr(String pluginName, String key, T or) {
+        return getDataOr(null,pluginName,key,or);
     }
 
     /**
      * This method checks if cache contains data
-     * @param cacheSource {@link com.github.kpgtb.ktools.manager.cache.CacheSource}
      * @param target Object from you want to get data (or null if cacheSource is SERVER)
      * @param pluginName Name of plugin that saves this data
      * @param key Key of data
@@ -400,9 +401,9 @@ public class CacheManager {
      * @return true if exists
      * @since 1.3.0
      */
-    public <T> boolean hasData(CacheSource cacheSource, Object target, String pluginName, String key, Class<T> expected) {
+    public <T> boolean hasData(Object target, String pluginName, String key, Class<T> expected) {
         try {
-            T data = getData(cacheSource,target,pluginName,key,expected);
+            T data = getData(target,pluginName,key,expected);
 
             if(data == null) {
                 return false;
@@ -423,7 +424,7 @@ public class CacheManager {
      * @since 1.3.0
      */
     public <T> boolean hasServerData(String pluginName, String key, Class<T> expected) {
-        return this.hasData(CacheSource.SERVER, null,pluginName,key,expected);
+        return this.hasData( null,pluginName,key,expected);
     }
 
     /**
@@ -446,5 +447,22 @@ public class CacheManager {
         acceptedTypes.put(int[].class, PersistentDataType.INTEGER_ARRAY);
         acceptedTypes.put(long[].class, PersistentDataType.LONG_ARRAY);
         return (PersistentDataType<Z, Z>) acceptedTypes.get(clazz);
+    }
+
+    /**
+     * THis method returns cachesource from target
+     * @param target Object that is the target
+     * @return CacheSource of target
+     * @throws IllegalArgumentException when target can't be converted to cache source
+     */
+    private CacheSource getSource(Object target) {
+        if(target == null) {
+            return CacheSource.SERVER;
+        }
+        if (target instanceof Player) return CacheSource.PLAYER;
+        if (target instanceof Entity) return CacheSource.ENTITY;
+        if (target instanceof ItemStack) return CacheSource.ITEMSTACK;
+
+        throw new IllegalArgumentException("Wrong target in cache. Excepted: null, player, entity, itemstack. Recived: " + target.getClass());
     }
 }

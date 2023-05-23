@@ -16,6 +16,8 @@
 
 package com.github.kpgtb.ktools.util.time;
 
+import java.util.HashMap;
+
 /**
  * Object that handles time (days, hours, minutes, seconds)
  * @since 1.6.0
@@ -38,8 +40,8 @@ public class Time {
      * @param text String in format XdXhXmXs (d=days, h=hours, m=minutes, s=seconds, X=integer)
      */
     public Time(String text) {
-        this.text = text;
         this.millis = toMillis(text);
+        this.text = fromMillis(this.millis);
     }
 
     /**
@@ -60,11 +62,13 @@ public class Time {
 
     /**
      * Get time as text in specified format
-     * @param format format of text where %d is next number (order: days, hours, minutes, seconds)
+     * @param format format of text. Placeholders: <days> <hours> <minutes> <seconds>
+     * @param hideZero Hide elements with "0" like 0 seconds
+     * @param splitSeq String which is a seq of chars between elements
      * @return Text in specified format
      */
-    public String format(String format) {
-        return fromMillis(this.millis, format);
+    public String format(String format, boolean hideZero, String splitSeq) {
+        return fromMillis(this.millis, format, hideZero, splitSeq);
     }
 
     private long toMillis(String time) {
@@ -117,7 +121,7 @@ public class Time {
         return seconds * 1000L;
     }
 
-    private String fromMillis(long millis, String format) {
+    private String fromMillis(long millis, String format, boolean hideZero, String splitSeq) {
 
         int seconds = (int) Math.floorDiv(millis,1000);
         int minutes = Math.floorDiv(seconds, 60);
@@ -127,10 +131,48 @@ public class Time {
         int days = Math.floorDiv(hours, 24);
         hours -= days * 24;
 
-        return String.format(format, days,hours,minutes, seconds);
+        String[] formatSplit = format.split(splitSeq);
+        StringBuilder result = new StringBuilder();
+
+        HashMap<String, Integer> types = new HashMap<>();
+        types.put("<days>", days);
+        types.put("<hours>", hours);
+        types.put("<minutes>", minutes);
+        types.put("<seconds>", seconds);
+
+        for (int i = 0; i < formatSplit.length; i++) {
+            String text = formatSplit[i];
+            String type = "";
+            int number = 0;
+
+            for (String t : types.keySet()) {
+                if(text.contains(t)) {
+                    type = t;
+                    number = types.get(t);
+                    break;
+                }
+            }
+
+            if(type.isEmpty()) {
+                result.append(text);
+                if((i+1) != formatSplit.length) {
+                    result.append(splitSeq);
+                }
+                break;
+            }
+
+            if(!hideZero || number != 0) {
+                result.append(text.replace(type, String.valueOf(number)));
+                if((i+1) != formatSplit.length) {
+                    result.append(splitSeq);
+                }
+            }
+        }
+
+        return result.toString();
     }
 
     private String fromMillis(long millis) {
-        return fromMillis(millis,"%dd %dh %dm %ds");
+        return fromMillis(millis,"<days>d <hours>h <minutes>m <seconds>s", true, " ");
     }
 }

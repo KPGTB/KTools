@@ -48,6 +48,7 @@ public class KitemBuilder {
     private ItemBuilderAction<InventoryDragEvent> onDragAction;
     private ItemBuilderBoolAction<EntityDamageByEntityEvent> onDamageAction;
     private ItemBuilderAction<PlayerRespawnEvent> onRespawnAction;
+    private ItemBuilderBoolAction<PlayerSwapHandItemsEvent> onSwapAction;
 
     public KitemBuilder(ToolsObjectWrapper wrapper, String pluginTag, String itemName, ItemStack itemStack) {
         this.wrapper = wrapper;
@@ -156,6 +157,14 @@ public class KitemBuilder {
         this.onRespawnAction = onRespawnAction;
     }
 
+    public ItemBuilderBoolAction<PlayerSwapHandItemsEvent> getOnSwapAction() {
+        return onSwapAction;
+    }
+
+    public void setOnSwapAction(ItemBuilderBoolAction<PlayerSwapHandItemsEvent> onSwapAction) {
+        this.onSwapAction = onSwapAction;
+    }
+
     /**
      * Register custom item
      * @return Kitem instance
@@ -241,6 +250,13 @@ public class KitemBuilder {
             public void onRespawn(PlayerRespawnEvent event) {
                 if(onRespawnAction != null) {
                     onRespawnAction.onEvent(event);
+                }
+            }
+
+            @Override
+            public void onSwap(PlayerSwapHandItemsEvent event, boolean toOff) {
+                if(onSwapAction != null) {
+                    onSwapAction.onEvent(event, toOff);
                 }
             }
         };
