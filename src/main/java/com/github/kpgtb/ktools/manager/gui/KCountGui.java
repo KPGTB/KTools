@@ -18,6 +18,7 @@ package com.github.kpgtb.ktools.manager.gui;
 
 import com.github.kpgtb.ktools.manager.gui.container.GuiContainer;
 import com.github.kpgtb.ktools.manager.gui.item.GuiItem;
+import com.github.kpgtb.ktools.manager.gui.item.common.CloseItem;
 import com.github.kpgtb.ktools.manager.gui.write.ICountResponse;
 import com.github.kpgtb.ktools.manager.language.LanguageLevel;
 import com.github.kpgtb.ktools.util.item.ItemBuilder;
@@ -65,10 +66,9 @@ public class KCountGui {
      * Open GUI to player
      */
     public void open() {
-        int rows = this.decimals ? 3 : 1;
         KGui gui = new KGui(
                 wrapper.getLanguageManager().getSingleString(LanguageLevel.GLOBAL, "countGuiName"),
-                rows,
+                3,
                 wrapper
         );
 
@@ -87,7 +87,7 @@ public class KCountGui {
             }
         });
 
-        GuiContainer container = new GuiContainer(gui, 0,0,9,rows);
+        GuiContainer container = new GuiContainer(gui, 0,0,9,3);
 
 
         GuiItem countItem = new GuiItem(
@@ -212,16 +212,19 @@ public class KCountGui {
             container.setItem(7,2,plus100);
 
         } else {
-            container.setItem(4,0,countItem);
+            container.setItem(4,1,countItem);
 
-            container.setItem(0,0,minus100);
-            container.setItem(1,0,minus10);
-            container.setItem(2,0,minus1);
+            container.setItem(0,1,minus100);
+            container.setItem(1,1,minus10);
+            container.setItem(2,1,minus1);
 
-            container.setItem(6,0,plus1);
-            container.setItem(7,0,plus10);
-            container.setItem(8,0,plus100);
+            container.setItem(6,1,plus1);
+            container.setItem(7,1,plus10);
+            container.setItem(8,1,plus100);
         }
+
+        container.setItem(4,0, CloseItem.get(wrapper));
+        container.setItem(4,2, CloseItem.get(wrapper));
 
         gui.addContainer(container);
 

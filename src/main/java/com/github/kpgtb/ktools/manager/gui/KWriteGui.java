@@ -16,12 +16,14 @@
 
 package com.github.kpgtb.ktools.manager.gui;
 
+import com.github.kpgtb.ktools.manager.gui.item.common.CloseItem;
 import com.github.kpgtb.ktools.manager.gui.write.IWriteResponse;
 import com.github.kpgtb.ktools.manager.language.LanguageLevel;
 import com.github.kpgtb.ktools.util.item.ItemBuilder;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -80,6 +82,8 @@ public class KWriteGui implements Listener {
                 .itemLeft(
                         new ItemBuilder(Material.PAPER).build()
                 )
+                .itemRight(CloseItem.get(wrapper).getItemStack())
+                .onRightInputClick(HumanEntity::closeInventory)
                 .title(
                         wrapper.getLanguageManager().getSingleString(LanguageLevel.GLOBAL, "writeGuiName")
                 )
