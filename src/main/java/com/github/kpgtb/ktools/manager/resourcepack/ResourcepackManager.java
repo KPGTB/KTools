@@ -30,7 +30,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,6 +50,7 @@ public class ResourcepackManager {
 
     private final ArrayList<CustomChar> customChars;
     private final ArrayList<CustomModelData> customModels;
+    private final ArrayList<CustomFile> customFiles;
     private final ArrayList<String> plugins;
 
     /**
@@ -67,6 +67,7 @@ public class ResourcepackManager {
 
         this.customChars = new ArrayList<>();
         this.customModels = new ArrayList<>();
+        this.customFiles = new ArrayList<>();
         this.plugins = new ArrayList<>();
     }
 
@@ -103,7 +104,7 @@ public class ResourcepackManager {
      * @param width Width of char
      */
     public void registerCustomChar(String pluginName, String character, String imageName, InputStream image, int height, int ascent, int width) {
-        File imageFile = this.saveImage(image,imageName,pluginName);
+        File imageFile = this.saveFile(image,imageName,pluginName);
         if(imageFile == null) {
             return;
         }
@@ -121,12 +122,21 @@ public class ResourcepackManager {
      * @param material Material that will have custom model data
      */
     public void registerCustomModelData(String pluginName, int model, String imageName, InputStream image, Material material) {
-        File imageFile = this.saveImage(image,imageName,pluginName);
+        File imageFile = this.saveFile(image,imageName,pluginName);
         if(imageFile == null) {
             return;
         }
         CustomModelData customModelData = new CustomModelData(imageFile,material,model);
         this.customModels.add(customModelData);
+    }
+
+    public void registerCustomFile(String pluginName, String destination, String fileName, InputStream file) {
+        File cFile = this.saveFile(file, fileName, pluginName);
+        if(cFile == null) {
+            return;
+        }
+        CustomFile customFile= new CustomFile(cFile, destination);
+        this.customFiles.add(customFile);
     }
 
     /**
@@ -204,12 +214,24 @@ public class ResourcepackManager {
             gson.toJson(packObj, packWriter);
             packWriter.close();
 
-            File shaderFolder = new File(tempFolder, "assets\\minecraft\\shaders\\core\\");
+            this.customFiles.forEach(customFile -> {
+                try {
+                    File folder = new File(tempFolder, customFile.getDestination());
+                    folder.mkdirs();
+                    File file = new File(folder, customFile.getFile().getName());
+                    file.createNewFile();
+                    Files.copy(customFile.getFile().toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+
+            /*File shaderFolder = new File(tempFolder, "assets\\minecraft\\shaders\\core\\");
             shaderFolder.mkdirs();
             plugin.saveResource("txt/rendertype_text.vsh", true);
             File savedShader = new File(plugin.getDataFolder(), "txt/rendertype_text.vsh");
             File shaderInFolder = new File(shaderFolder, "rendertype_text.vsh");
-            Files.move(savedShader.toPath(), shaderInFolder.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.move(savedShader.toPath(), shaderInFolder.toPath(), StandardCopyOption.REPLACE_EXISTING);*/
             
             File itemFolder = new File(tempFolder, "assets\\minecraft\\textures\\item\\");
             itemFolder.mkdirs();
@@ -454,12 +476,12 @@ public class ResourcepackManager {
             return false;
         }
     }
-    private File saveImage(InputStream stream, String imageName, String pluginName) {
+    private File saveFile(InputStream stream, String fileName, String pluginName) {
         File folder = new File(this.texturesFolder, pluginName);
         if(!folder.exists()) {
             folder.mkdirs();
         }
-        File file = new File(folder, imageName + ".png");
+        File file = new File(folder, fileName);
         if(file.exists()) {
             return file;
         }
