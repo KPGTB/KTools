@@ -21,6 +21,10 @@ count_gui:
   countInfo: "<gold><u><value>"
   countInfoLore:
   - "<green><b>Click to accept"
+timer:
+  defaultTimer: "<green><timer> left"
+  defaultEndTimer: "<green>Finished!"
+  defaultCancelTimer: "<red>Cancelled!"
 resourcePackDeny:
   - ""
   - "<red><b>To play on this server, you need to accept the resource pack!"

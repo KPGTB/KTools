@@ -330,10 +330,11 @@ public class LanguageManager {
     /**
      * Convert mini message string to formatted string
      * @param mm Mini message string
+     * @param placeholders Placeholders
      * @return formatted string
      */
-    public String convertMmToString(String mm) {
-        return convertComponentToString(MiniMessage.miniMessage().deserialize(mm));
+    public String convertMmToString(String mm, TagResolver... placeholders) {
+        return convertComponentToString(MiniMessage.miniMessage().deserialize(mm, placeholders));
     }
 
     /**
