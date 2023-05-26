@@ -19,6 +19,7 @@ package com.github.kpgtb.ktools.util.time.timer;
 import com.github.kpgtb.ktools.manager.language.LanguageLevel;
 import com.github.kpgtb.ktools.manager.language.LanguageManager;
 import com.github.kpgtb.ktools.util.time.Time;
+import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
@@ -90,6 +91,30 @@ public class Timer {
     }
 
     /**
+     * Constructor of timer
+     * @param wrapper Instance of ToolsObjectWrapper
+     * @param sendType Type of timer
+     * @param timeType Seconds when timer should send message {@link com.github.kpgtb.ktools.util.time.timer.TimerTime}
+     * @param time Time of timer
+     */
+    public Timer(ToolsObjectWrapper wrapper,
+                 TimerSendType sendType, Set<Integer> timeType, int time) {
+        this.adventure = wrapper.getAdventure();
+        this.plugin = wrapper.getPlugin();
+        this.sendType = sendType;
+        this.timeType = timeType;
+        this.time = time;
+
+        this.viewers = new ArrayList<>();
+
+        setTickMessage(wrapper.getLanguageManager().getSingleComponent(LanguageLevel.GLOBAL, "defaultTimer"));
+        setEndMessage(wrapper.getLanguageManager().getSingleComponent(LanguageLevel.GLOBAL, "defaultEndTimer"));
+        setEndMessage(wrapper.getLanguageManager().getSingleComponent(LanguageLevel.GLOBAL, "defaultCancelTimer"));
+
+        end();
+    }
+
+    /**
      * Set format of timer
      * @param timeFormat {@link com.github.kpgtb.ktools.util.time.Time}#format()
      * @param timeFormatHideZero {@link com.github.kpgtb.ktools.util.time.Time}#format()
@@ -118,7 +143,7 @@ public class Timer {
      * @return This timer
      */
     public Timer setTickMessage(@NotNull Component component) {
-        return setTickMessage(MiniMessage.miniMessage().serialize(component));
+        return setTickMessage(MiniMessage.miniMessage().serialize(component).replace("\\<time>", "<time>"));
     }
 
     /**

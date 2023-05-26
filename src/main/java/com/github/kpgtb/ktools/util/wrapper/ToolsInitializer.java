@@ -54,12 +54,13 @@ public class ToolsInitializer {
 
     /**
      * Prepare language manager
-     * @param lang Lang key. It is a name of file with messages IN resources/lang
+     * @param lang Current lang key.
+     * @param defaultLang Default language key. It is a name of file with messages IN resources/lang
      * @return This initializer
      */
-    public ToolsInitializer prepareLanguage(String lang) {
+    public ToolsInitializer prepareLanguage(String lang, String defaultLang) {
         this.languageManager = new LanguageManager(plugin.getDataFolder(), lang, globalManagersWrapper.getDebugManager(),globalManagersWrapper.getGlobalLanguageManager());
-        this.languageManager.saveDefaultLanguage(String.format("lang/%s.yml", lang), plugin);
+        this.languageManager.saveDefaultLanguage(String.format("lang/%s.yml", defaultLang), plugin);
         this.languageManager.refreshMessages();
         return this;
     }
