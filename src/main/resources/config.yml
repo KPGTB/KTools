@@ -3,6 +3,7 @@ cache:
   player: "metadata" # file or metadata
   entity: "metadata" # file or metadata
 resourcepack: true
+resourcePackRefreshRate: "15m" # Delay to check if resource pack works.
 data:
   type: "SQLITE"
   mysql:

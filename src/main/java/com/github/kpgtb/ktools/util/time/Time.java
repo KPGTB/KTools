@@ -53,6 +53,12 @@ public class Time {
     }
 
     /**
+     * Get time in ticks
+     * @return ticks
+     */
+    public long getTicks() {return (millis / 1000L * 20L);}
+
+    /**
      * Get time as text
      * @return Text in format Xd Xh Xm Xs
      */

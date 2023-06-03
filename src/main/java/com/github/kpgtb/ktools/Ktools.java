@@ -34,6 +34,7 @@ import com.github.kpgtb.ktools.manager.updater.UpdaterManager;
 import com.github.kpgtb.ktools.manager.updater.version.KVersion;
 import com.github.kpgtb.ktools.util.bstats.Metrics;
 import com.github.kpgtb.ktools.util.file.PackageUtil;
+import com.github.kpgtb.ktools.util.time.Time;
 import com.github.kpgtb.ktools.util.wrapper.GlobalManagersWrapper;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -116,6 +117,7 @@ public final class Ktools extends JavaPlugin {
             resourcepackManager = new ResourcepackManager(this, debug, cacheManager);
             ResourcepackManager finalResourcepackManager = resourcepackManager;
             UiManager finalUiManager = uiManager;
+            JavaPlugin plugin = this;
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -190,7 +192,12 @@ public final class Ktools extends JavaPlugin {
                     }
 
                     if(finalResourcepackManager.isEnabled()) {
-                        finalResourcepackManager.prepareResourcepack();
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                finalResourcepackManager.prepareResourcepack();
+                            }
+                        }.runTaskTimerAsynchronously(plugin,1L,new Time(getConfig().getString("resourcePackRefreshRate")).getTicks());
                     }
                 }
             }.runTaskLater(this, 1L);

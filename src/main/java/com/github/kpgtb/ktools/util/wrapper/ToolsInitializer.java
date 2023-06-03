@@ -25,7 +25,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * Class that handles plugin initialization
- * @since 2.0.0
+ * @since 1.7.0
  */
 public class ToolsInitializer {
     private final JavaPlugin plugin;

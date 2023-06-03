@@ -419,8 +419,8 @@ public class ResourcepackManager {
         try {
             String boundary = Long.toHexString(System.currentTimeMillis());
 
-            HttpURLConnection connection = (HttpURLConnection) new URL("https://transfer.sh/").openConnection();
-            connection.setRequestMethod("POST");
+            HttpURLConnection connection = (HttpURLConnection) new URL("https://temp.sh/"+fileToUpload.getName()).openConnection();
+            connection.setRequestMethod("PUT");
             connection.setDoOutput(true);
             connection.setDoInput(true);
             connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
@@ -469,7 +469,7 @@ public class ResourcepackManager {
         try {
             URL url = new URL(urlString);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("HEAD");
+            connection.setRequestMethod("GET");
             int responseCode = connection.getResponseCode();
             return responseCode == HttpURLConnection.HTTP_OK;
         } catch (Exception e) {
