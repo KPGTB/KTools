@@ -49,7 +49,6 @@ public final class Ktools extends JavaPlugin {
 
     private ToolsObjectWrapper toolsObjectWrapper;
     private GlobalManagersWrapper globalManagersWrapper;
-    private boolean legacy;
 
     public static boolean HAS_UPDATE;
 
@@ -61,9 +60,9 @@ public final class Ktools extends JavaPlugin {
         long startMillis = System.currentTimeMillis();
         debug.sendInfo(DebugType.START, "Enabling plugin...");
 
-        legacy = !new KVersion(
+        boolean legacy = !new KVersion(
                 Bukkit.getBukkitVersion()
-                .split("-")[0]
+                        .split("-")[0]
         ).isNewerOrEquals("1.14");
         if(legacy) {
             debug.sendWarning(DebugType.START, "You are using legacy version! Not everything can be available!", true);

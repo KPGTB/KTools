@@ -19,14 +19,18 @@ package com.github.kpgtb.ktools.manager.gui.container;
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.manager.gui.KGui;
+import com.github.kpgtb.ktools.manager.gui.item.GuiItem;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Paged gui container contains specific box of items from GUI with pages system
  */
 public class PagedGuiContainer extends GuiContainer {
+    public static final int UNLIMITED_PAGES = Integer.MAX_VALUE;
+
     private final DebugManager debug;
 
     private final ArrayList<GuiContainer> containers;
@@ -131,4 +135,65 @@ public class PagedGuiContainer extends GuiContainer {
             setPageIdx(page + 1);
         }
     }
+
+    /**
+     * Fill paged container with items
+     * @param items List of GuiItems
+     * @param pagesLimit Limit of pages
+     * @param startX start X
+     * @param startY start Y
+     * @param offsetX x offset
+     * @param offsetY y offset
+     * @since 2.0.0
+     */
+    public void fillWithItems(List<GuiItem> items, int pagesLimit, int startX, int startY, int offsetX, int offsetY) {
+        clearPages();
+        List<GuiContainer> newPages = new ArrayList<>();
+        newPages.add(new GuiContainer(this));
+
+        int x = startX;
+        int y = startY;
+
+        for (GuiItem item : items) {
+            if(x >= this.getWidth()) {
+                x = startX;
+                y+=offsetY;
+            }
+            if(y >= this.getWidth()) {
+                x = startX;
+                y = startY;
+                if(pagesLimit > newPages.size()) {
+                    newPages.add(new GuiContainer(this));
+                } else {
+                    break;
+                }
+            }
+            GuiContainer lastPage = newPages.get(newPages.size() - 1);
+            lastPage.setItem(x,y,item);
+
+            x+=offsetX;
+        }
+
+        newPages.forEach(this::addPage);
+    }
+
+    /**
+     * Fill paged container with items
+     * @param items List of GuiItems
+     * @param pagesLimit Limit of pages
+     * @since 2.0.0
+     */
+    public void fillWithItems(List<GuiItem> items, int pagesLimit) {
+        this.fillWithItems(items,pagesLimit,0,0,1,1);
+    }
+
+    /**
+     * Fill paged container with items
+     * @param items List of GuiItems
+     * @since 2.0.0
+     */
+    public void fillWithItems(List<GuiItem> items) {
+        this.fillWithItems(items,UNLIMITED_PAGES,0,0,1,1);
+    }
+
 }
