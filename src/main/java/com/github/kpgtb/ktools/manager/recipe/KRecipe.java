@@ -32,7 +32,7 @@ import java.util.Iterator;
 /**
  * Abstract class that handles process of preparing recipe
  */
-public abstract class Krecipe implements Listener {
+public abstract class KRecipe implements Listener {
     private final NamespacedKey recipeKey;
     private Recipe recipe;
     private boolean isRegistered;
@@ -42,7 +42,7 @@ public abstract class Krecipe implements Listener {
      * @param recipeKey Key of recipe
      * @param toolsObjectWrapper ToolsObjectWrapper or object that extends it.
      */
-    public Krecipe(NamespacedKey recipeKey, ToolsObjectWrapper toolsObjectWrapper) {
+    public KRecipe(NamespacedKey recipeKey, ToolsObjectWrapper toolsObjectWrapper) {
         this.recipeKey = recipeKey;
 
         this.recipe = null;

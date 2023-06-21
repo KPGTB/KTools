@@ -17,12 +17,12 @@
 package com.github.kpgtb.ktools.listener;
 
 import com.github.kpgtb.ktools.manager.language.LanguageLevel;
-import com.github.kpgtb.ktools.manager.listener.Klistener;
+import com.github.kpgtb.ktools.manager.listener.KListener;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 
-public class ResourcePackListener extends Klistener {
+public class ResourcePackListener extends KListener {
     private final ToolsObjectWrapper wrapper;
     public ResourcePackListener(ToolsObjectWrapper toolsObjectWrapper) {
         super(toolsObjectWrapper);

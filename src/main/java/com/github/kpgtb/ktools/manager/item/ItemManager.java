@@ -37,7 +37,7 @@ import java.util.HashMap;
  * @since 1.3.0
  */
 public class ItemManager {
-    private final HashMap<String, Kitem> customItems;
+    private final HashMap<String, KItem> customItems;
     private final File itemsFile;
 
     /**
@@ -62,7 +62,7 @@ public class ItemManager {
 
         ArrayList<String> tags = new ArrayList<>();
 
-        for(Class<?> clazz : ReflectionUtil.getAllClassesInPackage(jarFile,itemsPackage, Kitem.class)) {
+        for(Class<?> clazz : ReflectionUtil.getAllClassesInPackage(jarFile,itemsPackage, KItem.class)) {
             try {
 
                 debug.sendInfo(DebugType.ITEM, "Registering item " + clazz.getSimpleName() + "...");
@@ -72,7 +72,7 @@ public class ItemManager {
                         .replace("Item", "")
                 );
 
-                Kitem item = (Kitem) clazz.getDeclaredConstructor(ToolsObjectWrapper.class, String.class)
+                KItem item = (KItem) clazz.getDeclaredConstructor(ToolsObjectWrapper.class, String.class)
                         .newInstance(toolsObjectWrapper, itemName);
 
                 ItemStack bukkitItem = item.getItem();
@@ -102,7 +102,7 @@ public class ItemManager {
      * @param item Instance of Kitem
      * @return tag of item
      */
-    public String registerItem(ToolsObjectWrapper toolsObjectWrapper, Kitem item) {
+    public String registerItem(ToolsObjectWrapper toolsObjectWrapper, KItem item) {
         PluginManager pluginManager = Bukkit.getPluginManager();
         DebugManager debug = toolsObjectWrapper.getDebugManager();
 
@@ -130,7 +130,7 @@ public class ItemManager {
         if(!this.customItems.containsKey(fullItemName)) {
             return;
         }
-        Kitem item = this.customItems.get(fullItemName);
+        KItem item = this.customItems.get(fullItemName);
         this.customItems.remove(fullItemName);
         HandlerList.unregisterAll(item);
     }
@@ -179,7 +179,7 @@ public class ItemManager {
      * @return ItemStack or null when not exists
      */
     @Nullable
-    public ItemStack getCustomItem(String pluginTag, Class<? extends Kitem> itemClass) {
+    public ItemStack getCustomItem(String pluginTag, Class<? extends KItem> itemClass) {
         String itemName = pluginTag + ":" + camelToSnake(
                 itemClass.getSimpleName()
                 .replace("Item", "")
@@ -191,7 +191,7 @@ public class ItemManager {
      * Get all registered items
      * @return HashMap of registered items
      */
-    public HashMap<String, Kitem> getCustomItems() {
+    public HashMap<String, KItem> getCustomItems() {
         return customItems;
     }
 

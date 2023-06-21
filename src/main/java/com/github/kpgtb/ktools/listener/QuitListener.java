@@ -16,7 +16,7 @@
 
 package com.github.kpgtb.ktools.listener;
 
-import com.github.kpgtb.ktools.manager.listener.Klistener;
+import com.github.kpgtb.ktools.manager.listener.KListener;
 import com.github.kpgtb.ktools.manager.ui.UiManager;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import org.bukkit.entity.Player;
@@ -28,7 +28,7 @@ import java.util.UUID;
 /**
  * QuitListener handles removing ui from player when they leave the server
  */
-public class QuitListener extends Klistener {
+public class QuitListener extends KListener {
     private final UiManager uiManager;
 
     /**

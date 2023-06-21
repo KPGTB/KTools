@@ -17,7 +17,7 @@
 package com.github.kpgtb.ktools.listener;
 
 import com.github.kpgtb.ktools.manager.cache.CacheManager;
-import com.github.kpgtb.ktools.manager.listener.Klistener;
+import com.github.kpgtb.ktools.manager.listener.KListener;
 import com.github.kpgtb.ktools.manager.resourcepack.ResourcepackManager;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import org.bukkit.entity.Player;
@@ -29,7 +29,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 /**
  * JoinListener handles setting resourcepack when player join to the server
  */
-public class JoinListener extends Klistener {
+public class JoinListener extends KListener {
     private final CacheManager cacheManager;
     private final ResourcepackManager resourcepackManager;
     private final JavaPlugin plugin;

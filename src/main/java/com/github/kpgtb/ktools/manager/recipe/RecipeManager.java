@@ -58,7 +58,7 @@ public class RecipeManager {
     public void registerRecipes(String recipesPackage) {
         PluginManager pluginManager = Bukkit.getPluginManager();
 
-        for(Class<?> clazz : ReflectionUtil.getAllClassesInPackage(jarFile,recipesPackage, Krecipe.class)) {
+        for(Class<?> clazz : ReflectionUtil.getAllClassesInPackage(jarFile,recipesPackage, KRecipe.class)) {
             try {
 
                 debug.sendInfo(DebugType.RECIPE, "Registering recipe " + clazz.getSimpleName() + "...");
@@ -69,7 +69,7 @@ public class RecipeManager {
 
                 debug.sendInfo(DebugType.RECIPE, "Recipe namespace key: " + recipeKey.getNamespace() + ":" + recipeKey.getKey());
 
-                Krecipe recipe = (Krecipe) clazz.getDeclaredConstructor(NamespacedKey.class, ToolsObjectWrapper.class)
+                KRecipe recipe = (KRecipe) clazz.getDeclaredConstructor(NamespacedKey.class, ToolsObjectWrapper.class)
                         .newInstance(recipeKey, toolsObjectWrapper);
 
                 Recipe bukkitRecipe = recipe.getRecipe();

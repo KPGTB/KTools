@@ -29,6 +29,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Write GUI is a gui with response when you can write sth
@@ -53,7 +54,7 @@ public class KWriteGui implements Listener {
      */
     public void open() {
         new AnvilGUI.Builder()
-                .onClose(p -> {
+                .onClose(stateSnapshot -> {
                     if(responsed) {
                         return;
                     }
@@ -63,16 +64,20 @@ public class KWriteGui implements Listener {
                         new BukkitRunnable() {
                             @Override
                             public void run() {
-                                lastGui.open(p);
+                                lastGui.open(stateSnapshot.getPlayer());
                             }
                         }.runTaskLater(wrapper.getPlugin(), 3);
                     }
                 })
-                .onComplete(completion -> {
-                    response.response(completion.getText());
+                .onClick((slot,stateSnapshot) -> {
+                    if(!slot.equals(AnvilGUI.Slot.OUTPUT)) {
+                        return Arrays.asList(AnvilGUI.ResponseAction.close());
+                    }
+
+                    response.response(stateSnapshot.getText());
                     responsed = true;
                     if(lastGui != null) {
-                        lastGui.open(completion.getPlayer());
+                        lastGui.open(stateSnapshot.getPlayer());
                     }
                     return Arrays.asList(AnvilGUI.ResponseAction.close());
                 })
@@ -83,7 +88,6 @@ public class KWriteGui implements Listener {
                         new ItemBuilder(Material.PAPER).build()
                 )
                 .itemRight(CloseItem.get(wrapper).getItemStack())
-                .onRightInputClick(HumanEntity::closeInventory)
                 .title(
                         wrapper.getLanguageManager().getSingleString(LanguageLevel.GLOBAL, "writeGuiName")
                 )

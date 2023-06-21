@@ -18,7 +18,7 @@ package com.github.kpgtb.ktools.util.time.timer;
 
 import com.github.kpgtb.ktools.manager.language.LanguageLevel;
 import com.github.kpgtb.ktools.manager.language.LanguageManager;
-import com.github.kpgtb.ktools.util.time.Time;
+import com.github.kpgtb.ktools.util.time.KTime;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -38,7 +38,7 @@ import java.util.Set;
 /**
  * Timer class that handles making timers
  */
-public class Timer {
+public class KTimer {
     private final BukkitAudiences adventure;
     private final JavaPlugin plugin;
 
@@ -50,6 +50,8 @@ public class Timer {
     private String timeFormat;
     private boolean timeFormatHideZero;
     private String timeFormatSplitSeq;
+    private String timeReplaceSplitSeq;
+    private String timeEmptyReplace;
 
     private String tickMessage;
     private Component cancelMessage;
@@ -73,8 +75,8 @@ public class Timer {
      * @param timeType Seconds when timer should send message {@link com.github.kpgtb.ktools.util.time.timer.TimerTime}
      * @param time Time of timer
      */
-    public Timer(BukkitAudiences adventure, JavaPlugin plugin, LanguageManager languageManager,
-                 TimerSendType sendType, Set<Integer> timeType, int time) {
+    public KTimer(BukkitAudiences adventure, JavaPlugin plugin, LanguageManager languageManager,
+                  TimerSendType sendType, Set<Integer> timeType, int time) {
         this.adventure = adventure;
         this.plugin = plugin;
         this.sendType = sendType;
@@ -97,8 +99,8 @@ public class Timer {
      * @param timeType Seconds when timer should send message {@link com.github.kpgtb.ktools.util.time.timer.TimerTime}
      * @param time Time of timer
      */
-    public Timer(ToolsObjectWrapper wrapper,
-                 TimerSendType sendType, Set<Integer> timeType, int time) {
+    public KTimer(ToolsObjectWrapper wrapper,
+                  TimerSendType sendType, Set<Integer> timeType, int time) {
         this.adventure = wrapper.getAdventure();
         this.plugin = wrapper.getPlugin();
         this.sendType = sendType;
@@ -116,15 +118,19 @@ public class Timer {
 
     /**
      * Set format of timer
-     * @param timeFormat {@link com.github.kpgtb.ktools.util.time.Time}#format()
-     * @param timeFormatHideZero {@link com.github.kpgtb.ktools.util.time.Time}#format()
-     * @param timeFormatSplitSeq {@link com.github.kpgtb.ktools.util.time.Time}#format()
+     * @param timeFormat {@link KTime}#format()
+     * @param timeFormatHideZero {@link KTime}#format()
+     * @param timeFormatSplitSeq {@link KTime}#format()
+     * @param timeReplaceSplitSeq {@link KTime}#format()
+     * @param timeEmptyReplace {@link KTime}#format()
      * @return This timer
      */
-    public Timer setTimeFormat(@NotNull String timeFormat, boolean timeFormatHideZero, @NotNull String timeFormatSplitSeq) {
+    public KTimer setTimeFormat(@NotNull String timeFormat, boolean timeFormatHideZero, @NotNull String timeFormatSplitSeq, @NotNull String timeReplaceSplitSeq, String timeEmptyReplace) {
         this.timeFormat = timeFormat;
         this.timeFormatHideZero = timeFormatHideZero;
         this.timeFormatSplitSeq = timeFormatSplitSeq;
+        this.timeReplaceSplitSeq = timeReplaceSplitSeq;
+        this.timeEmptyReplace = timeEmptyReplace;
         return this;
     }
 
@@ -133,7 +139,7 @@ public class Timer {
      * @param message Message that should be sent. Add <time> placeholder to see time
      * @return This timer
      */
-    public Timer setTickMessage(@NotNull String message) {
+    public KTimer setTickMessage(@NotNull String message) {
         this.tickMessage = message;
         return this;
     }
@@ -142,7 +148,7 @@ public class Timer {
      * @param component Component that should be sent. Add <time> placeholder to see time
      * @return This timer
      */
-    public Timer setTickMessage(@NotNull Component component) {
+    public KTimer setTickMessage(@NotNull Component component) {
         return setTickMessage(MiniMessage.miniMessage().serialize(component).replace("\\<time>", "<time>"));
     }
 
@@ -151,7 +157,7 @@ public class Timer {
      * @param component Component that should be sent.
      * @return This timer
      */
-    public Timer setEndMessage(@NotNull Component component) {
+    public KTimer setEndMessage(@NotNull Component component) {
         this.endMessage = component;
         return this;
     }
@@ -160,7 +166,7 @@ public class Timer {
      * @param message Message that should be sent.
      * @return This timer
      */
-    public Timer setEndMessage(@NotNull String message) {
+    public KTimer setEndMessage(@NotNull String message) {
         return setEndMessage(MiniMessage.miniMessage().deserialize(message));
     }
 
@@ -169,7 +175,7 @@ public class Timer {
      * @param component Component that should be sent.
      * @return This timer
      */
-    public Timer setCancelMessage(@NotNull Component component) {
+    public KTimer setCancelMessage(@NotNull Component component) {
         this.cancelMessage = component;
         return this;
     }
@@ -178,7 +184,7 @@ public class Timer {
      * @param message Message that should be sent.
      * @return This timer
      */
-    public Timer setCancelMessage(@NotNull String message) {
+    public KTimer setCancelMessage(@NotNull String message) {
         return setCancelMessage(MiniMessage.miniMessage().deserialize(message));
     }
 
@@ -187,7 +193,7 @@ public class Timer {
      * @param startAction action
      * @return This timer
      */
-    public Timer setStartAction(TimerAction startAction) {
+    public KTimer setStartAction(TimerAction startAction) {
         this.startAction = startAction;
         return this;
     }
@@ -196,7 +202,7 @@ public class Timer {
      * @param tickAction action
      * @return This timer
      */
-    public Timer setTickAction(TimerAction tickAction) {
+    public KTimer setTickAction(TimerAction tickAction) {
         this.tickAction = tickAction;
         return this;
     }
@@ -205,7 +211,7 @@ public class Timer {
      * @param cancelAction action
      * @return This timer
      */
-    public Timer setCancelAction(TimerAction cancelAction) {
+    public KTimer setCancelAction(TimerAction cancelAction) {
         this.cancelAction = cancelAction;
         return this;
     }
@@ -214,7 +220,7 @@ public class Timer {
      * @param endAction action
      * @return This timer
      */
-    public Timer setEndAction(TimerAction endAction) {
+    public KTimer setEndAction(TimerAction endAction) {
         this.endAction = endAction;
         return this;
     }
@@ -237,7 +243,7 @@ public class Timer {
      * @param player viewer
      * @return This timer
      */
-    public Timer addViewer(Player player) {
+    public KTimer addViewer(Player player) {
         if(!hasViewer(player)) {
             viewers.add(player);
         }
@@ -248,7 +254,7 @@ public class Timer {
      * @param player viewer
      * @return This timer
      */
-    public Timer removeViewer(Player player) {
+    public KTimer removeViewer(Player player) {
         viewers.remove(player);
         return this;
     }
@@ -256,7 +262,7 @@ public class Timer {
      * Clear viewers
      * @return This timer
      */
-    public Timer clearViewers() {
+    public KTimer clearViewers() {
         viewers.clear();
         return this;
     }
@@ -281,7 +287,7 @@ public class Timer {
      * Start the timer
      * @return This timer
      */
-    public Timer start() {
+    public KTimer start() {
         if(started) {
             return this;
         }
@@ -291,7 +297,7 @@ public class Timer {
             startAction.run(this);
         }
 
-        Timer timerObj = this;
+        KTimer timerObj = this;
         timer = new BukkitRunnable() {
             @Override
             public void run() {
@@ -313,7 +319,7 @@ public class Timer {
      * Cancel the timer
      * @return This timer
      */
-    public Timer cancel() {
+    public KTimer cancel() {
         if(!started || ended) {
             return this;
         }
@@ -332,8 +338,8 @@ public class Timer {
         }
 
         if(timeType.contains(timeLeft) || timeType.contains(-1)) {
-            Time time = new Time(timeLeft * 1000L);
-            String timeStr = timeFormat == null || timeFormat.isEmpty() ? time.getText() : time.format(timeFormat, timeFormatHideZero, timeFormatSplitSeq);
+            KTime time = new KTime(timeLeft * 1000L);
+            String timeStr = timeFormat == null || timeFormat.isEmpty() ? time.getText() : time.format(timeFormat, timeFormatHideZero, timeFormatSplitSeq, timeReplaceSplitSeq,timeEmptyReplace);
 
             sendMessageToViewers(
                     MiniMessage.miniMessage().deserialize(tickMessage, Placeholder.unparsed("time", timeStr))

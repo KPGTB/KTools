@@ -59,7 +59,7 @@ public class PackageUtil {
      * @return tag of plugin
      * @since 1.6.0
      */
-    public String tag() {
+    public String getTag() {
         return tag;
     }
 }

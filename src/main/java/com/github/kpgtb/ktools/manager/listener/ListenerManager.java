@@ -52,10 +52,10 @@ public class ListenerManager {
     public void registerListeners(String listenersPackage) {
         PluginManager pluginManager = Bukkit.getPluginManager();
 
-        for(Class<?> clazz : ReflectionUtil.getAllClassesInPackage(jarFile,listenersPackage, Klistener.class)) {
+        for(Class<?> clazz : ReflectionUtil.getAllClassesInPackage(jarFile,listenersPackage, KListener.class)) {
             try {
 
-                Klistener listener = (Klistener) clazz.getDeclaredConstructor(ToolsObjectWrapper.class)
+                KListener listener = (KListener) clazz.getDeclaredConstructor(ToolsObjectWrapper.class)
                         .newInstance(toolsObjectWrapper);
                 pluginManager.registerEvents(listener, toolsObjectWrapper.getPlugin());
                 debug.sendInfo(DebugType.LISTENER, "Registered listener " + clazz.getSimpleName());

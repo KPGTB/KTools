@@ -16,7 +16,7 @@
 
 package com.github.kpgtb.ktools.manager.item.builder;
 
-import com.github.kpgtb.ktools.manager.item.Kitem;
+import com.github.kpgtb.ktools.manager.item.KItem;
 import com.github.kpgtb.ktools.manager.item.builder.action.ItemBuilderAction;
 import com.github.kpgtb.ktools.manager.item.builder.action.ItemBuilderBoolAction;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
@@ -31,7 +31,7 @@ import org.bukkit.inventory.ItemStack;
 /**
  * Builder of Kitem.
  */
-public class KitemBuilder {
+public class KItemBuilder {
     private final ToolsObjectWrapper wrapper;
     private final String pluginTag;
     private final String itemName;
@@ -50,7 +50,7 @@ public class KitemBuilder {
     private ItemBuilderAction<PlayerRespawnEvent> onRespawnAction;
     private ItemBuilderBoolAction<PlayerSwapHandItemsEvent> onSwapAction;
 
-    public KitemBuilder(ToolsObjectWrapper wrapper, String pluginTag, String itemName, ItemStack itemStack) {
+    public KItemBuilder(ToolsObjectWrapper wrapper, String pluginTag, String itemName, ItemStack itemStack) {
         this.wrapper = wrapper;
         this.pluginTag = pluginTag;
         this.itemName = itemName;
@@ -169,8 +169,8 @@ public class KitemBuilder {
      * Register custom item
      * @return Kitem instance
      */
-    public Kitem register() {
-        Kitem item = new Kitem(wrapper, pluginTag + ":" + itemName) {
+    public KItem register() {
+        KItem item = new KItem(wrapper, pluginTag + ":" + itemName) {
             @Override
             public ItemStack getItem() {
                 return itemStack;

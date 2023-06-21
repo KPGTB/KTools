@@ -34,7 +34,7 @@ import com.github.kpgtb.ktools.manager.updater.UpdaterManager;
 import com.github.kpgtb.ktools.manager.updater.version.KVersion;
 import com.github.kpgtb.ktools.util.bstats.Metrics;
 import com.github.kpgtb.ktools.util.file.PackageUtil;
-import com.github.kpgtb.ktools.util.time.Time;
+import com.github.kpgtb.ktools.util.time.KTime;
 import com.github.kpgtb.ktools.util.wrapper.GlobalManagersWrapper;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -122,7 +122,7 @@ public final class Ktools extends JavaPlugin {
                 @Override
                 public void run() {
                     if(finalUiManager != null && finalUiManager.isRequired()) {
-                        finalResourcepackManager.registerPlugin(packageUtil.tag(), getDescription().getVersion());
+                        finalResourcepackManager.registerPlugin(packageUtil.getTag(), getDescription().getVersion());
                         //Shader
                         finalResourcepackManager.registerCustomFile("noShadow", "assets\\minecraft\\shaders\\core\\", "rendertype_text.vsh", getResource("txt/rendertype_text.vsh"));
                         //NegativeSpaces
@@ -197,7 +197,7 @@ public final class Ktools extends JavaPlugin {
                             public void run() {
                                 finalResourcepackManager.prepareResourcepack();
                             }
-                        }.runTaskTimerAsynchronously(plugin,1L,new Time(getConfig().getString("resourcePackRefreshRate")).getTicks());
+                        }.runTaskTimerAsynchronously(plugin,1L,new KTime(getConfig().getString("resourcePackRefreshRate")).getTicks());
                     }
                 }
             }.runTaskLater(this, 1L);
@@ -213,7 +213,7 @@ public final class Ktools extends JavaPlugin {
         debug.sendInfo(DebugType.START, "Loaded tools object wrapper.");
 
         debug.sendInfo(DebugType.START, "Loading commands...");
-        CommandManager commandManager = new CommandManager(toolsObjectWrapper, getFile(), packageUtil.tag());
+        CommandManager commandManager = new CommandManager(toolsObjectWrapper, getFile(), packageUtil.getTag());
         commandManager.registerCommands(packageUtil.get("command"));
         debug.sendInfo(DebugType.START, "Loaded commands.");
 

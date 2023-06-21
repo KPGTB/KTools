@@ -16,13 +16,16 @@
 
 package com.github.kpgtb.ktools.util.time;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * Object that handles time (days, hours, minutes, seconds)
  * @since 1.6.0
  */
-public class Time {
+public class KTime {
     private final long millis;
     private final String text;
 
@@ -30,7 +33,7 @@ public class Time {
      * Get object of Time from millis
      * @param millis Milliseconds
      */
-    public Time(long millis) {
+    public KTime(long millis) {
         this.millis = millis;
         this.text = fromMillis(millis);
     }
@@ -39,7 +42,7 @@ public class Time {
      * Get object of Time from string
      * @param text String in format XdXhXmXs (d=days, h=hours, m=minutes, s=seconds, X=integer)
      */
-    public Time(String text) {
+    public KTime(String text) {
         this.millis = toMillis(text);
         this.text = fromMillis(this.millis);
     }
@@ -71,10 +74,12 @@ public class Time {
      * @param format format of text. Placeholders: <days> <hours> <minutes> <seconds>
      * @param hideZero Hide elements with "0" like 0 seconds
      * @param splitSeq String which is a seq of chars between elements
+     * @param replaceSplitSeq string that should be replacement for splitSeq or null when it should be like splitSeq
+     * @param emptyReplace string that should be returned if millis is 0
      * @return Text in specified format
      */
-    public String format(String format, boolean hideZero, String splitSeq) {
-        return fromMillis(this.millis, format, hideZero, splitSeq);
+    public String format(String format, boolean hideZero, String splitSeq, @Nullable String replaceSplitSeq, String emptyReplace) {
+        return fromMillis(this.millis, format, hideZero, splitSeq, replaceSplitSeq, emptyReplace);
     }
 
     private long toMillis(String time) {
@@ -127,7 +132,8 @@ public class Time {
         return seconds * 1000L;
     }
 
-    private String fromMillis(long millis, String format, boolean hideZero, String splitSeq) {
+    private String fromMillis(long millis, String format, boolean hideZero, String splitSeq, @Nullable String replaceSplitSeq, String emptyReplace) {
+        String end = replaceSplitSeq == null ? splitSeq : replaceSplitSeq;
 
         int seconds = (int) Math.floorDiv(millis,1000);
         int minutes = Math.floorDiv(seconds, 60);
@@ -162,7 +168,7 @@ public class Time {
             if(type.isEmpty()) {
                 result.append(text);
                 if((i+1) != formatSplit.length) {
-                    result.append(splitSeq);
+                    result.append(end);
                 }
                 break;
             }
@@ -170,15 +176,41 @@ public class Time {
             if(!hideZero || number != 0) {
                 result.append(text.replace(type, String.valueOf(number)));
                 if((i+1) != formatSplit.length) {
-                    result.append(splitSeq);
+                    result.append(end);
                 }
             }
         }
 
-        return result.toString();
+        String resultStr = result.toString();
+        if(resultStr.endsWith(end)) {
+            resultStr = resultStr.substring(
+                    0,
+                    resultStr.length() - end.length()
+            );
+        }
+
+        return resultStr.isEmpty() ? emptyReplace : resultStr;
     }
 
     private String fromMillis(long millis) {
-        return fromMillis(millis,"<days>d <hours>h <minutes>m <seconds>s", true, " ");
+        return fromMillis(millis,"<days>d <hours>h <minutes>m <seconds>s", true, " ", null, "now");
+    }
+
+    @Override
+    public String toString() {
+        return this.text.replace(" ", "");
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        KTime time = (KTime) o;
+        return millis == time.millis;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(millis);
     }
 }

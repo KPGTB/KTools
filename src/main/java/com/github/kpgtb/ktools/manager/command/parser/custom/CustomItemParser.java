@@ -17,7 +17,7 @@
 package com.github.kpgtb.ktools.manager.command.parser.custom;
 
 import com.github.kpgtb.ktools.manager.command.parser.IParamParser;
-import com.github.kpgtb.ktools.manager.item.Kitem;
+import com.github.kpgtb.ktools.manager.item.KItem;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
@@ -25,9 +25,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CustomItemParser implements IParamParser<Kitem> {
+public class CustomItemParser implements IParamParser<KItem> {
     @Override
-    public Kitem convert(String param, ToolsObjectWrapper wrapper) {
+    public KItem convert(String param, ToolsObjectWrapper wrapper) {
         return wrapper.getItemManager().getCustomItems().get(param);
     }
 
@@ -39,7 +39,7 @@ public class CustomItemParser implements IParamParser<Kitem> {
     @Override
     public @NotNull List<String> complete(String arg, CommandSender sender, ToolsObjectWrapper wrapper) {
         return wrapper.getItemManager().getCustomItems().keySet().stream()
-                .filter(item -> item.startsWith(arg))
+                .filter(item -> item.startsWith(arg) || item.split(":",2)[1].startsWith(arg))
                 .limit(30)
                 .collect(Collectors.toList());
     }

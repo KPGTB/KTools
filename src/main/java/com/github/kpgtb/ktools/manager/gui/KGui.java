@@ -40,7 +40,7 @@ import java.util.ArrayList;
 /**
  * KGui handles gui making process in plugin
  */
-public class KGui implements Listener {
+public abstract class KGui implements Listener {
     private final String name;
     private final int rows;
     private final ArrayList<GuiContainer> containers;
@@ -122,13 +122,28 @@ public class KGui implements Listener {
      */
     public void removeContainer(GuiContainer container) {
         this.containers.remove(container);
+        this.update();
     }
+
+    /**
+     * Reset containers
+     */
+    public void resetContainers() {
+        this.containers.clear();
+        this.update();
+    }
+
+    /**
+     * Prepare items in gui
+     */
+    public abstract void prepareGui();
 
     /**
      * Open GUI to player
      * @param player Player that should have open GUI
      */
     public void open(Player player) {
+        prepareGui();
         player.openInventory(bukkitInventory);
     }
 

@@ -18,20 +18,24 @@ package com.github.kpgtb.ktools.manager.gui;
 
 import com.github.kpgtb.ktools.manager.gui.container.GuiContainer;
 import com.github.kpgtb.ktools.manager.gui.item.GuiItem;
+import com.github.kpgtb.ktools.manager.gui.item.GuiItemLocation;
 import com.github.kpgtb.ktools.manager.gui.item.common.CloseItem;
 import com.github.kpgtb.ktools.manager.gui.write.ICountResponse;
 import com.github.kpgtb.ktools.manager.language.LanguageLevel;
 import com.github.kpgtb.ktools.util.item.ItemBuilder;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.HashMap;
+
 /**
  * Count GUI is a gui with response where you can count sth
  */
-public class KCountGui {
+public class KCountGui extends KGui{
     private final ToolsObjectWrapper wrapper;
     private final KGui lastGui;
     private final ICountResponse response;
@@ -48,6 +52,12 @@ public class KCountGui {
     private boolean responsed;
 
     public KCountGui(ToolsObjectWrapper wrapper, KGui lastGui, ICountResponse response, Player player, double defaultValue, double min, double max, boolean decimals, Material countMat) {
+        super(
+                wrapper.getLanguageManager().getSingleString(LanguageLevel.GLOBAL, "countGuiName"),
+                3,
+                wrapper
+        );
+
         this.wrapper = wrapper;
         this.lastGui = lastGui;
         this.response = response;
@@ -62,18 +72,12 @@ public class KCountGui {
         this.responsed = false;
     }
 
-    /**
-     * Open GUI to player
-     */
-    public void open() {
-        KGui gui = new KGui(
-                wrapper.getLanguageManager().getSingleString(LanguageLevel.GLOBAL, "countGuiName"),
-                3,
-                wrapper
-        );
 
-        gui.blockClick();
-        gui.setCloseAction(e -> {
+    @Override
+    public void prepareGui() {
+        resetContainers();
+        blockClick();
+        setCloseAction(e -> {
             if(!this.responsed) {
                 this.response.response(defaultValue);
                 if(this.lastGui != null) {
@@ -87,8 +91,7 @@ public class KCountGui {
             }
         });
 
-        GuiContainer container = new GuiContainer(gui, 0,0,9,3);
-
+        GuiContainer container = new GuiContainer(this, 0,0,9,3);
 
         GuiItem countItem = new GuiItem(
                 new ItemBuilder(this.countMat)
@@ -107,131 +110,46 @@ public class KCountGui {
                 this.lastGui.open((Player) e.getWhoClicked());
             }
         });
+        container.setItem(4,1,countItem);
 
-        GuiItem plus1 = new GuiItem(
-                new ItemBuilder(Material.GREEN_STAINED_GLASS_PANE)
-                        .displayname(wrapper.getLanguageManager().getSingleString(LanguageLevel.GLOBAL, "countPlus", Placeholder.parsed("value", 1.0D + "")))
-                        .build()
-        );
-        plus1.setClickAction(e -> changeValue(gui, container,1.0, countItem));
+        HashMap<GuiItemLocation, Double> changeItems = new HashMap<>();
 
-        GuiItem plus10 = new GuiItem(
-                new ItemBuilder(Material.GREEN_STAINED_GLASS_PANE)
-                        .displayname(wrapper.getLanguageManager().getSingleString(LanguageLevel.GLOBAL, "countPlus", Placeholder.parsed("value", 10.0D + "")))
-                        .build()
-        );
-        plus10.setClickAction(e -> changeValue(gui, container,10.0, countItem));
-
-        GuiItem plus100 = new GuiItem(
-                new ItemBuilder(Material.GREEN_STAINED_GLASS_PANE)
-                        .displayname(wrapper.getLanguageManager().getSingleString(LanguageLevel.GLOBAL, "countPlus", Placeholder.parsed("value", 100.0D + "")))
-                        .build()
-        );
-        plus100.setClickAction(e -> changeValue(gui, container,100.0, countItem));
-
-        GuiItem minus1 = new GuiItem(
-                new ItemBuilder(Material.RED_STAINED_GLASS_PANE)
-                        .displayname(wrapper.getLanguageManager().getSingleString(LanguageLevel.GLOBAL, "countMinus", Placeholder.parsed("value", 1.0D + "")))
-                        .build()
-        );
-        minus1.setClickAction(e -> changeValue(gui, container,-1.0, countItem));
-
-        GuiItem minus10 = new GuiItem(
-                new ItemBuilder(Material.RED_STAINED_GLASS_PANE)
-                        .displayname(wrapper.getLanguageManager().getSingleString(LanguageLevel.GLOBAL, "countMinus", Placeholder.parsed("value", 10.0D + "")))
-                        .build()
-        );
-        minus10.setClickAction(e -> changeValue(gui, container,-10.0, countItem));
-
-        GuiItem minus100 = new GuiItem(
-                new ItemBuilder(Material.RED_STAINED_GLASS_PANE)
-                        .displayname(wrapper.getLanguageManager().getSingleString(LanguageLevel.GLOBAL, "countMinus", Placeholder.parsed("value", 100.0D + "")))
-                        .build()
-        );
-        minus100.setClickAction(e -> changeValue(gui, container,-100.0, countItem));
+        changeItems.put(decimals ? new GuiItemLocation(1,0) : new GuiItemLocation(2,1), -1.0);
+        changeItems.put(decimals ? new GuiItemLocation(7,0) : new GuiItemLocation(6,1), 1.0);
+        changeItems.put(new GuiItemLocation(1, 1), -10.0);
+        changeItems.put(new GuiItemLocation(7, 1), 10.0);
+        changeItems.put(decimals ? new GuiItemLocation(1,2) : new GuiItemLocation(0,1), -100.0);
+        changeItems.put(decimals ? new GuiItemLocation(7,2) : new GuiItemLocation(8,1), 100.0);
 
         if(decimals) {
-            GuiItem plusD01 = new GuiItem(
-                    new ItemBuilder(Material.GREEN_STAINED_GLASS_PANE)
-                            .displayname(wrapper.getLanguageManager().getSingleString(LanguageLevel.GLOBAL, "countPlus", Placeholder.parsed("value", 0.01D + "")))
-                            .build()
-            );
-            plusD01.setClickAction(e -> changeValue(gui, container,0.01, countItem));
-
-            GuiItem plusD1 = new GuiItem(
-                    new ItemBuilder(Material.GREEN_STAINED_GLASS_PANE)
-                            .displayname(wrapper.getLanguageManager().getSingleString(LanguageLevel.GLOBAL, "countPlus", Placeholder.parsed("value", 0.1D + "")))
-                            .build()
-            );
-            plusD1.setClickAction(e -> changeValue(gui, container,0.1, countItem));
-
-            GuiItem plusD5 = new GuiItem(
-                    new ItemBuilder(Material.GREEN_STAINED_GLASS_PANE)
-                            .displayname(wrapper.getLanguageManager().getSingleString(LanguageLevel.GLOBAL, "countPlus", Placeholder.parsed("value", 0.5D + "")))
-                            .build()
-            );
-            plusD5.setClickAction(e -> changeValue(gui, container,0.5, countItem));
-
-            GuiItem minusD01 = new GuiItem(
-                    new ItemBuilder(Material.RED_STAINED_GLASS_PANE)
-                            .displayname(wrapper.getLanguageManager().getSingleString(LanguageLevel.GLOBAL, "countMinus", Placeholder.parsed("value", 0.01D + "")))
-                            .build()
-            );
-            minusD01.setClickAction(e -> changeValue(gui, container,-0.01, countItem));
-
-            GuiItem minusD1 = new GuiItem(
-                    new ItemBuilder(Material.RED_STAINED_GLASS_PANE)
-                            .displayname(wrapper.getLanguageManager().getSingleString(LanguageLevel.GLOBAL, "countMinus", Placeholder.parsed("value", 0.1D + "")))
-                            .build()
-            );
-            minusD1.setClickAction(e -> changeValue(gui, container,-0.1, countItem));
-
-            GuiItem minusD5 = new GuiItem(
-                    new ItemBuilder(Material.RED_STAINED_GLASS_PANE)
-                            .displayname(wrapper.getLanguageManager().getSingleString(LanguageLevel.GLOBAL, "countMinus", Placeholder.parsed("value", 0.5D + "")))
-                            .build()
-            );
-            minusD5.setClickAction(e -> changeValue(gui, container,-0.5, countItem));
-
-            container.setItem(4,1,countItem);
-
-            container.setItem(1,2,minus100);
-            container.setItem(1,1,minus10);
-            container.setItem(1,0,minus1);
-
-            container.setItem(2,2,minusD5);
-            container.setItem(2,1,minusD1);
-            container.setItem(2,0,minusD01);
-
-            container.setItem(6,2,plusD5);
-            container.setItem(6,1,plusD1);
-            container.setItem(6,0,plusD01);
-
-            container.setItem(7,0,plus1);
-            container.setItem(7,1,plus10);
-            container.setItem(7,2,plus100);
-
-        } else {
-            container.setItem(4,1,countItem);
-
-            container.setItem(0,1,minus100);
-            container.setItem(1,1,minus10);
-            container.setItem(2,1,minus1);
-
-            container.setItem(6,1,plus1);
-            container.setItem(7,1,plus10);
-            container.setItem(8,1,plus100);
+            changeItems.put(new GuiItemLocation(2,0), -0.01);
+            changeItems.put(new GuiItemLocation(6,0), 0.01);
+            changeItems.put(new GuiItemLocation(2,1), -0.1);
+            changeItems.put(new GuiItemLocation(6,1), 0.1);
+            changeItems.put(new GuiItemLocation(2,2), -0.5);
+            changeItems.put(new GuiItemLocation(6,2), 0.5);
         }
+
+        changeItems.forEach((location, value) -> {
+            Material material = value >= 0 ? Material.GREEN_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE;
+            String langCode = value >= 0 ? "countPlus" : "countMinus";
+            TagResolver valuePlaceholder = Placeholder.unparsed("value", String.valueOf(Math.abs(value)));
+
+            GuiItem item = new GuiItem(
+                new ItemBuilder(material)
+                    .displayname(wrapper.getLanguageManager().getSingleString(LanguageLevel.GLOBAL, langCode, valuePlaceholder))
+            );
+            item.setClickAction(e -> changeValue(value));
+            container.setItem(location.getX(),location.getY(),item);
+        });
 
         container.setItem(4,0, CloseItem.get(wrapper));
         container.setItem(4,2, CloseItem.get(wrapper));
 
-        gui.addContainer(container);
-
-        gui.open(player);
+        addContainer(container);
     }
 
-    private void changeValue(KGui gui, GuiContainer container, double addValue, GuiItem countItem) {
+    private void changeValue(double addValue) {
         double newValue = Math.round((this.value + addValue) * 100.0) / 100.0;
 
         if(newValue < min) {
@@ -242,13 +160,6 @@ public class KCountGui {
         }
 
         this.value = newValue;
-
-        countItem.setItemBuilder(
-                countItem.getItemBuilder()
-                    .displayname(
-                            wrapper.getLanguageManager().getSingleString(LanguageLevel.GLOBAL, "countInfo", Placeholder.parsed("value", this.value+""))
-                    )
-        );
-        gui.update();
+        prepareGui();
     }
 }

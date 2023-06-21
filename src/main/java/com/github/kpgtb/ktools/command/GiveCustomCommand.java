@@ -18,7 +18,7 @@ package com.github.kpgtb.ktools.command;
 
 import com.github.kpgtb.ktools.manager.command.KCommand;
 import com.github.kpgtb.ktools.manager.command.annotation.Description;
-import com.github.kpgtb.ktools.manager.item.Kitem;
+import com.github.kpgtb.ktools.manager.item.KItem;
 import com.github.kpgtb.ktools.manager.language.LanguageLevel;
 import com.github.kpgtb.ktools.util.item.ItemUtil;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
@@ -39,7 +39,7 @@ public class GiveCustomCommand extends KCommand {
     }
 
     @Description("Give custom item from plugins that supports Ktools")
-    public void item(CommandSender sender, Player target, Kitem item, int amount) {
+    public void item(CommandSender sender, Player target, KItem item, int amount) {
         ItemStack result = item.getItem().clone();
         result.setAmount(amount);
 

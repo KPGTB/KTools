@@ -22,11 +22,11 @@ import org.bukkit.event.Listener;
 /**
  * Abstract class that handles process of preparing listener
  */
-public abstract class Klistener implements Listener {
+public abstract class KListener implements Listener {
 
     /**
      * Constructor of listener.
      * @param toolsObjectWrapper ToolsObjectWrapper or object that extends it.
      */
-    public Klistener(ToolsObjectWrapper toolsObjectWrapper) {}
+    public KListener(ToolsObjectWrapper toolsObjectWrapper) {}
 }

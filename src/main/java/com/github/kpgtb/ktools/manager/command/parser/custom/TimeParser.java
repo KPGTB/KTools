@@ -17,7 +17,7 @@
 package com.github.kpgtb.ktools.manager.command.parser.custom;
 
 import com.github.kpgtb.ktools.manager.command.parser.IParamParser;
-import com.github.kpgtb.ktools.util.time.Time;
+import com.github.kpgtb.ktools.util.time.KTime;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
@@ -25,19 +25,19 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.List;
 
-public class TimeParser implements IParamParser<Time> {
+public class TimeParser implements IParamParser<KTime> {
     @Override
-    public Time convert(String param, ToolsObjectWrapper wrapper) {
-        return new Time(param);
+    public KTime convert(String param, ToolsObjectWrapper wrapper) {
+        return new KTime(param);
     }
 
     @Override
     public boolean canConvert(String param, ToolsObjectWrapper wrapper) {
-        return new Time(param).getMillis() > 0;
+        return new KTime(param).getMillis() >= 0;
     }
 
     @Override
     public @NotNull List<String> complete(String arg, CommandSender sender, ToolsObjectWrapper wrapper) {
-        return Arrays.asList("XdXhXmXs");
+        return Arrays.asList("XdXhXmXs", "Current: " + new KTime(arg).format("<days> days#<hours> hours#<minutes> minutes#<seconds> seconds", true, "#", " ", "0 seconds"));
     }
 }

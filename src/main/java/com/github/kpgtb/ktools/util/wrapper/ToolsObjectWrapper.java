@@ -26,6 +26,7 @@ import com.github.kpgtb.ktools.manager.resourcepack.ResourcepackManager;
 import com.github.kpgtb.ktools.manager.ui.UiManager;
 import com.github.kpgtb.ktools.util.file.PackageUtil;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -139,4 +140,13 @@ public class ToolsObjectWrapper {
     public PackageUtil getPackageUtil() {
         return packageUtil;
     }
+
+    public String getTag() {
+        return this.packageUtil.getTag();
+    }
+
+    public FileConfiguration getConfig() {
+        return this.plugin.getConfig();
+    }
+
 }

@@ -20,5 +20,5 @@ package com.github.kpgtb.ktools.util.time.timer;
  * Action of timer interface
  */
 public interface TimerAction {
-    void run(Timer timer);
+    void run(KTimer timer);
 }

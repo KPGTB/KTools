@@ -42,7 +42,7 @@ import java.util.List;
  * Abstract class that handles process of preparing custom item
  * @since 1.3.0
  */
-public abstract class Kitem implements Listener {
+public abstract class KItem implements Listener {
     private final ToolsObjectWrapper wrapper;
     private final String fullItemTag;
     private final List<Player> deathPlayers;
@@ -52,7 +52,7 @@ public abstract class Kitem implements Listener {
      * @param wrapper Instance of ToolsObjectWrapper
      * @param fullItemTag Full item name (plugin:item)
      */
-    public Kitem(ToolsObjectWrapper wrapper, String fullItemTag) {
+    public KItem(ToolsObjectWrapper wrapper, String fullItemTag) {
         this.wrapper = wrapper;
         this.fullItemTag = fullItemTag;
         this.deathPlayers = new ArrayList<>();
@@ -104,6 +104,18 @@ public abstract class Kitem implements Listener {
      */
     public abstract ItemStack getItem();
 
+    /**
+     * Check if ItemStack is similar to item from this object
+     * @param is ItemStack to compare
+     * @return true if items are similar
+     */
+    public boolean isSimilar(ItemStack is) {
+        if(is == null || is.getType().equals(Material.AIR)) {
+            return false;
+        }
+        return this.getItem().isSimilar(is);
+    }
+
     public void onUse(PlayerInteractEvent event) {}
     public void onClick(InventoryClickEvent event, boolean cursor) {}
     public void onDrop(PlayerDropItemEvent event) {}
@@ -125,7 +137,7 @@ public abstract class Kitem implements Listener {
             return;
         }
 
-        if(is.isSimilar(this.getItem())) {
+        if(this.isSimilar(is)) {
             this.onUse(event);
         }
     }
@@ -135,14 +147,14 @@ public abstract class Kitem implements Listener {
         ItemStack clicked = event.getCurrentItem();
 
         if(clicked != null && !clicked.getType().equals(Material.AIR)) {
-            if(clicked.isSimilar(this.getItem())) {
+            if(this.isSimilar(clicked)) {
                 this.onClick(event,false);
             }
         }
 
         ItemStack cursor = event.getCursor();
         if(cursor != null && !cursor.getType().equals(Material.AIR)) {
-            if(cursor.isSimilar(this.getItem())) {
+            if(this.isSimilar(cursor)) {
                 this.onClick(event,true);
             }
         }
@@ -156,7 +168,7 @@ public abstract class Kitem implements Listener {
             return;
         }
 
-        if(is.isSimilar(this.getItem())) {
+        if(this.isSimilar(is)) {
             this.onDrop(event);
         }
     }
@@ -170,7 +182,7 @@ public abstract class Kitem implements Listener {
                 continue;
             }
 
-            if(is.isSimilar(this.getItem())) {
+            if(this.isSimilar(is)) {
                 this.deathPlayers.add(event.getEntity());
                 this.onDeath(event);
                 break;
@@ -186,7 +198,7 @@ public abstract class Kitem implements Listener {
             return;
         }
 
-        if(is.isSimilar(this.getItem())) {
+        if(this.isSimilar(is)) {
             this.onBreak(event);
         }
     }
@@ -199,7 +211,7 @@ public abstract class Kitem implements Listener {
             return;
         }
 
-        if(is.isSimilar(this.getItem())) {
+        if(this.isSimilar(is)) {
             this.onConsume(event);
         }
     }
@@ -210,7 +222,7 @@ public abstract class Kitem implements Listener {
         ItemStack newItem = inv.getItem(event.getNewSlot());
 
         if(newItem != null && !newItem.getType().equals(Material.AIR)) {
-            if(newItem.isSimilar(this.getItem())) {
+            if(this.isSimilar(newItem)) {
                 this.onHeld(event,false);
             }
         }
@@ -218,7 +230,7 @@ public abstract class Kitem implements Listener {
         ItemStack oldItem = inv.getItem(event.getPreviousSlot());
 
         if(oldItem != null && !oldItem.getType().equals(Material.AIR)) {
-            if(oldItem.isSimilar(this.getItem())) {
+            if(this.isSimilar(oldItem)) {
                 this.onHeld(event,true);
             }
         }
@@ -232,7 +244,7 @@ public abstract class Kitem implements Listener {
             return;
         }
 
-        if(is.isSimilar(this.getItem())) {
+        if(this.isSimilar(is)) {
             this.onPickup(event);
         }
     }
@@ -246,7 +258,7 @@ public abstract class Kitem implements Listener {
                 continue;
             }
 
-            if(is.isSimilar(this.getItem())) {
+            if(this.isSimilar(is)) {
                 this.onDrag(event);
                 break;
             }
@@ -265,13 +277,13 @@ public abstract class Kitem implements Listener {
         ItemStack off = inv.getItemInOffHand();
 
         if(main != null && !main.getType().equals(Material.AIR)) {
-            if(main.isSimilar(this.getItem())) {
+            if(this.isSimilar(main)) {
                 this.onDamage(event, false);
             }
         }
 
         if(off != null && !off.getType().equals(Material.AIR)) {
-            if(off.isSimilar(this.getItem())) {
+            if(this.isSimilar(off)) {
                 this.onDamage(event, true);
             }
         }
@@ -291,7 +303,7 @@ public abstract class Kitem implements Listener {
         ItemStack mainItem = event.getMainHandItem();
 
         if(mainItem != null && !mainItem.getType().equals(Material.AIR)) {
-            if(mainItem.isSimilar(this.getItem())) {
+            if(this.isSimilar(mainItem)) {
                 this.onSwap(event,false);
             }
         }
@@ -299,7 +311,7 @@ public abstract class Kitem implements Listener {
         ItemStack offItem = event.getOffHandItem();
 
         if(offItem != null && !offItem.getType().equals(Material.AIR)) {
-            if(offItem.isSimilar(this.getItem())) {
+            if(this.isSimilar(offItem)) {
                 this.onSwap(event,true);
             }
         }
