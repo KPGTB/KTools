@@ -16,6 +16,7 @@
 
 package com.github.kpgtb.ktools.manager.command;
 
+import com.github.kpgtb.ktools.manager.command.KCommand;
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.util.file.ReflectionUtil;
@@ -99,6 +100,7 @@ public class CommandManager {
 
                 KCommand command = (KCommand) clazz.getDeclaredConstructor(ToolsObjectWrapper.class, String.class)
                         .newInstance(toolsObjectWrapper, finalPath.toString());
+                command.prepareCommand();
                 commandMap.register(pluginTag, command);
 
             } catch (Exception e) {

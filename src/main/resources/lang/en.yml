@@ -1,11 +1,14 @@
 global_command:
   onlyPlayer: "<gray>>></gray> <red>This command is only for players!"
   noPermission: "<gray>>></gray> <red>You don't have permissions to use this command!"
-  helpLine: "<gray>>> /</gray><gold><command></gold> <gray>-</gray> <yellow><description>"
+  helpInfoStart: "<dark_green><st>┌─────┤</st> /<green><command> <dark_green>- <blue>Help page"
+  helpNoInfo:    "<dark_green><st>├─</st> <red>There isn't any help for you."
+  helpLine:      "<dark_green><st>├─</st> <green><command> <dark_green>- <aqua><description>"
+  helpInfoEnd:   "<dark_green><st>└─────┤</st> /<green><command> <dark_green>- <blue>Help page"
 util_command:
   givenCustomItem: "<gray>>> <yellow>You given <gold><item><gray>x<gold><amount> <yellow>to <gold><target>"
   getCustomItem: "<gray>>> <yellow>You get <gold><item><gray>x<gold><amount> <yellow>from <gold><player>"
-  reloadedMessages: "<gray>>> <green>Reloaded all messages from <dark_green><plugins> <green>hooked plugins!"
+  reloadedMessages: "<gray>>> <green>Reloaded all messages from <dark_green><plugins> <green>hooked plugin[s]!"
 gui:
   closeItem: "<red><b>CLOSE"
 pages_gui:

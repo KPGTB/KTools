@@ -16,49 +16,52 @@
 
 package com.github.kpgtb.ktools.manager.command;
 
-import com.github.kpgtb.ktools.manager.command.filter.IFilter;
+import com.github.kpgtb.ktools.manager.command.filter.FilterWrapper;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.List;
 
-/**
- * Object that stores all information about sub command
- */
-public class Subcommand {
-    private final String name;
+public class CommandInfo {
+    private final CommandPath path;
     private final String description;
-    private final ArrayList<String> permissions;
+    private final List<String> permissions;
+
     private final boolean playerRequired;
-    private final Class<? extends IFilter<?>>[] senderOrFilters;
-    private final Class<? extends IFilter<?>>[] senderAndFilters;
-    private final LinkedHashMap<String, CommandArgument> argsType;
+    private final FilterWrapper sourceFilters;
+
+    private final List<CommandArg> args;
+
+    private final Object methodInvoker;
     private final Method method;
     private final boolean endless;
     private final boolean hidden;
 
-    public Subcommand(String name, String description, ArrayList<String> permissions, boolean playerRequired, Class<? extends IFilter<?>>[] senderOrFilters, Class<? extends IFilter<?>>[] senderAndFilters, LinkedHashMap<String, CommandArgument> argsType, Method method, boolean endless, boolean hidden) {
-        this.name = name;
+    public CommandInfo(CommandPath path, String description, List<String> permissions, boolean playerRequired, FilterWrapper sourceFilters, List<CommandArg> args, Object methodInvoker, Method method, boolean endless, boolean hidden) {
+        this.path = path;
         this.description = description;
         this.permissions = permissions;
         this.playerRequired = playerRequired;
-        this.senderOrFilters = senderOrFilters;
-        this.senderAndFilters = senderAndFilters;
-        this.argsType = argsType;
+        this.sourceFilters = sourceFilters;
+        this.args = args;
+        this.methodInvoker = methodInvoker;
         this.method = method;
         this.endless = endless;
         this.hidden = hidden;
     }
 
-    public String getName() {
-        return name;
+    public Object getMethodInvoker() {
+        return methodInvoker;
+    }
+
+    public CommandPath getPath() {
+        return path;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public ArrayList<String> getPermissions() {
+    public List<String> getPermissions() {
         return permissions;
     }
 
@@ -66,8 +69,12 @@ public class Subcommand {
         return playerRequired;
     }
 
-    public LinkedHashMap<String, CommandArgument> getArgsType() {
-        return argsType;
+    public FilterWrapper getSourceFilters() {
+        return sourceFilters;
+    }
+
+    public List<CommandArg> getArgs() {
+        return args;
     }
 
     public Method getMethod() {
@@ -76,14 +83,6 @@ public class Subcommand {
 
     public boolean isEndless() {
         return endless;
-    }
-
-    public Class<? extends IFilter<?>>[] getSenderOrFilters() {
-        return senderOrFilters;
-    }
-
-    public Class<? extends IFilter<?>>[] getSenderAndFilters() {
-        return senderAndFilters;
     }
 
     public boolean isHidden() {

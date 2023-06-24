@@ -29,8 +29,12 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Description("Manage ktools")
 public class KtoolsCommand extends KCommand {
@@ -45,72 +49,38 @@ public class KtoolsCommand extends KCommand {
     @WithoutPermission
     @Description("Information about plugin")
     public void info(CommandSender sender) {
-        Component firstLine = Component.text("Some plugins on this server uses free, open-source ")
-                .color(TextColor.color(40,226,139))
-                .append(
-                        Component.text("Ktools")
-                                .color(TextColor.color(165,223,252))
-                                .decorate(TextDecoration.BOLD, TextDecoration.UNDERLINED)
-                                .clickEvent(ClickEvent.openUrl("https://www.spigotmc.org/resources/ktools.108301/"))
-                                .hoverEvent(
-                                        Component.text("Go to SpigotMC page")
-                                                .color(TextColor.color(249,213,33))
-                                )
-                );
+        MiniMessage mm = MiniMessage.miniMessage();
+        String pluginVersion = wrapper.getPlugin().getDescription().getVersion().split("-")[0];
+        List<Component> messagesToSend = new ArrayList<>();
 
-        Component secondLine = Component.text("Author of tools: ")
-                .color(TextColor.color(40,226,139))
-                .append(
-                        Component.text("KPG-TB")
-                                .color(TextColor.color(165,223,252))
-                                .decorate(TextDecoration.BOLD, TextDecoration.UNDERLINED)
-                                .clickEvent(ClickEvent.openUrl("https://kpgtb.pl/"))
-                                .hoverEvent(
-                                        Component.text("Check portfolio")
-                                                .color(TextColor.color(249,213,33))
-                                )
-                );
+        messagesToSend.add(mm.deserialize("<#28e28b>Some plugins on this server uses free, open-source <underlined><bold><#a5dffc><click:open_url:'https://www.spigotmc.org/resources/ktools.108301/'><hover:show_text:'<#f9d521>Go to SpigotMC page'>Ktools"));
+        messagesToSend.add(mm.deserialize("<#28e28b>Author of tools: <underlined><bold><#a5dffc><click:open_url:'https://kpgtb.pl/'><hover:show_text:'<#f9d521>Check portfolio'>KPG-TB"));
+        messagesToSend.add(
+                Ktools.HAS_UPDATE
+                ?
+                mm.deserialize("<#28e28b>Version of tools: <underlined><bold><#a5dffc><click:open_url:'https://www.spigotmc.org/resources/ktools.108301/'><hover:show_text:'<#ff8482>Server has outdated version of tools!'>"+pluginVersion)
+                :
+                mm.deserialize("<#28e28b>Version of tools: <underlined><bold><#a5dffc><hover:show_text:'<#caf9a1>Server has the newest version of tools!'>"+pluginVersion)
+        );
 
-        Component version = Component.text(wrapper.getPlugin().getDescription().getVersion().split("-")[0])
-                .color(TextColor.color(165,223,252))
-                .decorate(TextDecoration.BOLD, TextDecoration.UNDERLINED)
-                .hoverEvent(
-                        Component.text("Server has the newest version of tools!")
-                                .color(TextColor.color(202, 249, 161))
-                );
 
-        if(Ktools.HAS_UPDATE) {
-            version = version.hoverEvent(
-                        Component.text("Server has outdated version of tools!")
-                                .color(TextColor.color(255, 132, 130))
-                    )
-                    .clickEvent(ClickEvent.openUrl("https://www.spigotmc.org/resources/ktools.108301/"));
+        Audience audience = wrapper.getAdventure().sender(sender);
+        messagesToSend.forEach(audience::sendMessage);
+    }
+
+    public class Messages {
+        @Description("Reload all messages (Also in hooked plugins)")
+        public void reload(CommandSender sender) {
+            LanguageManager global = wrapper.getLanguageManager();
+            global.refreshMessages();
+            global.getHookedManagers().forEach(LanguageManager::refreshMessages);
+
+            Audience audience = wrapper.getAdventure().sender(sender);
+            global.getComponent(
+                    LanguageLevel.GLOBAL,
+                    "reloadedMessages",
+                    Placeholder.unparsed("plugins", String.valueOf(global.getHookedManagers().size() + 1))
+            ).forEach(audience::sendMessage);
         }
-
-        Component thirdLine = Component.text("Version of tools: ")
-                .color(TextColor.color(40,226,139))
-                .append(
-                    version
-                );
-
-        Audience audience = wrapper.getAdventure().sender(sender);
-        audience.sendMessage(firstLine);
-        audience.sendMessage(secondLine);
-        audience.sendMessage(thirdLine);
     }
-
-    @Description("Reload all messages (Also in hooked plugins)")
-    public void reloadMessages(CommandSender sender) {
-        LanguageManager global = wrapper.getLanguageManager();
-        global.refreshMessages();
-        global.getHookedManagers().forEach(LanguageManager::refreshMessages);
-
-        Audience audience = wrapper.getAdventure().sender(sender);
-        global.getComponent(
-                LanguageLevel.GLOBAL,
-                "reloadedMessages",
-                Placeholder.unparsed("plugins", String.valueOf(global.getHookedManagers().size() + 1))
-        ).forEach(audience::sendMessage);
-    }
-
 }

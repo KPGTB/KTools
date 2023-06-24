@@ -16,6 +16,7 @@
 
 package com.github.kpgtb.ktools.manager.command.filter;
 
+import com.github.kpgtb.ktools.manager.command.annotation.Filter;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
@@ -23,7 +24,7 @@ import org.bukkit.command.CommandSender;
 import java.util.List;
 
 /**
- * Filter to command's arguments. It can be used by annotation {@link com.github.kpgtb.ktools.manager.command.annotation.Filter}
+ * Filter to command's arguments. It can be used by annotation {@link Filter}
  */
 public interface IFilter<T> {
     /**

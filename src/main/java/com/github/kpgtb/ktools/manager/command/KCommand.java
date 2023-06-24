@@ -16,19 +16,19 @@
 
 package com.github.kpgtb.ktools.manager.command;
 
+import com.github.kpgtb.ktools.manager.command.annotation.*;
+import com.github.kpgtb.ktools.manager.command.filter.FilterWrapper;
 import com.github.kpgtb.ktools.manager.command.filter.IFilter;
+import com.github.kpgtb.ktools.manager.command.parser.IParamParser;
 import com.github.kpgtb.ktools.manager.command.parser.ParamParserManager;
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
-import com.github.kpgtb.ktools.manager.language.LanguageManager;
-import com.github.kpgtb.ktools.manager.command.annotation.*;
-import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.manager.language.LanguageLevel;
+import com.github.kpgtb.ktools.manager.language.LanguageManager;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -40,623 +40,551 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.lang.reflect.ParameterizedType;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
-/**
- * Abstract class that handles process of preparing command
- */
 public abstract class KCommand extends Command {
-    private final String cmdName;
-
     private final ToolsObjectWrapper wrapper;
-    private final DebugManager debug;
+    private final String groupPath;
+    private String cmdName;
+
     private final LanguageManager language;
     private final BukkitAudiences adventure;
     private final ParamParserManager parser;
 
-    private final LinkedList<Subcommand> mainCommands;
-    private final LinkedHashMap<String, Subcommand> subcommands;
+    private final File commandsFile;
+    private final YamlConfiguration commandsConf;
+    private int variantIdx = 0;
 
-    /**
-     * Constructor of command. It also handles getting information about command
-     * @param toolsObjectWrapper ToolsObjectWrapper or object that extends it.
-     * @param groupPath Path to command from commands package
-     */
-    public KCommand(ToolsObjectWrapper toolsObjectWrapper, String groupPath) {
+    private final Map<CommandPath, List<CommandInfo>> subCommands;
+
+    public KCommand(ToolsObjectWrapper wrapper, String groupPath) {
         super("");
 
-        this.wrapper = toolsObjectWrapper;
-        this.debug = toolsObjectWrapper.getDebugManager();
-        this.language = toolsObjectWrapper.getLanguageManager();
-        this.adventure = toolsObjectWrapper.getAdventure();
-        this.parser = toolsObjectWrapper.getParamParserManager();
+        this.wrapper = wrapper;
+        this.language = wrapper.getLanguageManager();
+        this.adventure = wrapper.getAdventure();
+        this.parser = wrapper.getParamParserManager();
+        this.groupPath = groupPath;
 
-        File dataFolder = toolsObjectWrapper.getPlugin().getDataFolder();
-        File commandsFile = new File(dataFolder, "commands.yml");
-        YamlConfiguration commandsConfig = YamlConfiguration.loadConfiguration(commandsFile);
+        this.commandsFile = new File(wrapper.getPlugin().getDataFolder(), "commands.yml");
+        this.commandsConf = YamlConfiguration.loadConfiguration(this.commandsFile);
 
-        cmdName = getClass().getSimpleName()
-                .toLowerCase()
-                .replace("command","");
+        this.subCommands = new LinkedHashMap<>();
+    }
 
-        commandsConfig.set(cmdName+".command", "/" + cmdName);
+    //
+    //  Creating command
+    //
 
-        String description = "";
-        Description descriptionAnnotation = getClass().getDeclaredAnnotation(Description.class);
-        if(descriptionAnnotation != null) {
-            description = descriptionAnnotation.value();
-        }
+    public final void prepareCommand() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        this.cmdName = getClass().getSimpleName().toLowerCase().replace("command", "");
+        super.setName(this.cmdName);
 
-        commandsConfig.set(cmdName+".description", description);
-
-        String[] aliases = new String[0];
-        CommandAliases commandAliases = getClass().getDeclaredAnnotation(CommandAliases.class);
-        if(commandAliases != null) {
-            aliases = commandAliases.value();
-        }
-
-        commandsConfig.set(cmdName+".aliases", aliases);
-
-        super.setName(cmdName);
+        Description descriptionAnn = getClass().getDeclaredAnnotation(Description.class);
+        String description = descriptionAnn != null ? descriptionAnn.value() : "Command created using Ktools";
         super.setDescription(description);
+
+        CommandAliases aliasesAnn = getClass().getDeclaredAnnotation(CommandAliases.class);
+        String[] aliases = aliasesAnn != null ? aliasesAnn.value() : new String[0];
         super.setAliases(Arrays.asList(aliases));
 
-        this.mainCommands = new LinkedList<>();
-        this.subcommands = new LinkedHashMap<>();
+        CustomPermission customGlobalPermissionAnn = getClass().getDeclaredAnnotation(CustomPermission.class);
+        String customGlobalPermission = customGlobalPermissionAnn != null ? customGlobalPermissionAnn.value() : null;
+        boolean globalWithoutPermission = getClass().getDeclaredAnnotation(WithoutPermission.class) != null;
 
-        String customCommandPermission = "";
-        boolean commandWithoutPermission = getClass().getDeclaredAnnotation(WithoutPermission.class) != null;
+        this.setCommandInfo("command", "/"+cmdName);
+        this.setCommandInfo("description", description);
+        this.setCommandInfo("aliases", aliases);
 
-        CustomPermission customCommandPermissionAnnotation = getClass().getDeclaredAnnotation(CustomPermission.class);
-        if(customCommandPermissionAnnotation != null) {
-            customCommandPermission = customCommandPermissionAnnotation.value();
-        }
+        scanClass(new CommandPath(), this.getClass(), this, customGlobalPermission, globalWithoutPermission);
+    }
 
-        this.debug.sendInfo(DebugType.COMMAND, "Registering command " + cmdName);
-
-        for(Method method : getClass().getDeclaredMethods()) {
+    private void scanClass(CommandPath path, Class<?> clazz, Object invoker, String customGlobalPermission, boolean globalWithoutPermission) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        for (Method method : clazz.getDeclaredMethods()) {
+            // === Check if it is command
             if(method.isSynthetic()) {
                 continue;
             }
-
-            this.debug.sendInfo(DebugType.COMMAND, "Trying method " + method.getName());
-            if(method.getAnnotation(NoCommand.class) != null) {
-                this.debug.sendInfo(DebugType.COMMAND, "This method is not a subcommand! Cancelling");
+            if(method.getDeclaredAnnotation(NoCommand.class) != null) {
                 continue;
             }
-            this.debug.sendInfo(DebugType.COMMAND, "This method is a subcommand!");
-
-            String subName = method.getName().toLowerCase();
-            String subDescription = "";
-
-            this.debug.sendInfo(DebugType.COMMAND, "Name: " + subName);
-
-            Description subcommandDescription = method.getDeclaredAnnotation(Description.class);
-            if(subcommandDescription != null) {
-                subDescription = subcommandDescription.value();
-            }
-
-            this.debug.sendInfo(DebugType.COMMAND, "Description: " + subDescription);
-
-            String customPermission = "";
-            boolean withoutPermission = method.getDeclaredAnnotation(WithoutPermission.class) != null;
-
-            CustomPermission customPermissionAnnotation = method.getDeclaredAnnotation(CustomPermission.class);
-            if(customPermissionAnnotation != null) {
-                customPermission = customPermissionAnnotation.value();
-            }
-
-            ArrayList<String> permissions = new ArrayList<>();
-            if(!withoutPermission && !commandWithoutPermission) {
-                // Method permission ex. command.admin.give.item
-                permissions.add(
-                        ("command." + groupPath + "." + cmdName + "." + subName).replace("..", ".")
-                );
-                // Command permission ex. command.admin.give.*
-                permissions.add(
-                        ("command." + groupPath + "." + cmdName + ".*").replace("..", ".")
-                );
-                // Group permission ex. command.admin.*
-                if(!groupPath.isEmpty()) {
-                    permissions.add(
-                            "command." + groupPath + ".*"
-                    );
-                }
-                // Global permission (command.*)
-                permissions.add(
-                        "command.*"
-                );
-                if(!customCommandPermission.isEmpty()) {
-                    permissions.add(
-                            customCommandPermission
-                    );
-                }
-                if(!customPermission.isEmpty()) {
-                    permissions.add(
-                            customPermission
-                    );
-                }
-            }
-
-            permissions.forEach(perm -> {
-                this.debug.sendInfo(DebugType.COMMAND, "Loaded permission: " + perm);
-            });
-
-            boolean playerRequired;
-            Class<? extends IFilter<?>>[] senderOrFilters = array();
-            Class<? extends IFilter<?>>[] senderAndFilters = array();
             if(method.getParameterCount() == 0) {
                 continue;
             }
 
-            Parameter[] parametersRaw = method.getParameters();
-            Parameter typeParam = parametersRaw[0];
-            Class<?> typeClazz = typeParam.getType();
+            // === Name & Path
+            String name = method.getName().toLowerCase();
 
-            if (Player.class.equals(typeClazz)) {
-                playerRequired = true;
-            } else if (CommandSender.class.equals(typeClazz)) {
-                playerRequired = false;
-            } else {
-                this.debug.sendWarning(DebugType.COMMAND, "This command isn't for console or player! Cancelling!");
+            CommandPath newPath = path.clone();
+            boolean mainCommand = method.getDeclaredAnnotation(MainCommand.class) != null;
+            String methodPath = mainCommand ? "" : name;
+            newPath.add(methodPath);
+            if(!this.subCommands.containsKey(newPath)) {
+                this.subCommands.put(newPath,new ArrayList<>());
+            }
+            List<CommandInfo> commands = this.subCommands.get(newPath);
+
+            // === Description
+            Description descriptionAnn = method.getDeclaredAnnotation(Description.class);
+            String description = descriptionAnn != null ? descriptionAnn.value() : "Subcommand created using Ktools";
+
+            // === Permissions
+            CustomPermission customPermissionAnn = method.getDeclaredAnnotation(CustomPermission.class);
+            String customPermission = customPermissionAnn != null ? customPermissionAnn.value() : null;
+            boolean withoutPermission = method.getDeclaredAnnotation(WithoutPermission.class) != null;
+
+            List<String> permissions = new ArrayList<>();
+            if(!withoutPermission && !globalWithoutPermission) {
+                if(mainCommand) {
+                    permissions.add(
+                            ("command."+this.groupPath+"."+this.cmdName+"."+newPath.getPermissionStr()+"."+name).replace("..", ".")
+                    );
+                } else {
+                    permissions.add(
+                            ("command." + this.groupPath + "." + this.cmdName + "." + newPath.getPermissionStr()).replace("..", ".")
+                    );
+                }
+                CommandPath permissionsPath = new CommandPath();
+                int permissionsPathMaxLength = newPath.getPath().length;
+                if(!mainCommand) {
+                    permissionsPathMaxLength--;
+                }
+                for (int i = 0; i < permissionsPathMaxLength; i++) {
+                    permissionsPath.add(newPath.getPath()[i]);
+                    permissions.add(
+                            ("command." + this.groupPath + "." + this.cmdName + "." + permissionsPath.getPermissionStr()+".*").replace("..", ".")
+                    );
+                }
+                permissions.add(
+                        ("command."+this.groupPath+"."+this.cmdName+".*").replace("..", ".")
+                );
+                if(!this.groupPath.isEmpty()) {
+                    permissions.add(
+                            ("command."+this.groupPath+".*").replace("..", ".")
+                    );
+                }
+                permissions.add("command.*");
+
+                if(customGlobalPermission != null) {
+                    permissions.add(customGlobalPermission);
+                }
+                if(customPermission != null) {
+                    permissions.add(customPermission);
+                }
+            }
+
+            // === Source
+            Parameter[] parameters = method.getParameters();
+            Parameter sourceParam = parameters[0];
+            Class<?> sourceClass = sourceParam.getType();
+
+            boolean playerRequired = Player.class.equals(sourceClass);
+            if(!playerRequired && !CommandSender.class.equals(sourceClass)) {
                 continue;
             }
 
-            Filter senderFilter = typeParam.getDeclaredAnnotation(Filter.class);
-            if(senderFilter != null) {
-                senderOrFilters = senderFilter.orFilters();
-                senderAndFilters = senderFilter.andFilters();
+            Filter sourceFiltersAnn = sourceParam.getDeclaredAnnotation(Filter.class);
+            FilterWrapper sourceFilters = null;
+            if(sourceFiltersAnn != null) {
+                sourceFilters = new FilterWrapper(sourceFiltersAnn);
             }
 
-            this.debug.sendInfo(DebugType.COMMAND, "This command is only for player: " + (playerRequired ? "yes" : "no"));
-
-            LinkedHashMap<String, CommandArgument> parameters = new LinkedHashMap<>();
-            for (int i = 1; i < parametersRaw.length; i++) {
-                this.debug.sendInfo(DebugType.COMMAND, "Loaded parameter " + parametersRaw[i].getName() + " with type " + parametersRaw[i].getType().getSimpleName());
-                Parameter param = parametersRaw[i];
+            // === Arguments
+            List<CommandArg> args = new LinkedList<>();
+            for (int i = 1; i < parameters.length; i++) {
+                Parameter param = parameters[i];
 
                 String paramName = param.getName();
                 Class<?> paramClass = param.getType();
-                Class<? extends IFilter<?>>[] paramOrFilters = array();
-                Class<? extends IFilter<?>>[] paramAndFilters = array();
 
-                Filter paramFilter = param.getDeclaredAnnotation(Filter.class);
-                if(paramFilter != null) {
-                    paramOrFilters = paramFilter.orFilters();
-                    paramAndFilters = paramFilter.andFilters();
+                Filter paramFiltersAnn = param.getDeclaredAnnotation(Filter.class);
+                FilterWrapper filters = null;
+                if(paramFiltersAnn != null) {
+                    filters = new FilterWrapper(paramFiltersAnn);
                 }
 
-                CommandArgument argument = new CommandArgument(paramName, paramClass, paramOrFilters, paramAndFilters);
-                parameters.put(paramName, argument);
+                Parser customParserAnn = param.getDeclaredAnnotation(Parser.class);
+                Class<? extends IParamParser<?>> customParser = null;
+                if(customParserAnn != null) {
+                    customParser = customParserAnn.value();
+                }
+
+                CommandArg arg = new CommandArg(paramName,paramClass, customParser, filters);
+                args.add(arg);
             }
 
+            // === Endless
             boolean endless = false;
-
-            if(!parameters.isEmpty()) {
-                Parameter lastParameter = parametersRaw[parametersRaw.length - 1];
-                if(lastParameter.getType().equals(String.class) &&
-                        lastParameter.getDeclaredAnnotation(LongString.class) != null) {
+            if(!args.isEmpty()) {
+                Parameter lastParam = parameters[parameters.length-1];
+                if(lastParam.getType().equals(String.class) &&
+                lastParam.getDeclaredAnnotation(LongString.class) != null) {
                     endless = true;
+                    String paramName = lastParam.getName();
+                    String newParamName = "[" + paramName + "]";
+                    args.get(args.size()-1).setName(newParamName);
                 }
             }
 
-            this.debug.sendInfo(DebugType.COMMAND, "This command is endless: " + (endless ? "yes" : "no"));
-
-            boolean isMain = method.getDeclaredAnnotation(MainCommand.class) != null;
-
-            StringBuilder cmdString = new StringBuilder("/" + cmdName);
-            if(!isMain) {
-                cmdString.append(" ")
-                        .append(subName);
-            }
-            AtomicInteger i = new AtomicInteger(1);
-            boolean finalEndless = endless;
-            parameters.forEach((argName, argsType) -> {
-                String start = "<";
-                String end = ">";
-                if(finalEndless && i.get() == parameters.size()) {
-                    start = "[<";
-                    end = ">]";
-                }
-                i.getAndIncrement();
-                cmdString
-                        .append(" ")
-                        .append(start)
-                        .append(argName)
-                        .append(end);
-            });
-
-
+            // === Hidden
             boolean hidden = method.getDeclaredAnnotation(Hidden.class) != null;
-            this.debug.sendInfo(DebugType.COMMAND, "This command is hidden: " + ((hidden) ? "yes" : "no"));
 
-            commandsConfig.set(cmdName+".variants."+subName+".command", cmdString.toString());
-            commandsConfig.set(cmdName+".variants."+subName+".description", subDescription);
-            commandsConfig.set(cmdName+".variants."+subName+".permissions", permissions);
-            commandsConfig.set(cmdName+".variants."+subName+".onlyPlayer", playerRequired);
-            commandsConfig.set(cmdName+".variants."+subName+".hidden", hidden);
+            // === Save
+            CommandInfo info = new CommandInfo(newPath,description,permissions,playerRequired,sourceFilters,args, invoker, method,endless,hidden);
+            commands.add(info);
 
-            Subcommand subcommand = new Subcommand(subName, subDescription, permissions,playerRequired, senderOrFilters, senderAndFilters, parameters,method, endless, hidden);
-            if(isMain) {
-                this.debug.sendInfo(DebugType.COMMAND, "This command is main command!");
-                this.mainCommands.add(subcommand);
-                continue;
-            }
-            this.debug.sendInfo(DebugType.COMMAND, "This command is sub command!");
-            subcommands.put(subName, subcommand);
+            String variantName = mainCommand ? newPath.getPermissionStr() + "." + name : newPath.getPermissionStr();
+            setVariantInfo(variantName, "command", getCommandStr(info));
+            setVariantInfo(variantName, "description", description);
+            setVariantInfo(variantName, "permissions", permissions);
+            setVariantInfo(variantName, "onlyPlayer", playerRequired);
+            setVariantInfo(variantName, "hidden", hidden);
+            this.variantIdx++;
         }
-        try {
-            commandsConfig.save(commandsFile);
-        } catch (IOException e) {
-            this.debug.sendWarning(DebugType.COMMAND, "Error while saving commands list");
+
+        // === Scan another classes
+        for (Class<?> c : clazz.getDeclaredClasses()) {
+            CommandPath newPath = path.clone();
+            newPath.add(c.getSimpleName().toLowerCase());
+
+            scanClass(
+                newPath,
+                c,
+                c.getDeclaredConstructor(clazz).newInstance(invoker),
+                customGlobalPermission,
+                globalWithoutPermission
+            );
         }
-        this.debug.sendInfo(DebugType.COMMAND, "Registered command " + cmdName);
+
+        saveCommandsFile();
     }
 
+    //
+    //  Overrides
+    //
+
     @Override
-    public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
-        Audience audience = adventure.sender(sender);
-        if(args.length == 0) {
-            boolean found = false;
-            for (Subcommand mainCommand : mainCommands) {
-                if(!mainCommand.getArgsType().isEmpty()) {
-                    continue;
-                }
-                if(mainCommand.isPlayerRequired() && (!(sender instanceof Player))) {
-                    found = true;
-                    continue;
-                }
-                if(!hasPermission(sender,mainCommand)) {
-                    language.getComponent(LanguageLevel.GLOBAL, "noPermission").forEach(audience::sendMessage);
-                    return false;
-                }
-                if(!passFilters(mainCommand.getSenderOrFilters(), mainCommand.getSenderAndFilters(), sender,sender)) {
-                    sendFilterMessages(mainCommand.getSenderOrFilters(), mainCommand.getSenderAndFilters(), sender,sender,audience);
-                    return false;
-                }
-                try {
-                    mainCommand.getMethod().invoke(this, sender);
-                    return true;
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    this.debug.sendWarning(DebugType.COMMAND, "Error while invoking main command");
-                    throw new RuntimeException(e);
+    public final boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
+        Audience audience = this.adventure.sender(sender);
+        List<CommandPath> possiblePaths = new ArrayList<>();
+
+        this.subCommands.keySet().forEach(path -> {
+            String[] pathArr = path.getPath();
+            if(args.length < pathArr.length) {
+                return;
+            }
+            for (int i = 0; i < pathArr.length; i++) {
+                if(!args[i].equalsIgnoreCase(pathArr[i])) {
+                    return;
                 }
             }
-
-            if(found) {
-                language.getComponent(LanguageLevel.GLOBAL, "onlyPlayer").forEach(audience::sendMessage);
-                return false;
-            }
-
-            sendHelp(sender);
-            return false;
-        }
-
-        ArrayList<Subcommand> possibleSubcommands = new ArrayList<>();
-        subcommands.forEach((name, subcommand) -> {
-            if(args[0].equalsIgnoreCase(name)) {
-                possibleSubcommands.add(subcommand);
-            }
+            possiblePaths.add(path);
         });
-        possibleSubcommands.addAll(mainCommands);
 
         boolean found = false;
-        CommandArgument notPassArg = null;
+        CommandArg notPassArg = null;
         Object notPassObj = null;
 
-        for(Subcommand subcommand : possibleSubcommands) {
+        for (CommandPath path : possiblePaths) {
+            List<CommandInfo> commands = this.subCommands.get(path);
+            List<String> fixedArgs = new LinkedList<>(Arrays.asList(args).subList(path.getPath().length, args.length));
 
-            ArrayList<CommandArgument> subCommandArgs = new ArrayList<>(subcommand.getArgsType().values());
-            ArrayList<Class<?>> subCommandClasses = new ArrayList<>();
-            subCommandArgs.forEach(arg -> {
-                subCommandClasses.add(arg.getClazz());
-            });
-            ArrayList<String> fixedArgs = new ArrayList<>(Arrays.asList(args));
-            if(subcommand.getName().equalsIgnoreCase(args[0])) {
-                fixedArgs.remove(0);
-            }
+            for (CommandInfo command : commands) {
+                if(!command.isEndless() && command.getArgs().size() != fixedArgs.size()) {
+                    continue;
+                }
+                if(command.isEndless() && command.getArgs().size() > fixedArgs.size()) {
+                    continue;
+                }
 
-            if(!subcommand.isEndless() && fixedArgs.size() != subCommandArgs.size()) {
-                continue;
-            }
+                boolean correctTypes = true;
+                for (int i = 0; i < command.getArgs().size(); i++) {
+                    if(command.isEndless() && command.getArgs().size() == i+1) {
+                        break;
+                    }
+                    CommandArg arg = command.getArgs().get(i);
 
-            if(subcommand.isEndless() && fixedArgs.size() < subCommandArgs.size()) {
-                continue;
-            }
-
-            boolean isIt = true;
-            int i = 0;
-            for(Class<?> expectedClass : subCommandClasses) {
-                if(subcommand.isEndless()) {
-                    if(subCommandArgs.size() == (i+1)) {
-                        if (expectedClass.equals(String.class)) {
+                    if(arg.hasCustomParser()) {
+                        if(!arg.getCustomParser().canConvert(fixedArgs.get(i), wrapper)) {
+                            correctTypes = false;
+                            break;
+                        }
+                    } else {
+                        if(!parser.canConvert(fixedArgs.get(i), arg.getClazz(), wrapper)) {
+                            correctTypes = false;
                             break;
                         }
                     }
+
                 }
-                if(!parser.canConvert(fixedArgs.get(i), expectedClass,wrapper)) {
-                    isIt = false;
-                    break;
+                if(!correctTypes) {
+                    continue;
                 }
-                i++;
-            }
 
-            if(!isIt) {
-                continue;
-            }
+                if(command.isPlayerRequired() && !(sender instanceof Player)) {
+                    found = true;
+                    continue;
+                }
 
-            if(subcommand.isPlayerRequired() && (!(sender instanceof Player))) {
-                found = true;
-                continue;
-            }
+                if(!hasPermission(sender,command)) {
+                    language.getComponent(LanguageLevel.GLOBAL, "noPermission").forEach(audience::sendMessage);
+                    return false;
+                }
 
-            if(!hasPermission(sender,subcommand)) {
-                language.getComponent(LanguageLevel.GLOBAL, "noPermission").forEach(audience::sendMessage);
-                return false;
-            }
-
-            Object[] commandArgs = new Object[subCommandArgs.size() + 1];
-            commandArgs[0] = sender;
-            for (int j = 1; j < commandArgs.length; j++) {
-                int fixedJ = j - 1;
-                if(subcommand.isEndless()) {
-                    if(commandArgs.length == (j+1)) {
-                        StringBuilder stringBuilder = new StringBuilder(fixedArgs.get(fixedJ));
+                Object[] finalArgs = new Object[command.getArgs().size() + 1];
+                finalArgs[0] = sender;
+                for (int i = 1; i < finalArgs.length; i++) {
+                    int j = i-1;
+                    if(command.isEndless() && finalArgs.length == i+1) {
+                        List<String> longStr = new ArrayList<>();
                         for (int k = j; k < fixedArgs.size(); k++) {
-                            stringBuilder
-                                .append(" ")
-                                .append(fixedArgs.get(k));
+                            longStr.add(fixedArgs.get(k));
                         }
-                        commandArgs[j] = stringBuilder.toString();
+                        finalArgs[i] = String.join(" ", longStr);
+                        break;
+                    }
+                    CommandArg arg = command.getArgs().get(j);
+                    if(arg.hasCustomParser()) {
+                        finalArgs[i] = arg.getCustomParser().convert(fixedArgs.get(j), wrapper);
+                    } else {
+                        finalArgs[i] = parser.convert(fixedArgs.get(j), arg.getClazz(), wrapper);
+                    }
+
+                }
+
+                boolean passSourceFilters = passFilters(command.getSourceFilters(), sender,sender);
+                if(!passSourceFilters) {
+                    found = true;
+                    notPassArg = new CommandArg("",null, null, command.getSourceFilters());
+                    notPassObj = sender;
+                    continue;
+                }
+
+                boolean passArgsFilters = true;
+                for (int j = 1; j < finalArgs.length; j++) {
+                    CommandArg arg = command.getArgs().get(j-1);
+                    passArgsFilters = passFilters(arg.getFilters(), finalArgs[j],sender);
+                    if(!passArgsFilters) {
+                        found = true;
+                        notPassArg = arg;
+                        notPassObj = finalArgs[j];
                         break;
                     }
                 }
-                commandArgs[j] = parser.convert(fixedArgs.get(fixedJ), subCommandArgs.get(fixedJ).getClazz(),wrapper);
-            }
 
-            boolean passSenderFilters = passFilters(subcommand.getSenderOrFilters(), subcommand.getSenderAndFilters(), sender,sender);
-            if(!passSenderFilters) {
-                found = true;
-                notPassArg = new CommandArgument("",null,subcommand.getSenderOrFilters(), subcommand.getSenderAndFilters());
-                notPassObj = sender;
-                continue;
-            }
-            boolean passArgsFilters = true;
-
-            for (int i1 = 1; i1 < commandArgs.length; i1++) {
-                passArgsFilters = passFilters(subCommandArgs.get((i1-1)), commandArgs[i1],sender);
                 if(!passArgsFilters) {
-                    found = true;
-                    notPassArg = subCommandArgs.get((i1-1));
-                    notPassObj = commandArgs[i1];
-                    break;
+                    continue;
                 }
-            }
 
-            if(!passArgsFilters) {
-                continue;
-            }
-
-            try {
-                subcommand.getMethod().invoke(this, commandArgs);
-                return true;
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                throw new RuntimeException(e);
+                try {
+                    command.getMethod().invoke(command.getMethodInvoker(), finalArgs);
+                    return true;
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
 
         if(found) {
             if(notPassArg != null && notPassObj != null) {
-                sendFilterMessages(notPassArg, notPassObj, sender,audience);
+                sendFilterMessages(notPassArg.getFilters(), notPassObj, sender,audience);
                 return false;
             }
             language.getComponent(LanguageLevel.GLOBAL, "onlyPlayer").forEach(audience::sendMessage);
             return false;
         }
         sendHelp(sender);
-        return false;
-    }
-
-    /**
-     * Method that handles sending help info to sender. It can be overridden
-     * @param sender Instance of CommandSender
-     */
-    protected void sendHelp(CommandSender sender) {
-        Audience audience = this.adventure.sender(sender);
-
-        HashMap<String, Subcommand> commands = new HashMap<>();
-        for (int i = 0; i < mainCommands.size(); i++) {
-            String key = "mcmd_" + i;
-            commands.put(key,mainCommands.get(i));
-        }
-        commands.putAll(subcommands);
-
-        ArrayList<Component> toSend = new ArrayList<>();
-
-        commands.forEach((subName, command) -> {
-            if(!hasPermission(sender,command)) {
-                return;
-            }
-            if(command.isHidden()) {
-                return;
-            }
-
-            StringBuilder cmdLine = subName.startsWith("mcmd_") ? new StringBuilder(cmdName + " ") : new StringBuilder(cmdName + " " + subName + " ");
-            AtomicInteger i = new AtomicInteger(1);
-            command.getArgsType().forEach((argName, argsType) -> {
-                String start = "<";
-                String end = ">";
-                if(command.isEndless() && i.get() == command.getArgsType().size()) {
-                    start = "[<";
-                    end = ">]";
-                }
-                i.getAndIncrement();
-                cmdLine
-                        .append(start)
-                        .append(argName)
-                        .append(end)
-                        .append(" ");
-            });
-            cmdLine.deleteCharAt(cmdLine.length() - 1);
-            ArrayList<TagResolver> placeholders = new ArrayList<>();
-            placeholders.add(Placeholder.parsed("command", cmdLine.toString()));
-            placeholders.add(Placeholder.parsed("description", command.getDescription()));
-            toSend.addAll(language.getComponent(LanguageLevel.GLOBAL, "helpLine", placeholders.toArray(new TagResolver[0])));
-        });
-
-        if(toSend.size() > 0) {
-            toSend.add(0,Component.text(" "));
-            toSend.add(Component.text(" "));
-        }
-
-        toSend.forEach(audience::sendMessage);
+        return true;
     }
 
     @NotNull
     @Override
-    public List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) throws IllegalArgumentException {
-        ArrayList<String> result = new ArrayList<>();
+    public final List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) throws IllegalArgumentException {
+        List<String> result = new LinkedList<>();
+        if(args.length == 0) return result;
 
-        if(args.length == 0) {
-            return result;
-        }
-
-        int lastArgIdx = args.length - 1;
-        String lastArg = args[lastArgIdx];
-
-        if(args.length == 1) {
-            result.addAll(
-                    subcommands.values()
-                        .stream()
-                        .filter(cmd -> hasPermission(sender,cmd))
-                        .filter(cmd -> !cmd.isHidden())
-                        .map(Subcommand::getName)
-                        .filter(s -> s.startsWith(lastArg))
-                        .collect(Collectors.toList())
-            );
-
-            mainCommands.forEach(cmd -> {
-                if(cmd.getArgsType().isEmpty()) {
+        this.subCommands.forEach((path, commands) -> {
+            commands.forEach(command -> {
+                if(!hasPermission(sender,command)) {
                     return;
                 }
-                if(!hasPermission(sender,cmd)) {
+                if(command.isHidden()) {
                     return;
                 }
-                if(cmd.isHidden()) {
+                if(command.isPlayerRequired() && !(sender instanceof Player)) {
                     return;
                 }
-                Optional<CommandArgument> clazz = cmd.getArgsType().values().stream().findFirst();
-                if(!clazz.isPresent()) {
+                if(args.length > command.getArgs().size() + path.getPath().length && !command.isEndless()) {
                     return;
                 }
 
-                List<String> complete = parser.complete(lastArg,sender,clazz.get().getClazz(),wrapper);
-                result.add("<" + clazz.get().getName() + ">");
-                result.addAll(getCompleterThatPass(complete,clazz.get(),sender));
+                boolean correctPath = true;
+                boolean inPath = false;
+                for (int i = 0; i < path.getPath().length; i++) {
+                    if(i < args.length-1) {
+                        if(!args[i].equalsIgnoreCase(path.getPath()[i])) {
+                            correctPath = false;
+                            break;
+                        }
+                    }
+                    if(i == args.length-1) {
+                        inPath = true;
+                        String resultPath = path.getPath()[i];
+                        if(resultPath.startsWith(args[args.length-1])) {
+                            result.add(path.getPath()[i]);
+                        }
+                        break;
+                    }
+                }
+
+                if(!correctPath) {
+                    return;
+                }
+
+                if(inPath) {
+                    return;
+                }
+
+                List<String> fixedArgs = new ArrayList<>(Arrays.asList(args).subList(path.getPath().length, args.length));
+
+                boolean correctTypes = true;
+                for (int i = 0; i < Math.min(fixedArgs.size()-1, command.getArgs().size()-1); i++) {
+                    CommandArg arg = command.getArgs().get(i);
+                    if(arg.hasCustomParser()) {
+                        if (!arg.getCustomParser().canConvert(fixedArgs.get(i), wrapper)) {
+                            correctTypes = false;
+                            break;
+                        }
+                    } else {
+                        if (!parser.canConvert(fixedArgs.get(i), arg.getClazz(), wrapper)) {
+                            correctTypes = false;
+                            break;
+                        }
+                    }
+                }
+
+                if(!correctTypes) {
+                    return;
+                }
+
+                CommandArg finalArg = command.isEndless() ? command.getArgs().get(command.getArgs().size()-1) : null;
+                if(fixedArgs.size() <= command.getArgs().size()) {
+                    finalArg = command.getArgs().get(fixedArgs.size()-1);
+                }
+                if(finalArg == null) {
+                    return;
+                }
+                List<String> complete;
+                if(finalArg.hasCustomParser()) {
+                    complete = finalArg.getCustomParser().complete(args[args.length-1],sender,wrapper);
+                } else {
+                    complete = parser.complete(args[args.length-1],sender,finalArg.getClazz(),wrapper);;
+                }
+                result.add("<"+finalArg.getName()+">");
+                result.addAll(getCompleterThatPass(complete,finalArg,sender));
             });
-
-            return result;
-        }
-
-        HashMap<String, Subcommand> commands = new HashMap<>();
-        for (int i = 0; i < mainCommands.size(); i++) {
-            String key = "mcmd_" + i;
-            commands.put(key,mainCommands.get(i));
-        }
-        commands.putAll(subcommands);
-
-        commands.forEach((subName, cmd) -> {
-            if(!hasPermission(sender,cmd)) {
-                return;
-            }
-            if(cmd.isHidden()) {
-                return;
-            }
-            boolean mainCmd = subName.startsWith("mcmd_");
-
-            List<String> trueArgs = Arrays.stream(args).collect(Collectors.toList());
-            if(!mainCmd) {
-                if(!subName.equalsIgnoreCase(args[0])) {
-                    return;
-                }
-                trueArgs.remove(0);
-            }
-            int trueLastIdx = trueArgs.size() -1;
-
-            if(cmd.getArgsType().size() >= trueArgs.size()) {
-                boolean isIt = true;
-                for (int i = 0; i < trueLastIdx; i++) {
-                    CommandArgument argument = (CommandArgument) cmd.getArgsType().values().toArray()[i];
-                    Class<?> clazz = argument.getClazz();
-                    if(!parser.canConvert(trueArgs.get(i), clazz,wrapper)) {
-                        isIt = false;
-                        break;
-                    }
-                }
-                if(!isIt) {
-                    return;
-                }
-                CommandArgument argument = (CommandArgument) cmd.getArgsType().values().toArray()[trueLastIdx];
-                Class<?> clazz = argument.getClazz();
-                List<String> complete = parser.complete(lastArg,sender,clazz,wrapper);
-                result.add("<" + argument.getName() + ">");
-                result.addAll(getCompleterThatPass(complete,argument,sender));
-            } else {
-                if(!cmd.isEndless()) {
-                    return;
-                }
-
-                boolean isIt = true;
-                for (int i = 0; i < cmd.getArgsType().size(); i++) {
-                    CommandArgument argument = (CommandArgument) cmd.getArgsType().values().toArray()[i];
-                    Class<?> clazz = argument.getClazz();
-                    if(!parser.canConvert(trueArgs.get(i), clazz,wrapper)) {
-                        isIt = false;
-                        break;
-                    }
-                }
-                if(!isIt) {
-                    return;
-                }
-                CommandArgument argument = (CommandArgument) cmd.getArgsType().values().toArray()[cmd.getArgsType().size() - 1];
-                result.add("[<" + argument.getName() + ">]");
-            }
         });
 
         return result;
     }
 
-    /**
-     * Check if sender has permissions to use command
-     * @param sender Command sender
-     * @param command Instance of Subcommand object
-     * @return true if it has one of required permissions
-     */
-    protected boolean hasPermission(CommandSender sender, Subcommand command) {
-        boolean hasPermission = command.getPermissions().isEmpty();
-        for(String perm : command.getPermissions()) {
-            if(sender.hasPermission(perm)) {
-                hasPermission = true;
-                break;
-            }
+    //
+    // Help Command
+    //
+
+    public void sendHelp(CommandSender sender) {
+        Audience audience = adventure.sender(sender);
+        List<Component> componentsToSend = new LinkedList<>();
+
+        subCommands.forEach((path, commands) -> {
+            commands.forEach(command -> {
+                if(!hasPermission(sender,command)) {
+                    return;
+                }
+                if(command.isHidden()) {
+                    return;
+                }
+                if(command.isPlayerRequired() && !(sender instanceof Player)) {
+                    return;
+                }
+
+                componentsToSend.addAll(wrapper.getLanguageManager().getComponent(
+                        LanguageLevel.PLUGIN,
+                        "helpLine",
+                        Placeholder.parsed("command", getCommandStr(command)),
+                        Placeholder.unparsed("description", command.getDescription())
+                ));
+            });
+        });
+
+        if(componentsToSend.isEmpty()) {
+            componentsToSend.addAll(language.getComponent(LanguageLevel.PLUGIN, "helpNoInfo"));
         }
-        return hasPermission;
+
+        componentsToSend.addAll(0,language.getComponent(LanguageLevel.PLUGIN, "helpInfoStart", Placeholder.parsed("command", cmdName)));
+        componentsToSend.add(0, Component.text(" "));
+
+        componentsToSend.addAll(language.getComponent(LanguageLevel.PLUGIN, "helpInfoEnd", Placeholder.parsed("command", cmdName)));
+        componentsToSend.add( Component.text(" "));
+
+        componentsToSend.forEach(audience::sendMessage);
     }
 
-    /**
-     * Check if obj pass filters
-     * @param orFilterClasses Or filters
-     * @param andFilterClasses And filters
-     * @param obj Object that should pass the test
-     * @return true if object pass tests
-     */
+    //
+    // Utilities
+    //
+
+    private String getCommandStr(CommandInfo command) {
+        CommandPath path = command.getPath();
+        StringBuilder cmdStr = new StringBuilder("/");
+        cmdStr.append(this.cmdName);
+        if(path.getPath().length > 0) {
+            cmdStr
+                    .append(" ")
+                    .append(path.getPathStr());
+        }
+
+        command.getArgs().forEach(arg -> {
+            cmdStr.append(" ")
+                    .append("<")
+                    .append(arg.getName())
+                    .append(">");
+        });
+        return cmdStr.toString();
+    }
+
+    private List<String> getCompleterThatPass(List<String> complete, CommandArg arg, CommandSender sender) {
+        List<String> result = new ArrayList<>();
+        complete.forEach(s -> {
+            Object obj;
+            if(arg.hasCustomParser()) {
+                obj = arg.getCustomParser().convert(s, wrapper);;
+            } else {
+                obj = parser.convert(s, arg.getClazz(), wrapper);;
+            }
+            if(passFilters(arg.getFilters(),obj,sender)) {
+                result.add(s);
+            }
+        });
+        return result;
+    }
+
+    private boolean hasPermission(CommandSender sender, CommandInfo command) {
+        for (String permission : command.getPermissions()) {
+            if(sender.hasPermission(permission)) {
+                return true;
+            }
+        }
+        return command.getPermissions().isEmpty();
+    }
+
     @SuppressWarnings("unchecked")
-    protected <T> boolean passFilters(Class<? extends IFilter<?>>[] orFilterClasses, Class<? extends IFilter<?>>[] andFilterClasses, T obj, CommandSender sender){
-        IFilter<T>[] orFilters = (IFilter<T>[]) convertFilterClassesToArray(orFilterClasses, obj.getClass());
-        IFilter<T>[] andFilters = (IFilter<T>[]) convertFilterClassesToArray(andFilterClasses, obj.getClass());
+    private <T> boolean passFilters(FilterWrapper filters, T obj, CommandSender sender) {
+        if(filters == null) {
+            return true;
+        }
+        IFilter<T>[] orFilters = (IFilter<T>[]) filters.getOrFilters(obj.getClass());
+        IFilter<T>[] andFilters = (IFilter<T>[]) filters.getAndFilters(obj.getClass());
 
         boolean passOr = true;
         boolean passAnd = true;
@@ -678,27 +606,16 @@ public abstract class KCommand extends Command {
         return passOr && passAnd;
     }
 
-
-    /**
-     * Check if obj pass filters
-     * @param argument Instance of CommandArgument
-     * @param obj Object that should pass the test
-     * @return true if object pass tests
-     */
-    protected <T> boolean passFilters(CommandArgument argument, T obj, CommandSender sender){
-        Class<? extends IFilter<?>>[] orFilterClasses = argument.getOrFilters();
-        Class<? extends IFilter<?>>[] andFilterClasses = argument.getAndFilters();
-
-        return passFilters(orFilterClasses,andFilterClasses,obj, sender);
-    }
-
     @SuppressWarnings("unchecked")
-    protected <T> void sendFilterMessages(Class<? extends IFilter<?>>[] orFilterClasses, Class<? extends IFilter<?>>[] andFilterClasses, T obj, CommandSender sender, Audience audience) {
+    private <T> void sendFilterMessages(FilterWrapper filters, T obj, CommandSender sender, Audience audience) {
+        if(filters == null) {
+            return;
+        }
         List<Component> message = new ArrayList<>();
         int lastWeight = -1;
 
-        IFilter<T>[] orFilters = (IFilter<T>[]) convertFilterClassesToArray(orFilterClasses, obj.getClass());
-        IFilter<T>[] andFilters = (IFilter<T>[]) convertFilterClassesToArray(andFilterClasses, obj.getClass());
+        IFilter<T>[] orFilters = (IFilter<T>[]) filters.getOrFilters(obj.getClass());
+        IFilter<T>[] andFilters = (IFilter<T>[]) filters.getAndFilters(obj.getClass());
 
         boolean passOr = false;
 
@@ -730,50 +647,19 @@ public abstract class KCommand extends Command {
         message.forEach(audience::sendMessage);
     }
 
-    protected <T> void sendFilterMessages(CommandArgument argument, T obj, CommandSender sender, Audience audience) {
-        Class<? extends IFilter<?>>[] orFilterClasses = argument.getOrFilters();
-        Class<? extends IFilter<?>>[] andFilterClasses = argument.getAndFilters();
-
-       sendFilterMessages(orFilterClasses,andFilterClasses,obj,sender,audience);
+    private void setCommandInfo(String key, Object value) {
+        this.commandsConf.set(this.cmdName+"."+key, value);
     }
 
-    protected List<String> getCompleterThatPass(List<String> complete, CommandArgument argument, CommandSender sender) {
-        List<String> result = new ArrayList<>();
-        complete.forEach(s -> {
-            Object obj = parser.convert(s, argument.getClazz(), wrapper);
-            if(passFilters(argument,obj,sender)) {
-                result.add(s);
-            }
-        });
-        return result;
+    private void setVariantInfo(String variant, String key, Object value) {
+        this.setCommandInfo("variants."+variantIdx+"_"+variant.replace(".", "_")+"."+key, value);
     }
 
-    @SuppressWarnings("unchecked")
-    private <T> IFilter<T>[] convertFilterClassesToArray(Class<? extends IFilter<?>>[] filters, Class<T> expected) {
-        return Arrays.stream(filters)
-                .filter(clazz -> {
-                    if(clazz.getGenericInterfaces().length == 0) {
-                        return false;
-                    }
-                    ParameterizedType type = (ParameterizedType) clazz.getGenericInterfaces()[0];
-                    if(type.getActualTypeArguments().length == 0) {
-                        return false;
-                    }
-                    Class<T> typeArgClazz = (Class<T>) type.getActualTypeArguments()[0];
-                    return typeArgClazz.isAssignableFrom(expected);
-                })
-                .map(clazz -> {
-                    try {
-                        return clazz.newInstance();
-                    } catch (Exception e) {
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .toArray(IFilter[]::new);
-    }
-
-    private <T> T[] array(T... arr) {
-        return arr;
+    private void saveCommandsFile() {
+        try {
+            this.commandsConf.save(this.commandsFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
