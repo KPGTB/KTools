@@ -43,7 +43,7 @@ public class CloseItem {
               .displayname(wrapper.getLanguageManager().getSingleString(LanguageLevel.GLOBAL, "closeItem"))
               .build()
         );
-        result.setClickAction(e -> e.getWhoClicked().closeInventory());
+        result.setClickAction((e,place) -> e.getWhoClicked().closeInventory());
         return result;
     }
 }

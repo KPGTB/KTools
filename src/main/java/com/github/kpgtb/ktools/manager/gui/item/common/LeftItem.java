@@ -44,7 +44,7 @@ public class LeftItem {
               .displayname(wrapper.getLanguageManager().getSingleString(LanguageLevel.GLOBAL, "pagesLeft"))
               .build()
         );
-        result.setClickAction(e -> pagedGuiContainer.previousPage());
+        result.setClickAction((e,place) -> pagedGuiContainer.previousPage());
         return result;
     }
 }

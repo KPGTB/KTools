@@ -103,7 +103,7 @@ public class KCountGui extends KGui{
                         )
                         .build()
         );
-        countItem.setClickAction(e -> {
+        countItem.setClickAction((e,place) -> {
             this.responsed = true;
             this.response.response(this.value);
             if(this.lastGui != null) {
@@ -139,7 +139,7 @@ public class KCountGui extends KGui{
                 new ItemBuilder(material)
                     .displayname(wrapper.getLanguageManager().getSingleString(LanguageLevel.GLOBAL, langCode, valuePlaceholder))
             );
-            item.setClickAction(e -> changeValue(value));
+            item.setClickAction((e,place) -> changeValue(value));
             container.setItem(location.getX(),location.getY(),item);
         });
 

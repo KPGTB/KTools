@@ -44,7 +44,7 @@ public class RightItem {
               .displayname(wrapper.getLanguageManager().getSingleString(LanguageLevel.GLOBAL, "pagesRight"))
               .build()
         );
-        result.setClickAction(e -> pagedGuiContainer.nextPage());
+        result.setClickAction((e,place) -> pagedGuiContainer.nextPage());
         return result;
     }
 }
