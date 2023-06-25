@@ -17,43 +17,32 @@
 package com.github.kpgtb.ktools.listener;
 
 import com.github.kpgtb.ktools.manager.listener.KListener;
-import com.github.kpgtb.ktools.manager.ui.UiManager;
 import com.github.kpgtb.ktools.manager.ui.bar.BarManager;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.entity.EntityAirChangeEvent;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.UUID;
-
-/**
- * QuitListener handles removing ui from player when they leave the server
- */
-public class QuitListener extends KListener {
-    private final UiManager uiManager;
+public class ModeChangeListener extends KListener {
     private final BarManager barManager;
+    private final JavaPlugin plugin;
 
-    /**
-     * Constructor of listener.
-     *
-     * @param toolsObjectWrapper ToolsObjectWrapper or object that extends it.
-     */
-    public QuitListener(ToolsObjectWrapper toolsObjectWrapper) {
+    public ModeChangeListener(ToolsObjectWrapper toolsObjectWrapper) {
         super(toolsObjectWrapper);
-        this.uiManager = toolsObjectWrapper.getUiManager();
         this.barManager = toolsObjectWrapper.getBarManager();
+        this.plugin = toolsObjectWrapper.getPlugin();
     }
 
     @EventHandler
-    public void onQuit(PlayerQuitEvent event) {
-        if(uiManager == null) {
-            return;
-        }
-        Player player = event.getPlayer();
-        UUID uuid = player.getUniqueId();
-
-        barManager.hideAllBars(player);
-        uiManager.removeAllUI(uuid);
-        uiManager.removeAllActionBars(uuid);
+    public void onChange(PlayerGameModeChangeEvent event) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                barManager.updateBars(event.getPlayer());
+            }
+        }.runTaskLater(plugin,3L);
     }
 }

@@ -18,7 +18,8 @@ package com.github.kpgtb.ktools.listener;
 
 import com.github.kpgtb.ktools.manager.cache.CacheManager;
 import com.github.kpgtb.ktools.manager.listener.KListener;
-import com.github.kpgtb.ktools.manager.resourcepack.ResourcepackManager;
+import com.github.kpgtb.ktools.manager.resourcepack.ResourcePackManager;
+import com.github.kpgtb.ktools.manager.ui.bar.BarManager;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -31,9 +32,10 @@ import org.bukkit.scheduler.BukkitRunnable;
  */
 public class JoinListener extends KListener {
     private final CacheManager cacheManager;
-    private final ResourcepackManager resourcepackManager;
+    private final ResourcePackManager resourcepackManager;
     private final JavaPlugin plugin;
     private final boolean legacy;
+    private final BarManager barManager;
     /**
      * Constructor of listener.
      *
@@ -45,6 +47,7 @@ public class JoinListener extends KListener {
         this.resourcepackManager = toolsObjectWrapper.getResourcepackManager();
         this.plugin = toolsObjectWrapper.getPlugin();
         this.legacy = toolsObjectWrapper.isLegacy();
+        this.barManager = toolsObjectWrapper.getBarManager();
     }
 
     @EventHandler
@@ -52,10 +55,10 @@ public class JoinListener extends KListener {
         if(legacy || !this.resourcepackManager.isEnabled()) {
             return;
         }
+        Player player = event.getPlayer();
         new BukkitRunnable() {
             @Override
             public void run() {
-                Player player = event.getPlayer();
                 if(!player.isOnline()) {
                     return;
                 }
@@ -66,7 +69,11 @@ public class JoinListener extends KListener {
                 player.setResourcePack(url);
             }
         }.runTaskLater(plugin, 60);
+
+        this.barManager.getBars().values().forEach(bar -> {
+            if(bar.isDefaultShow()) {
+                this.barManager.showBar(bar,player);
+            }
+        });
     }
-
-
 }

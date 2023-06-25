@@ -40,7 +40,7 @@ import java.util.zip.ZipOutputStream;
 /**
  * ResourceManager handles process of creating resourcepack with custom chars and custom models.
  */
-public class ResourcepackManager {
+public class ResourcePackManager {
     private final JavaPlugin plugin;
     private final DebugManager debug;
     private final CacheManager cache;
@@ -59,7 +59,7 @@ public class ResourcepackManager {
      * @param debug Instance of DebugManager
      * @param cache Instance of CacheManager
      */
-    public ResourcepackManager(JavaPlugin plugin, DebugManager debug, CacheManager cache) {
+    public ResourcePackManager(JavaPlugin plugin, DebugManager debug, CacheManager cache) {
         this.plugin = plugin;
         this.debug = debug;
         this.cache = cache;
@@ -149,10 +149,20 @@ public class ResourcepackManager {
     }
 
     /**
+     * Check if plugin is registered
+     * @param pluginName Name of plugin
+     * @param version Version of plugin
+     * @return true if is registered
+     */
+    public boolean isPluginRegistered(String pluginName, String version) {
+        return this.plugins.contains(pluginName+"["+version+"]");
+    }
+
+    /**
      * Check plugins that require resourcepack manager
      * @return String with plugins and versions
      */
-    private String getPluginsString() {
+    public String getPluginsString() {
         Collections.sort(this.plugins);
         StringBuilder builder = new StringBuilder();
         this.plugins.forEach(s -> {

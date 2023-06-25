@@ -27,8 +27,9 @@ import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.manager.item.ItemManager;
 import com.github.kpgtb.ktools.manager.language.LanguageManager;
 import com.github.kpgtb.ktools.manager.listener.ListenerManager;
-import com.github.kpgtb.ktools.manager.resourcepack.ResourcepackManager;
+import com.github.kpgtb.ktools.manager.resourcepack.ResourcePackManager;
 import com.github.kpgtb.ktools.manager.ui.UiManager;
+import com.github.kpgtb.ktools.manager.ui.bar.BarManager;
 import com.github.kpgtb.ktools.manager.updater.SpigotUpdater;
 import com.github.kpgtb.ktools.manager.updater.UpdaterManager;
 import com.github.kpgtb.ktools.manager.updater.version.KVersion;
@@ -102,6 +103,10 @@ public final class Ktools extends JavaPlugin {
         dataManager.registerPersisters(packageUtil.get("manager.data.persister"), getFile());
         debug.sendInfo(DebugType.START, "Loaded database.");
 
+        debug.sendInfo(DebugType.START, "Loading bars...");
+        BarManager barManager = new BarManager(toolsObjectWrapper);
+        debug.sendInfo(DebugType.START, "Loaded bars.");
+
         UiManager uiManager = null;
         if(Bukkit.getPluginManager().getPlugin("ProtocolLib") != null && !legacy) {
             debug.sendInfo(DebugType.START, "Loading ui...");
@@ -110,11 +115,11 @@ public final class Ktools extends JavaPlugin {
             debug.sendInfo(DebugType.START, "Loaded ui.");
         }
 
-        ResourcepackManager resourcepackManager = null;
+        ResourcePackManager resourcepackManager = null;
         if(!legacy) {
             debug.sendInfo(DebugType.START, "Loading resourcepack...");
-            resourcepackManager = new ResourcepackManager(this, debug, cacheManager);
-            ResourcepackManager finalResourcepackManager = resourcepackManager;
+            resourcepackManager = new ResourcePackManager(this, debug, cacheManager);
+            ResourcePackManager finalResourcepackManager = resourcepackManager;
             UiManager finalUiManager = uiManager;
             JavaPlugin plugin = this;
             new BukkitRunnable() {
@@ -190,6 +195,10 @@ public final class Ktools extends JavaPlugin {
                         finalResourcepackManager.registerCustomChar("space", "\uF83F", "space_nosplit.png", getResource("txt/space_nosplit.png"), 1023, -32768, 1024);
                     }
 
+                    if(!barManager.getBars().isEmpty()) {
+                        barManager.prepareBars();
+                    }
+
                     if(finalResourcepackManager.isEnabled()) {
                         new BukkitRunnable() {
                             @Override
@@ -208,7 +217,7 @@ public final class Ktools extends JavaPlugin {
         debug.sendInfo(DebugType.START, "Loaded items.");
 
         debug.sendInfo(DebugType.START, "Loading tools object wrapper...");
-        this.toolsObjectWrapper = new ToolsObjectWrapper(cacheManager,debug,globalLanguageManager,this,adventure,paramParserManager, dataManager, resourcepackManager, uiManager, itemManager, legacy, packageUtil);
+        this.toolsObjectWrapper = new ToolsObjectWrapper(cacheManager,debug,globalLanguageManager,this,adventure,paramParserManager, dataManager, resourcepackManager, uiManager, itemManager, legacy, packageUtil, barManager);
         debug.sendInfo(DebugType.START, "Loaded tools object wrapper.");
 
         debug.sendInfo(DebugType.START, "Loading commands...");
@@ -222,14 +231,14 @@ public final class Ktools extends JavaPlugin {
         debug.sendInfo(DebugType.START, "Loaded listeners.");
 
         debug.sendInfo(DebugType.START, "Loading global managers wrapper...");
-        this.globalManagersWrapper = new GlobalManagersWrapper(debug, globalLanguageManager,cacheManager,paramParserManager,dataManager,uiManager,resourcepackManager, itemManager, legacy);
+        this.globalManagersWrapper = new GlobalManagersWrapper(debug, globalLanguageManager,cacheManager,paramParserManager,dataManager,uiManager,resourcepackManager, itemManager, barManager, legacy);
         debug.sendInfo(DebugType.START, "Loaded global managers wrapper.");
 
         debug.sendInfo(DebugType.START, "Checking updates...");
         UpdaterManager updaterManager = new UpdaterManager(getDescription(), new SpigotUpdater("108301"),debug);
         HAS_UPDATE = updaterManager.checkUpdate();
 
-        Metrics metrics = new Metrics(this, 18408);
+        new Metrics(this, 18408);
 
         debug.sendInfo(DebugType.START, "Enabled plugin in " + (System.currentTimeMillis() - startMillis) + "ms.");
     }

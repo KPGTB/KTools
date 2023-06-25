@@ -22,8 +22,9 @@ import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.item.ItemManager;
 import com.github.kpgtb.ktools.manager.language.LanguageManager;
 import com.github.kpgtb.ktools.manager.command.parser.ParamParserManager;
-import com.github.kpgtb.ktools.manager.resourcepack.ResourcepackManager;
+import com.github.kpgtb.ktools.manager.resourcepack.ResourcePackManager;
 import com.github.kpgtb.ktools.manager.ui.UiManager;
+import com.github.kpgtb.ktools.manager.ui.bar.BarManager;
 import com.github.kpgtb.ktools.util.file.PackageUtil;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -40,13 +41,14 @@ public class ToolsObjectWrapper {
     private final BukkitAudiences adventure;
     private final ParamParserManager paramParserManager;
     private final DataManager dataManager;
-    private final ResourcepackManager resourcepackManager;
+    private final ResourcePackManager resourcepackManager;
     private final UiManager uiManager;
     private final ItemManager itemManager;
     private final boolean legacy;
     private final PackageUtil packageUtil;
+    private final BarManager barManager;
 
-    public ToolsObjectWrapper(CacheManager cacheManager, DebugManager debugManager, LanguageManager languageManager, JavaPlugin plugin, BukkitAudiences adventure, ParamParserManager paramParserManager, DataManager dataManager, ResourcepackManager resourcepackManager, UiManager uiManager, ItemManager itemManager, boolean legacy, PackageUtil packageUtil) {
+    public ToolsObjectWrapper(CacheManager cacheManager, DebugManager debugManager, LanguageManager languageManager, JavaPlugin plugin, BukkitAudiences adventure, ParamParserManager paramParserManager, DataManager dataManager, ResourcePackManager resourcepackManager, UiManager uiManager, ItemManager itemManager, boolean legacy, PackageUtil packageUtil, BarManager barManager) {
         this.cacheManager = cacheManager;
         this.debugManager = debugManager;
         this.languageManager = languageManager;
@@ -59,6 +61,7 @@ public class ToolsObjectWrapper {
         this.itemManager = itemManager;
         this.legacy = legacy;
         this.packageUtil = packageUtil;
+        this.barManager = barManager;
     }
 
     public ToolsObjectWrapper(GlobalManagersWrapper globalManagersWrapper, LanguageManager languageManager, JavaPlugin plugin, BukkitAudiences adventure, PackageUtil packageUtil) {
@@ -70,6 +73,7 @@ public class ToolsObjectWrapper {
         this.uiManager = globalManagersWrapper.getUiManager();
         this.itemManager = globalManagersWrapper.getItemManager();
         this.legacy = globalManagersWrapper.isLegacy();
+        this.barManager = globalManagersWrapper.getBarManager();
 
         this.languageManager = languageManager;
         this.plugin = plugin;
@@ -86,11 +90,16 @@ public class ToolsObjectWrapper {
         this.uiManager = initializer.getGlobalManagersWrapper().getUiManager();
         this.itemManager = initializer.getGlobalManagersWrapper().getItemManager();
         this.legacy = initializer.getGlobalManagersWrapper().isLegacy();
+        this.barManager = initializer.getGlobalManagersWrapper().getBarManager();
 
         this.languageManager = initializer.getLanguageManager();
         this.plugin = initializer.getPlugin();
         this.adventure = initializer.getAdventure();
         this.packageUtil = initializer.getPackageUtil();
+    }
+
+    public BarManager getBarManager() {
+        return barManager;
     }
 
     public CacheManager getCacheManager() {
@@ -121,7 +130,7 @@ public class ToolsObjectWrapper {
         return dataManager;
     }
 
-    public ResourcepackManager getResourcepackManager() {
+    public ResourcePackManager getResourcepackManager() {
         return resourcepackManager;
     }
 
