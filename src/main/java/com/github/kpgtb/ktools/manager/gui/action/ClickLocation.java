@@ -16,8 +16,8 @@
 
 package com.github.kpgtb.ktools.manager.gui.action;
 
-import org.bukkit.event.inventory.InventoryClickEvent;
-
-public interface ClickAction {
-    void run(InventoryClickEvent event, ClickLocation clickLocation);
+public enum ClickLocation {
+    TOP,
+    BOTTOM,
+    OUTSIDE
 }

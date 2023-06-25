@@ -42,6 +42,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
 
+/**
+ * Abstract class that handles process of creating commands
+ */
 public abstract class KCommand extends Command {
     private final ToolsObjectWrapper wrapper;
     private final String groupPath;
@@ -76,6 +79,9 @@ public abstract class KCommand extends Command {
     //  Creating command
     //
 
+    /**
+     * Prepare commands from that class
+     */
     public final void prepareCommand() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         this.cmdName = getClass().getSimpleName().toLowerCase().replace("command", "");
         super.setName(this.cmdName);
@@ -492,6 +498,10 @@ public abstract class KCommand extends Command {
     // Help Command
     //
 
+    /**
+     * Send help message to sender
+     * @param sender Command Sender
+     */
     public void sendHelp(CommandSender sender) {
         Audience audience = adventure.sender(sender);
         List<Component> componentsToSend = new LinkedList<>();

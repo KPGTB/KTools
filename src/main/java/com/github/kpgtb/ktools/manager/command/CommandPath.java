@@ -20,6 +20,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
+/**
+ * Path to subcommand
+ */
 public class CommandPath implements Cloneable {
     private String pathStr;
     private String[] path;
@@ -43,6 +46,10 @@ public class CommandPath implements Cloneable {
         this.pathStr = String.join(" ", this.path);
     }
 
+    /**
+     * Add new element to sub command path
+     * @param element Element to add
+     */
     public void add(String element) {
         if(element.isEmpty()) {
             return;

@@ -19,6 +19,9 @@ package com.github.kpgtb.ktools.manager.command;
 import com.github.kpgtb.ktools.manager.command.filter.FilterWrapper;
 import com.github.kpgtb.ktools.manager.command.parser.IParamParser;
 
+/**
+ * Info about command arg
+ */
 public class CommandArg {
     private String name;
     private final Class<?> clazz;

@@ -21,6 +21,9 @@ import com.github.kpgtb.ktools.manager.command.filter.FilterWrapper;
 import java.lang.reflect.Method;
 import java.util.List;
 
+/**
+ * Info about command
+ */
 public class CommandInfo {
     private final CommandPath path;
     private final String description;

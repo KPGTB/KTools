@@ -19,20 +19,27 @@ package com.github.kpgtb.ktools.manager.gui;
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.manager.gui.action.ClickAction;
+import com.github.kpgtb.ktools.manager.gui.action.ClickLocation;
 import com.github.kpgtb.ktools.manager.gui.action.CloseAction;
 import com.github.kpgtb.ktools.manager.gui.action.DragAction;
 import com.github.kpgtb.ktools.manager.gui.container.GuiContainer;
 import com.github.kpgtb.ktools.manager.gui.item.GuiItem;
+import com.github.kpgtb.ktools.manager.gui.item.GuiItemLocation;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -48,11 +55,12 @@ public abstract class KGui implements Listener {
     private ClickAction globalClickAction;
     private DragAction globalDragAction;
     private CloseAction closeAction;
-    private boolean cancelShift;
 
     private final Inventory bukkitInventory;
+    private boolean updateItems;
 
     private final DebugManager debug;
+    private final JavaPlugin plugin;
 
     /**
      * Constructor of KGui
@@ -65,7 +73,8 @@ public abstract class KGui implements Listener {
         this.rows = rows;
         this.containers = new ArrayList<>();
         this.debug = tools.getDebugManager();
-        this.cancelShift = false;
+        this.updateItems = false;
+        this.plugin = tools.getPlugin();
 
         if(rows > 6 || rows < 1) {
             this.debug.sendWarning(DebugType.GUI, "Gui rows must be a value between 1 and 6");
@@ -82,9 +91,8 @@ public abstract class KGui implements Listener {
      * @since 1.3.0
      */
     public void blockClick() {
-        this.setGlobalClickAction(e -> e.setCancelled(true));
+        this.setGlobalClickAction((e,loc) -> e.setCancelled(true));
         this.setGlobalDragAction(e -> e.setCancelled(true));
-        this.setCancelShift(true);
     }
 
     public String getName() {
@@ -189,6 +197,26 @@ public abstract class KGui implements Listener {
     }
 
     /**
+     * Experimental feature
+     * Check if items are updated when changed
+     * @return true if items in container are updated after change
+     * @since 2.0.0
+     */
+    public boolean isUpdateItems() {
+        return updateItems;
+    }
+
+    /**
+     * Experimental feature
+     * Update items in containers after player will change it
+     * @param updateItems If items should be updated
+     * @since 2.0.0
+     */
+    public void setUpdateItems(boolean updateItems) {
+        this.updateItems = updateItems;
+    }
+
+    /**
      * Get action that will be invoking, when someone clicks in this gui
      * @return ClickAction interface
      */
@@ -236,32 +264,17 @@ public abstract class KGui implements Listener {
         this.closeAction = closeAction;
     }
 
-    /**
-     * Check if shift click TO inv is cancelled
-     * @return true if cancelled
-     * @since 1.6.0
-     */
-    public boolean isCancelShift() {
-        return cancelShift;
-    }
-
-    /**
-     * Set if shift click TO inv should be cancelled
-     * @param cancelShift true if cancel
-     * @since 1.6.0
-     */
-    public void setCancelShift(boolean cancelShift) {
-        this.cancelShift = cancelShift;
-    }
-
     @EventHandler
     public void onGlobalClick(InventoryClickEvent event) {
-        Inventory inv = event.getClickedInventory();
-        if(inv != this.bukkitInventory) {
+        Inventory inv = event.getInventory();
+        Inventory clickedInv = event.getClickedInventory();
+        if(!inv.equals(this.bukkitInventory)) {
             return;
         }
+
         if(this.getGlobalClickAction() != null) {
-            this.getGlobalClickAction().run(event);
+            ClickLocation clickLocation = clickedInv == null ? ClickLocation.OUTSIDE : clickedInv.equals(this.bukkitInventory) ? ClickLocation.TOP : ClickLocation.BOTTOM;
+            this.getGlobalClickAction().run(event,clickLocation);
         }
     }
 
@@ -287,32 +300,56 @@ public abstract class KGui implements Listener {
         }
 
         if(item.getClickAction() != null) {
-            item.getClickAction().run(event);
+            item.getClickAction().run(event, ClickLocation.TOP);
         }
     }
 
-    @EventHandler
-    public void onShift(InventoryClickEvent event) {
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onUpdate(InventoryClickEvent event) {
+        if(event.isCancelled()) {
+            return;
+        }
+        if(!this.updateItems) {
+            return;
+        }
+
         Inventory inv = event.getInventory();
-
-        if(inv != this.bukkitInventory) {
+        if(!inv.equals(this.bukkitInventory)) {
             return;
         }
 
-        Inventory clicked = event.getClickedInventory();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < inv.getContents().length; i++) {
+                    ItemStack realIS = inv.getItem(i);
+                    GuiContainer container = getContainerAt(i);
+                    if(container == null) {
+                        continue;
+                    }
+                    GuiItemLocation loc = container.getContainerLocFromGuiLoc(i);
+                    GuiItem guiItem = container.getItem(loc);
 
-        if(clicked == null || !clicked.getType().equals(InventoryType.PLAYER)) {
-            return;
-        }
+                    if(guiItem == null) {
+                        if(realIS != null && !realIS.getType().equals(Material.AIR)) {
+                            container.setItem(loc.getX(), loc.getY(), new GuiItem(realIS));
+                        }
+                        continue;
+                    }
 
-        if(!event.isShiftClick()) {
-            return;
-        }
+                    if(realIS == null || realIS.getType().equals(Material.AIR)) {
+                        container.removeItem(loc.getX(),loc.getY());
+                        continue;
+                    }
 
+                    if(guiItem.getItemStack().isSimilar(realIS)) {
+                        continue;
+                    }
 
-        if(this.cancelShift) {
-            event.setCancelled(true);
-        }
+                    guiItem.setItemStack(realIS);
+                }
+            }
+        }.runTaskLater(plugin,3);
     }
 
     @EventHandler
