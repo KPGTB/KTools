@@ -48,7 +48,7 @@ public class BarManager {
         this.uiObjects = new HashMap<>();
         this.plugins = new HashMap<>();
 
-        this.nextChar = 45056;
+        this.nextChar = 61440;
     }
 
     public void setWrapper(ToolsObjectWrapper wrapper) {
@@ -111,14 +111,14 @@ public class BarManager {
          barsList.forEach(bar -> {
              bar.getIcons().forEach(icon -> {
                  for (int i = 0; i < possiblePlaces; i++) {
-                     String fullChar = String.format("%04x", this.nextChar);
+                     String fullChar = Character.toString((char) this.nextChar);
                      icon.getFullChar().put(i,fullChar);
                      this.nextChar++;
-                     String halfChar = String.format("%04x", this.nextChar);
-                     icon.getFullChar().put(i,halfChar);
+                     String halfChar = Character.toString((char) this.nextChar);
+                     icon.getHalfChar().put(i,halfChar);
                      this.nextChar++;
-                     String emptyChar = String.format("%04x", this.nextChar);
-                     icon.getFullChar().put(i,emptyChar);
+                     String emptyChar = Character.toString((char) this.nextChar);
+                     icon.getEmptyChar().put(i,emptyChar);
                      this.nextChar++;
 
                      int ascent = -16 + (i* icon.getIconsHeight());
@@ -184,7 +184,7 @@ public class BarManager {
         if(!this.uiObjects.containsKey(uuid)) {
             this.uiObjects.put(uuid, new HashMap<>());
         }
-        this.uiObjects.get(uuid).keySet().forEach(bar -> hideBar(bar,player, true));
+        new ArrayList<>(this.uiObjects.get(uuid).keySet()).forEach(bar -> hideBar(bar,player, true));
     }
 
     /**

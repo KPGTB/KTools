@@ -116,7 +116,7 @@ public class UiManager {
                     }
                 }
             }
-        }.runTaskTimer(plugin, 20,20);
+        }.runTaskTimer(plugin, 5,5);
     }
     private void stopActionBar() {
         if(packet != null) {

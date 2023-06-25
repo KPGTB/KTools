@@ -125,6 +125,10 @@ public final class Ktools extends JavaPlugin {
             new BukkitRunnable() {
                 @Override
                 public void run() {
+                    if(!barManager.getBars().isEmpty()) {
+                        barManager.prepareBars();
+                    }
+
                     if(finalUiManager != null && finalUiManager.isRequired()) {
                         finalResourcepackManager.registerPlugin(packageUtil.getTag(), getDescription().getVersion());
                         //Shader
@@ -193,10 +197,6 @@ public final class Ktools extends JavaPlugin {
                         finalResourcepackManager.registerCustomChar("space", "\uF83D", "space_nosplit.png", getResource("txt/space_nosplit.png"), 255, -32768, 256);
                         finalResourcepackManager.registerCustomChar("space", "\uF83E", "space_nosplit.png", getResource("txt/space_nosplit.png"), 511, -32768, 512);
                         finalResourcepackManager.registerCustomChar("space", "\uF83F", "space_nosplit.png", getResource("txt/space_nosplit.png"), 1023, -32768, 1024);
-                    }
-
-                    if(!barManager.getBars().isEmpty()) {
-                        barManager.prepareBars();
                     }
 
                     if(finalResourcepackManager.isEnabled()) {

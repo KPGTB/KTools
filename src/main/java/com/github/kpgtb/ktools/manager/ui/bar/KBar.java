@@ -89,7 +89,7 @@ public class KBar {
     @Nullable
     public BarIcons getIconsFor(double value) {
         for (BarIcons icon : icons) {
-            if(icon.getFrom() >= value && icon.getTo() <= value) {
+            if(icon.getFrom() <= value && icon.getTo() >= value) {
                 return icon;
             }
         }
