@@ -104,7 +104,7 @@ public final class Ktools extends JavaPlugin {
         debug.sendInfo(DebugType.START, "Loaded database.");
 
         debug.sendInfo(DebugType.START, "Loading bars...");
-        BarManager barManager = new BarManager(toolsObjectWrapper);
+        BarManager barManager = new BarManager();
         debug.sendInfo(DebugType.START, "Loaded bars.");
 
         UiManager uiManager = null;
@@ -219,6 +219,8 @@ public final class Ktools extends JavaPlugin {
         debug.sendInfo(DebugType.START, "Loading tools object wrapper...");
         this.toolsObjectWrapper = new ToolsObjectWrapper(cacheManager,debug,globalLanguageManager,this,adventure,paramParserManager, dataManager, resourcepackManager, uiManager, itemManager, legacy, packageUtil, barManager);
         debug.sendInfo(DebugType.START, "Loaded tools object wrapper.");
+
+        barManager.setWrapper(toolsObjectWrapper);
 
         debug.sendInfo(DebugType.START, "Loading commands...");
         CommandManager commandManager = new CommandManager(toolsObjectWrapper, getFile(), packageUtil.getTag());

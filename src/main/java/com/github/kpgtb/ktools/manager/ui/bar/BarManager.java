@@ -37,19 +37,22 @@ import java.util.*;
 public class BarManager {
     private final Map<String, KBar> bars;
     private final Map<UUID, Map<KBar,BaseUiObject>> uiObjects;
-    private final ToolsObjectWrapper wrapper;
+    private ToolsObjectWrapper wrapper;
     private final Map<String, String> plugins;
 
     private int nextChar;
 
-    public BarManager(ToolsObjectWrapper wrapper) {
-        this.wrapper = wrapper;
+    public BarManager() {
 
         this.bars = new HashMap<>();
         this.uiObjects = new HashMap<>();
         this.plugins = new HashMap<>();
 
         this.nextChar = 45056;
+    }
+
+    public void setWrapper(ToolsObjectWrapper wrapper) {
+        this.wrapper = wrapper;
     }
 
     /**
@@ -121,8 +124,8 @@ public class BarManager {
                      int ascent = -16 + (i* icon.getIconsHeight());
 
                      resourcePack.registerCustomChar(wrapper.getTag(), fullChar, bar.getName()+"_full.png", icon.getFullImage(),icon.getIconsHeight(),ascent,icon.getIconsWidth());
-                     resourcePack.registerCustomChar(wrapper.getTag(), halfChar, bar.getName()+"_half.png", icon.getFullImage(),icon.getIconsHeight(),ascent,icon.getIconsWidth());
-                     resourcePack.registerCustomChar(wrapper.getTag(), emptyChar, bar.getName()+"_empty.png", icon.getFullImage(),icon.getIconsHeight(),ascent,icon.getIconsWidth());
+                     resourcePack.registerCustomChar(wrapper.getTag(), halfChar, bar.getName()+"_half.png", icon.getHalfImage(),icon.getIconsHeight(),ascent,icon.getIconsWidth());
+                     resourcePack.registerCustomChar(wrapper.getTag(), emptyChar, bar.getName()+"_empty.png", icon.getEmptyImage(),icon.getIconsHeight(),ascent,icon.getIconsWidth());
                  }
              });
          });

@@ -16,6 +16,8 @@
 
 package com.github.kpgtb.ktools.manager.ui.bar;
 
+import org.bukkit.plugin.java.JavaPlugin;
+
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,9 +29,10 @@ public class BarIcons {
     private final double from;
     private final double to;
 
-    private final InputStream fullImage;
-    private final InputStream halfImage;
-    private final InputStream emptyImage;
+    private final JavaPlugin plugin;
+    private final String fullImage;
+    private final String halfImage;
+    private final String emptyImage;
 
     private Map<Integer,String> fullChar;
     private Map<Integer,String> halfChar;
@@ -38,9 +41,10 @@ public class BarIcons {
     private final int iconsHeight;
     private final int iconsWidth;
 
-    public BarIcons(double from, double to, InputStream fullImage, InputStream halfImage, InputStream emptyImage, int iconsHeight, int iconsWidth) {
+    public BarIcons(double from, double to, JavaPlugin plugin, String fullImage, String halfImage, String emptyImage, int iconsHeight, int iconsWidth) {
         this.from = from;
         this.to = to;
+        this.plugin = plugin;
         this.fullImage = fullImage;
         this.halfImage = halfImage;
         this.emptyImage = emptyImage;
@@ -93,14 +97,14 @@ public class BarIcons {
     }
 
     public InputStream getFullImage() {
-        return fullImage;
+        return this.plugin.getResource(this.fullImage);
     }
 
     public InputStream getHalfImage() {
-        return halfImage;
+        return this.plugin.getResource(this.halfImage);
     }
 
     public InputStream getEmptyImage() {
-        return emptyImage;
+        return this.plugin.getResource(this.emptyImage);
     }
 }
