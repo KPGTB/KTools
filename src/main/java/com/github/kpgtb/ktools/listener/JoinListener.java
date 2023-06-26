@@ -52,23 +52,25 @@ public class JoinListener extends KListener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        if(legacy || !this.resourcepackManager.isEnabled()) {
+        if(legacy) {
             return;
         }
         Player player = event.getPlayer();
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if(!player.isOnline()) {
-                    return;
+        if(resourcepackManager.isEnabled()) {
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (!player.isOnline()) {
+                        return;
+                    }
+                    String url = cacheManager.getServerData("ktools", "resourcepackUrl", String.class);
+                    if (url == null) {
+                        return;
+                    }
+                    player.setResourcePack(url);
                 }
-                String url = cacheManager.getServerData("ktools", "resourcepackUrl", String.class);
-                if(url == null) {
-                    return;
-                }
-                player.setResourcePack(url);
-            }
-        }.runTaskLater(plugin, 60);
+            }.runTaskLater(plugin, 60);
+        }
 
         this.barManager.getBars().values().forEach(bar -> {
             if(bar.isDefaultShow()) {

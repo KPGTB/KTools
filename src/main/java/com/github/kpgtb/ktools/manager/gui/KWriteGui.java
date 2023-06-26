@@ -87,7 +87,6 @@ public class KWriteGui implements Listener {
                 .itemLeft(
                         new ItemBuilder(Material.PAPER).build()
                 )
-                .itemRight(CloseItem.get(wrapper).getItemStack())
                 .title(
                         wrapper.getLanguageManager().getSingleString(LanguageLevel.GLOBAL, "writeGuiName")
                 )

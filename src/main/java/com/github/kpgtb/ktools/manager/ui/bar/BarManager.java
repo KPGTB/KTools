@@ -122,10 +122,13 @@ public class BarManager {
                      this.nextChar++;
 
                      int ascent = -16 + (i*(icon.getIconsHeight()+1));
+                     if(ascent > icon.getIconsHeight()) {
+                         continue;
+                     }
 
-                     resourcePack.registerCustomChar(wrapper.getTag(), fullChar, bar.getName()+"_full.png", icon.getFullImage(),icon.getIconsHeight(),ascent,icon.getIconsWidth());
-                     resourcePack.registerCustomChar(wrapper.getTag(), halfChar, bar.getName()+"_half.png", icon.getHalfImage(),icon.getIconsHeight(),ascent,icon.getIconsWidth());
-                     resourcePack.registerCustomChar(wrapper.getTag(), emptyChar, bar.getName()+"_empty.png", icon.getEmptyImage(),icon.getIconsHeight(),ascent,icon.getIconsWidth());
+                     resourcePack.registerCustomChar(wrapper.getTag(), fullChar, bar.getName()+"_"+String.valueOf(icon.getFrom()).replace(".", "_")+"_full.png", icon.getFullImage(),icon.getIconsHeight(),ascent,icon.getIconsWidth());
+                     resourcePack.registerCustomChar(wrapper.getTag(), halfChar, bar.getName()+"_"+String.valueOf(icon.getFrom()).replace(".", "_")+"_half.png", icon.getHalfImage(),icon.getIconsHeight(),ascent,icon.getIconsWidth());
+                     resourcePack.registerCustomChar(wrapper.getTag(), emptyChar, bar.getName()+"_"+String.valueOf(icon.getFrom()).replace(".", "_")+"_empty.png", icon.getEmptyImage(),icon.getIconsHeight(),ascent,icon.getIconsWidth());
                  }
              });
          });
@@ -141,7 +144,7 @@ public class BarManager {
         if(isBarShowed(bar,player)) {
             return;
         }
-        BaseUiObject uiObj = new BaseUiObject("", Alignment.LEFT, 15);
+        BaseUiObject uiObj = new BaseUiObject("", Alignment.LEFT, 10);
         wrapper.getUiManager().addUI(uuid,uiObj);
         this.uiObjects.get(uuid).put(bar,uiObj);
         updateBars(player);
@@ -237,6 +240,11 @@ public class BarManager {
                 break;
             }
             barPlace++;
+        }
+
+        if(barPlace > 2) {
+            uiObj.update("");
+            return;
         }
 
         double value = this.getValue(bar,player);
