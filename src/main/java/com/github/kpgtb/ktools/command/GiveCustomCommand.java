@@ -29,7 +29,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-@Description("Give custom items from plugins that supports Ktools")
+@Description("Give custom items from plugins that supports KTools")
 public class GiveCustomCommand extends KCommand {
     private final ToolsObjectWrapper wrapper;
 
@@ -38,7 +38,7 @@ public class GiveCustomCommand extends KCommand {
         this.wrapper = toolsObjectWrapper;
     }
 
-    @Description("Give custom item from plugins that supports Ktools")
+    @Description("Give custom item from plugins that supports KTools")
     public void item(CommandSender sender, Player target, KItem item, int amount) {
         ItemStack result = item.getItem().clone();
         result.setAmount(amount);

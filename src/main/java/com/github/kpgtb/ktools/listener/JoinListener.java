@@ -44,7 +44,7 @@ public class JoinListener extends KListener {
     public JoinListener(ToolsObjectWrapper toolsObjectWrapper) {
         super(toolsObjectWrapper);
         this.cacheManager = toolsObjectWrapper.getCacheManager();
-        this.resourcepackManager = toolsObjectWrapper.getResourcepackManager();
+        this.resourcepackManager = toolsObjectWrapper.getResourcePackManager();
         this.plugin = toolsObjectWrapper.getPlugin();
         this.legacy = toolsObjectWrapper.isLegacy();
         this.barManager = toolsObjectWrapper.getBarManager();

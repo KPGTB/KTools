@@ -1,8 +1,8 @@
-name: Ktools
+name: KTools
 version: '${project.version}'
-main: com.github.kpgtb.ktools.Ktools
+main: com.github.kpgtb.ktools.KTools
 authors: [ KPG_TB ]
-description: An advenced, reloaded version of my tools to Spigot and Paper plugins
+description: An advanced, reloaded version of my tools to Spigot and Paper plugins
 website: kpgtb.github.io
 softdepend: [PlaceholderAPI, ProtocolLib]
 api-version: 1.13

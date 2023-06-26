@@ -42,13 +42,13 @@ public class BarManager {
 
     private int nextChar;
 
-    public BarManager() {
+    public BarManager(int startChar) {
 
         this.bars = new HashMap<>();
         this.uiObjects = new HashMap<>();
         this.plugins = new HashMap<>();
 
-        this.nextChar = 61440;
+        this.nextChar = startChar;
     }
 
     public void setWrapper(ToolsObjectWrapper wrapper) {
@@ -84,7 +84,7 @@ public class BarManager {
      * Prepare resource pack and ui
      */
     public void prepareBars() {
-        ResourcePackManager resourcePack = wrapper.getResourcepackManager();
+        ResourcePackManager resourcePack = wrapper.getResourcePackManager();
         if(resourcePack == null) {
             throw new RuntimeException("ResourcePackManager is not supported! ResourcePack requirements: Minecraft Version 1.14+");
         }
@@ -121,7 +121,7 @@ public class BarManager {
                      icon.getEmptyChar().put(i,emptyChar);
                      this.nextChar++;
 
-                     int ascent = -16 + (i* icon.getIconsHeight());
+                     int ascent = -16 + (i*(icon.getIconsHeight()+1));
 
                      resourcePack.registerCustomChar(wrapper.getTag(), fullChar, bar.getName()+"_full.png", icon.getFullImage(),icon.getIconsHeight(),ascent,icon.getIconsWidth());
                      resourcePack.registerCustomChar(wrapper.getTag(), halfChar, bar.getName()+"_half.png", icon.getHalfImage(),icon.getIconsHeight(),ascent,icon.getIconsWidth());
@@ -240,10 +240,13 @@ public class BarManager {
         }
 
         double value = this.getValue(bar,player);
+        BarIcons icons = bar.getIconsFor(value);
+        double fixedValue = value - Math.floor(icons.getFrom());
+        double fixedMax = Math.min(bar.getMax() - Math.floor(icons.getFrom()), icons.getTo() - Math.floor(icons.getFrom()));
 
-        double fullIcon = bar.getMax() / 10.0;
-        int fullIconsInUI = (int) Math.floor(value / fullIcon);
-        boolean hasHalfIconInUI = value % fullIcon > 0;
+        double fullIcon = fixedMax / 10.0;
+        int fullIconsInUI = (int) Math.floor(fixedValue / fullIcon);
+        boolean hasHalfIconInUI = fixedValue % fullIcon > 0;
         int emptyIconsInUI = 10 - fullIconsInUI;
         if(hasHalfIconInUI) {
             emptyIconsInUI -= 1;
@@ -251,7 +254,7 @@ public class BarManager {
 
         String spaceChar = "\uF802";
 
-        BarIcons icons = bar.getIconsFor(value);
+
         String fullIconChar = icons.getFullChar().get(barPlace) + spaceChar;
         String halfIconChar = icons.getHalfChar().get(barPlace) + spaceChar;
         String emptyIconChar = icons.getEmptyChar().get(barPlace) + spaceChar;

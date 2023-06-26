@@ -16,6 +16,7 @@
 
 package com.github.kpgtb.ktools.manager.language;
 
+import com.github.kpgtb.ktools.KTools;
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.manager.updater.version.KVersion;
@@ -72,7 +73,7 @@ public class LanguageManager {
      * @param dataFolder Folder with plugin's data. Use JavaPlugin#getDataFolder() to get this
      * @param lang Language of messages. Get this from plugin's config
      * @param debug Instance of {@link DebugManager}
-     * @param globalManager Instance of Global LanguageManager. Take it from {@link com.github.kpgtb.ktools.Ktools}
+     * @param globalManager Instance of Global LanguageManager. Take it from {@link KTools}
      */
     public LanguageManager(File dataFolder, String lang, DebugManager debug, LanguageManager globalManager) {
         this.dataFolder = dataFolder;

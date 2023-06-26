@@ -1,30 +1,51 @@
+# Language of KTools
+# To translate, check folder lang
 lang: "en"
+# Where some data should be saved in cache
+# file -> in file called cache.yml
+# metadata -> in PersistentDataContainer
 cache:
   player: "metadata" # file or metadata
   entity: "metadata" # file or metadata
+# Enabled resource pack (only if required by other plugins)
 resourcepack: true
-resourcePackRefreshRate: "15m" # Delay to check if resource pack works.
+# Refresh rate of checking if resource pack is correct
+resourcePackRefreshRate: "15m"
+# Data save info
 data:
+  # Possible options: SQLITE or MYSQL
+  # SQLITE -> Data is saved in file called database.db
+  # MYSQL -> Data is saved on MySQL server
   type: "SQLITE"
+  # If type is MYSQL, please fill these credentials
   mysql:
     host: "localhost"
     port: 3306
     username: "root"
     password: ""
     database: "minecraft"
+  # With these options, you can manage database cache (from OrmLite)
+  # The cache system saves the most recent database queries to improve performance. It's highly recommended for use!
+  # With the capacity option, you can manage the size of the cache per DAO. Greater - Better Server Performance - More RAM usage
+  # Capacity '0' changes the system to default. It means that there can be stored unlimited amount of objects, but they are removed after garbage collection.
+  # Test on your server which option is better for you. Disable only if you have a small amount of RAM!
   cache:
-    # With these options, you can manage database cache (from OrmLite)
-    # The cache system saves the most recent database queries to improve performance. It's highly recommended for use!
-    # With the capacity option, you can manage the size of the cache per DAO. Greater - Better Server Performance - More RAM usage
-    # Capacity '0' changes the system to default. It means that there can be stored unlimited amount of objects, but they are removed after garbage collection.
-    # Test on your server which option is better for you. Disable only if you have a small amount of RAM!
     enabled: true
     capacity: 0
+# Gui default items
 gui:
-  closeItem: BARRIER
+  closeItem: "BARRIER"
   pages:
-    leftItem: ARROW
-    rightItem: ARROW
+    leftItem: "ARROW"
+    rightItem: "ARROW"
+# Custom bars above food options
+bar:
+  # Character to start during preparation of custom bars resource pack
+  # Use decimal value
+  # Default: 61440 (HEX: F000)
+  startChar: 61440
+# Debug options. Here you can enable or disable certain options to debug
+# Enabled options will be displayed in the server's console (only if enabled is true)
 debug:
   enable: false
   start: true

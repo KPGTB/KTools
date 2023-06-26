@@ -16,7 +16,7 @@
 
 package com.github.kpgtb.ktools.command;
 
-import com.github.kpgtb.ktools.Ktools;
+import com.github.kpgtb.ktools.KTools;
 import com.github.kpgtb.ktools.manager.command.KCommand;
 import com.github.kpgtb.ktools.manager.command.annotation.Description;
 import com.github.kpgtb.ktools.manager.command.annotation.MainCommand;
@@ -26,9 +26,6 @@ import com.github.kpgtb.ktools.manager.language.LanguageManager;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
@@ -36,11 +33,11 @@ import org.bukkit.command.CommandSender;
 import java.util.ArrayList;
 import java.util.List;
 
-@Description("Manage ktools")
-public class KtoolsCommand extends KCommand {
+@Description("Manage KTools")
+public class KToolsCommand extends KCommand {
     private final ToolsObjectWrapper wrapper;
 
-    public KtoolsCommand(ToolsObjectWrapper toolsObjectWrapper, String groupPath) {
+    public KToolsCommand(ToolsObjectWrapper toolsObjectWrapper, String groupPath) {
         super(toolsObjectWrapper, groupPath);
         this.wrapper = toolsObjectWrapper;
     }
@@ -53,10 +50,10 @@ public class KtoolsCommand extends KCommand {
         String pluginVersion = wrapper.getPlugin().getDescription().getVersion().split("-")[0];
         List<Component> messagesToSend = new ArrayList<>();
 
-        messagesToSend.add(mm.deserialize("<#28e28b>Some plugins on this server uses free, open-source <underlined><bold><#a5dffc><click:open_url:'https://www.spigotmc.org/resources/ktools.108301/'><hover:show_text:'<#f9d521>Go to SpigotMC page'>Ktools"));
+        messagesToSend.add(mm.deserialize("<#28e28b>Some plugins on this server uses free, open-source <underlined><bold><#a5dffc><click:open_url:'https://www.spigotmc.org/resources/ktools.108301/'><hover:show_text:'<#f9d521>Go to SpigotMC page'>KTools"));
         messagesToSend.add(mm.deserialize("<#28e28b>Author of tools: <underlined><bold><#a5dffc><click:open_url:'https://kpgtb.pl/'><hover:show_text:'<#f9d521>Check portfolio'>KPG-TB"));
         messagesToSend.add(
-                Ktools.HAS_UPDATE
+                KTools.HAS_UPDATE
                 ?
                 mm.deserialize("<#28e28b>Version of tools: <underlined><bold><#a5dffc><click:open_url:'https://www.spigotmc.org/resources/ktools.108301/'><hover:show_text:'<#ff8482>Server has outdated version of tools!'>"+pluginVersion)
                 :

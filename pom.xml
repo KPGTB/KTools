@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.kpgtb</groupId>
-    <artifactId>Ktools</artifactId>
+    <artifactId>KTools</artifactId>
     <version>2.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Ktools</name>
+    <name>KTools</name>
 
     <description>An advanced, reloaded version of my tools to Spigot and Paper plugins</description>
     <properties>

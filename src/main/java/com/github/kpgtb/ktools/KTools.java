@@ -46,7 +46,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 /**
  * Main class of plugin
  */
-public final class Ktools extends JavaPlugin {
+public final class KTools extends JavaPlugin {
 
     private ToolsObjectWrapper toolsObjectWrapper;
     private GlobalManagersWrapper globalManagersWrapper;
@@ -104,7 +104,7 @@ public final class Ktools extends JavaPlugin {
         debug.sendInfo(DebugType.START, "Loaded database.");
 
         debug.sendInfo(DebugType.START, "Loading bars...");
-        BarManager barManager = new BarManager();
+        BarManager barManager = new BarManager(getConfig().getInt("bar.startChar"));
         debug.sendInfo(DebugType.START, "Loaded bars.");
 
         UiManager uiManager = null;

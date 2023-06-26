@@ -18,7 +18,7 @@ package com.github.kpgtb.ktools.manager.ui.bar.save;
 
 import com.github.kpgtb.ktools.manager.ui.bar.KBar;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
-import org.bukkit.entity.Player;
+import org.bukkit.OfflinePlayer;
 
 /**
  * Save bar values in player cache
@@ -27,12 +27,18 @@ public class PlayerCacheMethod implements IBarSaveMethod{
     private final String prefix = "bar_data_%s";
 
     @Override
-    public void set(ToolsObjectWrapper wrapper, KBar bar, Player player, double value) {
-        wrapper.getCacheManager().setData(player,wrapper.getTag(),String.format(prefix,bar.getName()), value);
+    public void set(ToolsObjectWrapper wrapper, KBar bar, OfflinePlayer player, double value) {
+        if(!player.isOnline()) {
+            throw new UnsupportedOperationException("Player needs to be online!");
+        }
+        wrapper.getCacheManager().setData(player.getPlayer(),wrapper.getTag(),String.format(prefix,bar.getName()), value);
     }
 
     @Override
-    public double get(ToolsObjectWrapper wrapper, KBar bar, Player player) {
-        return wrapper.getCacheManager().getDataOr(player,wrapper.getTag(),String.format(prefix,bar.getName()),bar.getDefaultValue());
+    public double get(ToolsObjectWrapper wrapper, KBar bar, OfflinePlayer player) {
+        if(!player.isOnline()) {
+            throw new UnsupportedOperationException("Player needs to be online!");
+        }
+        return wrapper.getCacheManager().getDataOr(player.getPlayer(),wrapper.getTag(),String.format(prefix,bar.getName()),bar.getDefaultValue());
     }
 }

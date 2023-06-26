@@ -82,7 +82,7 @@ public class GlobalManagersWrapper {
         return uiManager;
     }
 
-    public ResourcePackManager getResourcepackManager() {
+    public ResourcePackManager getResourcePackManager() {
         return resourcepackManager;
     }
 

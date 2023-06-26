@@ -16,7 +16,7 @@
 
 package com.github.kpgtb.ktools.util.wrapper;
 
-import com.github.kpgtb.ktools.Ktools;
+import com.github.kpgtb.ktools.KTools;
 import com.github.kpgtb.ktools.manager.language.LanguageManager;
 import com.github.kpgtb.ktools.util.file.PackageUtil;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -43,7 +43,7 @@ public class ToolsInitializer {
     public ToolsInitializer(JavaPlugin plugin) {
         this.plugin = plugin;
 
-        Ktools tools = (Ktools) Bukkit.getPluginManager().getPlugin("Ktools");
+        KTools tools = (KTools) Bukkit.getPluginManager().getPlugin("KTools");
         this.globalManagersWrapper = tools.getGlobalManagersWrapper();
         this.adventure = BukkitAudiences.create(plugin);
         this.packageUtil = new PackageUtil(

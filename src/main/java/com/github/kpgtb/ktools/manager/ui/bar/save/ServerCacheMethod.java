@@ -18,7 +18,7 @@ package com.github.kpgtb.ktools.manager.ui.bar.save;
 
 import com.github.kpgtb.ktools.manager.ui.bar.KBar;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
-import org.bukkit.entity.Player;
+import org.bukkit.OfflinePlayer;
 
 /**
  * Save bar values in server cache
@@ -27,12 +27,12 @@ public class ServerCacheMethod implements IBarSaveMethod{
     private final String prefix = "bar_data_%s_%s";
 
     @Override
-    public void set(ToolsObjectWrapper wrapper, KBar bar, Player player, double value) {
+    public void set(ToolsObjectWrapper wrapper, KBar bar, OfflinePlayer player, double value) {
         wrapper.getCacheManager().setServerData(wrapper.getTag(),String.format(prefix,bar.getName(),player.getUniqueId()), value);
     }
 
     @Override
-    public double get(ToolsObjectWrapper wrapper, KBar bar, Player player) {
+    public double get(ToolsObjectWrapper wrapper, KBar bar, OfflinePlayer player) {
         return wrapper.getCacheManager().getServerDataOr(wrapper.getTag(),String.format(prefix,bar.getName(),player.getUniqueId()),bar.getDefaultValue());
     }
 }

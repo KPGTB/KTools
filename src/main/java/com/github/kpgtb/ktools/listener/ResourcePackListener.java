@@ -31,10 +31,10 @@ public class ResourcePackListener extends KListener {
 
     @EventHandler
     public void onResourcePack(PlayerResourcePackStatusEvent event) {
-        if(wrapper.getResourcepackManager() == null) {
+        if(wrapper.getResourcePackManager() == null) {
             return;
         }
-        if(!wrapper.getResourcepackManager().isEnabled()) {
+        if(!wrapper.getResourcePackManager().isEnabled()) {
             return;
         }
         if(event.getStatus().equals(PlayerResourcePackStatusEvent.Status.DECLINED)) {

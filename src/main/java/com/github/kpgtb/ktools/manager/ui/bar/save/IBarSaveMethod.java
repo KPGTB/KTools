@@ -18,12 +18,12 @@ package com.github.kpgtb.ktools.manager.ui.bar.save;
 
 import com.github.kpgtb.ktools.manager.ui.bar.KBar;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
-import org.bukkit.entity.Player;
+import org.bukkit.OfflinePlayer;
 
 /**
  * Bar value save method
  */
 public interface IBarSaveMethod {
-    void set(ToolsObjectWrapper wrapper, KBar bar, Player player, double value);
-    double get(ToolsObjectWrapper wrapper, KBar bar, Player player);
+    void set(ToolsObjectWrapper wrapper, KBar bar, OfflinePlayer player, double value);
+    double get(ToolsObjectWrapper wrapper, KBar bar, OfflinePlayer player);
 }

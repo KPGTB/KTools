@@ -69,7 +69,7 @@ public class ToolsObjectWrapper {
         this.debugManager = globalManagersWrapper.getDebugManager();
         this.paramParserManager = globalManagersWrapper.getParamParserManager();
         this.dataManager = globalManagersWrapper.getDataManager();
-        this.resourcepackManager = globalManagersWrapper.getResourcepackManager();
+        this.resourcepackManager = globalManagersWrapper.getResourcePackManager();
         this.uiManager = globalManagersWrapper.getUiManager();
         this.itemManager = globalManagersWrapper.getItemManager();
         this.legacy = globalManagersWrapper.isLegacy();
@@ -86,7 +86,7 @@ public class ToolsObjectWrapper {
         this.debugManager = initializer.getGlobalManagersWrapper().getDebugManager();
         this.paramParserManager = initializer.getGlobalManagersWrapper().getParamParserManager();
         this.dataManager = initializer.getGlobalManagersWrapper().getDataManager();
-        this.resourcepackManager = initializer.getGlobalManagersWrapper().getResourcepackManager();
+        this.resourcepackManager = initializer.getGlobalManagersWrapper().getResourcePackManager();
         this.uiManager = initializer.getGlobalManagersWrapper().getUiManager();
         this.itemManager = initializer.getGlobalManagersWrapper().getItemManager();
         this.legacy = initializer.getGlobalManagersWrapper().isLegacy();
@@ -130,7 +130,7 @@ public class ToolsObjectWrapper {
         return dataManager;
     }
 
-    public ResourcePackManager getResourcepackManager() {
+    public ResourcePackManager getResourcePackManager() {
         return resourcepackManager;
     }
 

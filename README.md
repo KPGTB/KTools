@@ -1,6 +1,6 @@
-# Ktools
+# KTools
 
-[![](https://jitpack.io/v/KPGTB/Ktools.svg)](https://jitpack.io/#KPGTB/Ktools)
+[![](https://jitpack.io/v/KPGTB/KTools.svg)](https://jitpack.io/#KPGTB/KTools)
 ![Spigot](https://img.shields.io/badge/Spigot-1.8--1.19-yellow)
 ![License](https://img.shields.io/badge/License-Apache%202.0-orange)
 ![Author](https://img.shields.io/badge/Author-KPG--TB-green)
@@ -29,7 +29,7 @@ Spigot 1.8 - 1.19
 ```xml
 <dependency>
     <groupId>com.github.KPGTB</groupId>
-    <artifactId>Ktools</artifactId>
+    <artifactId>KTools</artifactId>
     <version>LATEST</version>
     <scope>provided</scope>
 </dependency>
