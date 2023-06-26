@@ -103,7 +103,7 @@ public class ResourcePackManager {
      * @param ascent Ascent of char
      * @param width Width of char
      */
-    public void registerCustomChar(String pluginName, String character, String imageName, InputStream image, int height, int ascent, int width) {
+    public void registerCustomChar(String pluginName, String character, String imageName, InputStream image, int height, int ascent, double width) {
         File imageFile = this.saveFile(image,imageName,pluginName);
         if(imageFile == null) {
             return;

@@ -39,9 +39,9 @@ public class BarIcons {
     private Map<Integer,String> emptyChar;
 
     private final int iconsHeight;
-    private final int iconsWidth;
+    private final double iconsWidth;
 
-    public BarIcons(double from, double to, JavaPlugin plugin, String fullImage, String halfImage, String emptyImage, int iconsHeight, int iconsWidth) {
+    public BarIcons(double from, double to, JavaPlugin plugin, String fullImage, String halfImage, String emptyImage, int iconsHeight, double iconsWidth) {
         this.from = from;
         this.to = to;
         this.plugin = plugin;
@@ -84,7 +84,7 @@ public class BarIcons {
         return iconsHeight;
     }
 
-    public int getIconsWidth() {
+    public double getIconsWidth() {
         return iconsWidth;
     }
 

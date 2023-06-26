@@ -24,7 +24,7 @@ import java.util.HashMap;
  * Util with width of characters
  */
 public class FontWidth {
-    public static final HashMap<Character, Integer> customWidths = new HashMap<>();
+    public static final HashMap<Character, Double> customWidths = new HashMap<>();
     private static JsonElement spacesJson;
 
     /**
@@ -32,33 +32,33 @@ public class FontWidth {
      * @param spaces File with spaces from NegativeSpaces represented as JsonElement
      */
     public static void initWidth(JsonElement spaces) {
-        customWidths.put(' ', 4);
-        customWidths.put('f', 5);
-        customWidths.put('t', 4);
-        customWidths.put('i', 2);
-        customWidths.put('k', 5);
-        customWidths.put('l', 3);
-        customWidths.put('I', 4);
-        customWidths.put('\'', 2);
-        customWidths.put('.', 2);
-        customWidths.put(',', 2);
-        customWidths.put(';', 2);
-        customWidths.put(':', 2);
-        customWidths.put('[', 4);
-        customWidths.put(']', 4);
-        customWidths.put('{', 4);
-        customWidths.put('}', 4);
-        customWidths.put('*', 4);
-        customWidths.put('!', 2);
-        customWidths.put('"', 4);
-        customWidths.put('(', 4);
-        customWidths.put(')', 4);
-        customWidths.put('|', 2);
-        customWidths.put('`', 3);
-        customWidths.put('<', 5);
-        customWidths.put('>', 5);
-        customWidths.put('@',7 );
-        customWidths.put('~', 7);
+        customWidths.put(' ', 4.0);
+        customWidths.put('f', 5.0);
+        customWidths.put('t', 4.0);
+        customWidths.put('i', 2.0);
+        customWidths.put('k', 5.0);
+        customWidths.put('l', 3.0);
+        customWidths.put('I', 4.0);
+        customWidths.put('\'', 2.0);
+        customWidths.put('.', 2.0);
+        customWidths.put(',', 2.0);
+        customWidths.put(';', 2.0);
+        customWidths.put(':', 2.0);
+        customWidths.put('[', 4.0);
+        customWidths.put(']', 4.0);
+        customWidths.put('{', 4.0);
+        customWidths.put('}', 4.0);
+        customWidths.put('*', 4.0);
+        customWidths.put('!', 2.0);
+        customWidths.put('"', 4.0);
+        customWidths.put('(', 4.0);
+        customWidths.put(')', 4.0);
+        customWidths.put('|', 2.0);
+        customWidths.put('`', 3.0);
+        customWidths.put('<', 5.0);
+        customWidths.put('>', 5.0);
+        customWidths.put('@',7.0 );
+        customWidths.put('~', 7.0);
 
         spacesJson = spaces;
     }
@@ -68,7 +68,7 @@ public class FontWidth {
      * @param character Character
      * @param width Width
      */
-    public static void registerCustomChar(Character character, int width) {
+    public static void registerCustomChar(Character character, double width) {
         customWidths.put(character, width);
     }
 
@@ -77,8 +77,8 @@ public class FontWidth {
      * @param character Character
      * @return Width of character
      */
-    public static Integer getWidth(Character character) {
-        return customWidths.getOrDefault(character, 6);
+    public static double getWidth(Character character) {
+        return customWidths.getOrDefault(character, 6.0);
     }
 
     /**

@@ -70,7 +70,7 @@ public class BaseUiObject {
     }
 
     private Integer[] getLeftAndRightPixels() {
-        int width = 0;
+        double width = 0;
 
         for(Character character : fixString(text).toCharArray()) {
             width += FontWidth.getWidth(character);
@@ -81,15 +81,15 @@ public class BaseUiObject {
         switch (alignment) {
             case LEFT:
                 pixels[0] = offset;
-                pixels[1] = -offset-width;
+                pixels[1] = (int) (-offset-Math.round(width));
                 break;
             case RIGHT:
-                pixels[0] = offset-width;
+                pixels[0] = (int) (offset-Math.round(width));
                 pixels[1] = -offset;
                 break;
             case CENTER:
-                pixels[0] = offset-width/2;
-                pixels[1] = -pixels[0]-width;
+                pixels[0] = (int) (offset-Math.round(width)/2);
+                pixels[1] = (int) (-pixels[0]-Math.round(width));
                 break;
         }
 
