@@ -159,7 +159,7 @@ public class PagedGuiContainer extends GuiContainer {
                 x = startX;
                 y+=offsetY;
             }
-            if(y >= this.getWidth()) {
+            if(y >= this.getHeight()) {
                 x = startX;
                 y = startY;
                 if(pagesLimit > newPages.size()) {
