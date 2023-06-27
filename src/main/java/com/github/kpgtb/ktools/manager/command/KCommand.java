@@ -519,7 +519,7 @@ public abstract class KCommand extends Command {
                 }
 
                 componentsToSend.addAll(wrapper.getLanguageManager().getComponent(
-                        LanguageLevel.PLUGIN,
+                        LanguageLevel.GLOBAL,
                         "helpLine",
                         Placeholder.parsed("command", getCommandStr(command)),
                         Placeholder.unparsed("description", command.getDescription())
@@ -528,13 +528,13 @@ public abstract class KCommand extends Command {
         });
 
         if(componentsToSend.isEmpty()) {
-            componentsToSend.addAll(language.getComponent(LanguageLevel.PLUGIN, "helpNoInfo"));
+            componentsToSend.addAll(language.getComponent(LanguageLevel.GLOBAL, "helpNoInfo"));
         }
 
-        componentsToSend.addAll(0,language.getComponent(LanguageLevel.PLUGIN, "helpInfoStart", Placeholder.parsed("command", cmdName)));
+        componentsToSend.addAll(0,language.getComponent(LanguageLevel.GLOBAL, "helpInfoStart", Placeholder.parsed("command", cmdName)));
         componentsToSend.add(0, Component.text(" "));
 
-        componentsToSend.addAll(language.getComponent(LanguageLevel.PLUGIN, "helpInfoEnd", Placeholder.parsed("command", cmdName)));
+        componentsToSend.addAll(language.getComponent(LanguageLevel.GLOBAL, "helpInfoEnd", Placeholder.parsed("command", cmdName)));
         componentsToSend.add( Component.text(" "));
 
         componentsToSend.forEach(audience::sendMessage);

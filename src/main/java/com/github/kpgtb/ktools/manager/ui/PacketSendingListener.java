@@ -57,6 +57,7 @@ public class PacketSendingListener {
         @Override
         public void onPacketSending(PacketEvent event) {
             if (event.isCancelled() || uiManager.isSending()) { return; }
+            if(event.getPacket().getChatComponents().size() == 0) {return;}
            uiManager.addActionBar(
                     event.getPlayer().getUniqueId(),
                     ComponentSerializer.parse(event.getPacket().getChatComponents().read(0).getJson())[0].toLegacyText(),
@@ -79,6 +80,7 @@ public class PacketSendingListener {
             if (event.isCancelled() || uiManager.isSending()) { return; }
             PacketContainer packet = event.getPacket();
             if (!packet.getTitleActions().read(0).equals(EnumWrappers.TitleAction.ACTIONBAR)) { return; }
+            if(event.getPacket().getChatComponents().size() == 0) {return;}
            uiManager.addActionBar(
                     event.getPlayer().getUniqueId(),
                     ComponentSerializer.parse(event.getPacket().getChatComponents().read(0).getJson())[0].toLegacyText(),

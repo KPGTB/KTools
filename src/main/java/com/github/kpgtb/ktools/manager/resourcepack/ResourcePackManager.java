@@ -243,9 +243,9 @@ public class ResourcePackManager {
             File shaderInFolder = new File(shaderFolder, "rendertype_text.vsh");
             Files.move(savedShader.toPath(), shaderInFolder.toPath(), StandardCopyOption.REPLACE_EXISTING);*/
             
-            File itemFolder = new File(tempFolder, "assets\\minecraft\\textures\\item\\");
+            File itemFolder = new File(tempFolder, "assets"+ File.separator +"minecraft"+ File.separator +"textures"+ File.separator +"item" + File.separator);
             itemFolder.mkdirs();
-            File modelsFolder = new File(tempFolder, "assets\\minecraft\\models\\item\\");
+            File modelsFolder = new File(tempFolder, "assets"+ File.separator +"minecraft"+ File.separator +"models"+ File.separator +"item" + File.separator);
             modelsFolder.mkdirs();
             HashMap<Material, ArrayList<Integer>> modelsToJson = new HashMap<>();
 
@@ -323,9 +323,9 @@ public class ResourcePackManager {
                 }
             });
 
-            File assetsFolder = new File(tempFolder, "assets\\");
+            File assetsFolder = new File(tempFolder, "assets" + File.separator);
             assetsFolder.mkdirs();
-            File fontFolder = new File(tempFolder, "assets\\minecraft\\font\\");
+            File fontFolder = new File(tempFolder, "assets"+File.separator+"minecraft"+File.separator+"font"+File.separator);
             fontFolder.mkdirs();
 
             String fontPath = fontFolder.getAbsolutePath() + File.separator + "default.json";
@@ -404,7 +404,7 @@ public class ResourcePackManager {
     private void addFolderToZip(String parentPath, File folder, ZipOutputStream zos) throws IOException {
         for (File file : folder.listFiles()) {
             if (file.isDirectory()) {
-                String path = parentPath + file.getName() + "/";
+                String path = parentPath + file.getName() + File.separator;
                 ZipEntry zipEntry = new ZipEntry(path);
                 zos.putNextEntry(zipEntry);
                 addFolderToZip(path, file, zos);

@@ -43,6 +43,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.io.File;
+
 /**
  * Main class of plugin
  */
@@ -132,7 +134,7 @@ public final class KTools extends JavaPlugin {
                     if(finalUiManager != null && finalUiManager.isRequired()) {
                         finalResourcepackManager.registerPlugin(packageUtil.getTag(), getDescription().getVersion());
                         //Shader
-                        finalResourcepackManager.registerCustomFile("noShadow", "assets\\minecraft\\shaders\\core\\", "rendertype_text.vsh", getResource("txt/rendertype_text.vsh"));
+                        finalResourcepackManager.registerCustomFile("noShadow", "assets"+ File.separator+"minecraft"+ File.separator+"shaders"+ File.separator+"core" + File.separator, "rendertype_text.vsh", getResource("txt/rendertype_text.vsh"));
                         //NegativeSpaces
                         finalResourcepackManager.registerCustomChar("space", "\uF801", "space_split.png", getResource("txt/space_split.png"), -3, -32768, -1);
                         finalResourcepackManager.registerCustomChar("space", "\uF802", "space_split.png", getResource("txt/space_split.png"), -4, -32768, -2);
