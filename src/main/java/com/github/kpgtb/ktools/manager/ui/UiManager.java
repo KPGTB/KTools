@@ -50,17 +50,14 @@ public class UiManager {
      * Constructor of this manager
      * @param plugin Instance of plugin
      * @param protocolManager Instance of ProtocolManager (ProtocolLib)
-     * @param spaces File with spaces from NegativeSpaces Resourcepack
      */
-    public UiManager(JavaPlugin plugin, ProtocolManager protocolManager, Reader spaces) {
+    public UiManager(JavaPlugin plugin, ProtocolManager protocolManager) {
         this.plugin = plugin;
         this.ui = new HashMap<>();
         this.standardActionBars = new HashMap<>();
         this.sending = false;
         this.required = false;
         this.protocolManager = protocolManager;
-
-        FontWidth.initWidth (new JsonParser().parse(spaces));
     }
 
     /**

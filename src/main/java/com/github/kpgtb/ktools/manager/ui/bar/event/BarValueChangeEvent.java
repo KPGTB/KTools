@@ -17,6 +17,7 @@
 package com.github.kpgtb.ktools.manager.ui.bar.event;
 
 import com.github.kpgtb.ktools.manager.ui.bar.KBar;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -24,6 +25,7 @@ import org.bukkit.event.HandlerList;
 
 /**
  * Event called when value of registered custom bar is changed
+ * Only called when player is online!
  */
 public class BarValueChangeEvent extends Event implements Cancellable {
     private static final HandlerList HANDLERS = new HandlerList();
@@ -37,10 +39,10 @@ public class BarValueChangeEvent extends Event implements Cancellable {
         return HANDLERS;
     }
 
-    private final Player player;
+    private final OfflinePlayer player;
     private final KBar bar;
     private final double oldValue;
-    private final double newValue;
+    private double newValue;
     private boolean cancelled;
 
     @Override
@@ -53,14 +55,14 @@ public class BarValueChangeEvent extends Event implements Cancellable {
         this.cancelled = cancel;
     }
 
-    public BarValueChangeEvent(Player player, KBar bar, double oldValue, double newValue) {
+    public BarValueChangeEvent(OfflinePlayer player, KBar bar, double oldValue, double newValue) {
         this.player = player;
         this.bar = bar;
         this.oldValue = oldValue;
         this.newValue = newValue;
     }
 
-    public Player getPlayer() {
+    public OfflinePlayer getPlayer() {
         return player;
     }
 
@@ -74,5 +76,9 @@ public class BarValueChangeEvent extends Event implements Cancellable {
 
     public double getNewValue() {
         return newValue;
+    }
+
+    public void setNewValue(double newValue) {
+        this.newValue = newValue;
     }
 }

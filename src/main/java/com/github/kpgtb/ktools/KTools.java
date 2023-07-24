@@ -36,8 +36,10 @@ import com.github.kpgtb.ktools.manager.updater.version.KVersion;
 import com.github.kpgtb.ktools.util.bstats.Metrics;
 import com.github.kpgtb.ktools.util.file.PackageUtil;
 import com.github.kpgtb.ktools.util.time.KTime;
+import com.github.kpgtb.ktools.util.ui.FontWidth;
 import com.github.kpgtb.ktools.util.wrapper.GlobalManagersWrapper;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
+import com.google.gson.JsonParser;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -110,10 +112,11 @@ public final class KTools extends JavaPlugin {
         debug.sendInfo(DebugType.START, "Loaded bars.");
 
         UiManager uiManager = null;
+        FontWidth.initWidth (new JsonParser().parse(getTextResource("spaces.json")));
         if(Bukkit.getPluginManager().getPlugin("ProtocolLib") != null && !legacy) {
             debug.sendInfo(DebugType.START, "Loading ui...");
             ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
-            uiManager = new UiManager(this,protocolManager, getTextResource("spaces.json"));
+            uiManager = new UiManager(this,protocolManager);
             debug.sendInfo(DebugType.START, "Loaded ui.");
         }
 
@@ -131,10 +134,9 @@ public final class KTools extends JavaPlugin {
                         barManager.prepareBars();
                     }
 
-                    if(finalUiManager != null && finalUiManager.isRequired()) {
+                    if(finalResourcepackManager.areSpacesRegistered() || (finalUiManager != null && finalUiManager.isRequired())) {
                         finalResourcepackManager.registerPlugin(packageUtil.getTag(), getDescription().getVersion());
-                        //Shader
-                        finalResourcepackManager.registerCustomFile("noShadow", "assets"+ File.separator+"minecraft"+ File.separator+"shaders"+ File.separator+"core" + File.separator, "rendertype_text.vsh", getResource("txt/rendertype_text.vsh"));
+
                         //NegativeSpaces
                         finalResourcepackManager.registerCustomChar("space", "\uF801", "space_split.png", getResource("txt/space_split.png"), -3, -32768, -1);
                         finalResourcepackManager.registerCustomChar("space", "\uF802", "space_split.png", getResource("txt/space_split.png"), -4, -32768, -2);
@@ -199,6 +201,11 @@ public final class KTools extends JavaPlugin {
                         finalResourcepackManager.registerCustomChar("space", "\uF83D", "space_nosplit.png", getResource("txt/space_nosplit.png"), 255, -32768, 256);
                         finalResourcepackManager.registerCustomChar("space", "\uF83E", "space_nosplit.png", getResource("txt/space_nosplit.png"), 511, -32768, 512);
                         finalResourcepackManager.registerCustomChar("space", "\uF83F", "space_nosplit.png", getResource("txt/space_nosplit.png"), 1023, -32768, 1024);
+                    }
+
+                    if(finalUiManager != null && finalUiManager.isRequired()) {
+                        //Shader
+                        finalResourcepackManager.registerCustomFile("noShadow", "assets"+ File.separator+"minecraft"+ File.separator+"shaders"+ File.separator+"core" + File.separator, "rendertype_text.vsh", getResource("txt/rendertype_text.vsh"));
                     }
 
                     if(finalResourcepackManager.isEnabled()) {

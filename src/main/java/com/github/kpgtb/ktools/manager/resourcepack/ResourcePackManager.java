@@ -29,11 +29,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -47,6 +48,7 @@ public class ResourcePackManager {
 
     private File texturesFolder;
     private boolean required;
+    private boolean spaces;
 
     private final ArrayList<CustomChar> customChars;
     private final ArrayList<CustomModelData> customModels;
@@ -64,11 +66,28 @@ public class ResourcePackManager {
         this.debug = debug;
         this.cache = cache;
         this.required = false;
+        this.spaces = false;
 
         this.customChars = new ArrayList<>();
         this.customModels = new ArrayList<>();
         this.customFiles = new ArrayList<>();
         this.plugins = new ArrayList<>();
+    }
+
+    /**
+     * Register NegativeSpaces Resource Pack
+     * @since 2.1.0
+     */
+    public void registerSpaces() {
+        this.spaces = true;
+    }
+
+    /**
+     * Check if NegativeSpaces are registered
+     * @since 2.1.0
+     */
+    public boolean areSpacesRegistered() {
+        return this.spaces;
     }
 
     /**
@@ -381,7 +400,6 @@ public class ResourcePackManager {
         this.debug.sendInfo(DebugType.RESOURCEPACK, "Prepared resourcepack in " + (System.currentTimeMillis() - millis) + "ms.");
     }
 
-    // Private utils
 
     private File folderToZip(File folder, String name) {
         try {
@@ -404,7 +422,7 @@ public class ResourcePackManager {
     private void addFolderToZip(String parentPath, File folder, ZipOutputStream zos) throws IOException {
         for (File file : folder.listFiles()) {
             if (file.isDirectory()) {
-                String path = parentPath + file.getName() + File.separator;
+                String path = parentPath + file.getName() + "/";
                 ZipEntry zipEntry = new ZipEntry(path);
                 zos.putNextEntry(zipEntry);
                 addFolderToZip(path, file, zos);
@@ -425,6 +443,7 @@ public class ResourcePackManager {
             }
         }
     }
+
     private String uploadFile(File fileToUpload) {
         try {
             String boundary = Long.toHexString(System.currentTimeMillis());

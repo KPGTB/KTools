@@ -25,6 +25,7 @@ import com.github.kpgtb.ktools.util.ui.NoShadow;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -289,20 +290,25 @@ public class BarManager {
      * @param player Player
      * @param value New value
      */
-    public void setValue(KBar bar, Player player, double value) {
+    public void setValue(KBar bar, OfflinePlayer player, double value) {
         if(value > bar.getMax()) {
             value = bar.getMax();
         }
         if(value < 0.0) {
             value = 0.0;
         }
-        BarValueChangeEvent event = new BarValueChangeEvent(player,bar,getValue(bar,player),value);
-        Bukkit.getPluginManager().callEvent(event);
-        if(event.isCancelled()) {
-            return;
+        if(player.isOnline()) {
+            Player online = player.getPlayer();
+            BarValueChangeEvent event = new BarValueChangeEvent(online, bar, getValue(bar, player), value);
+            Bukkit.getPluginManager().callEvent(event);
+            if (event.isCancelled()) {
+                return;
+            }
+            bar.getSaveMethod().set(wrapper, bar, player, event.getNewValue());
+            updateBar(bar, online);
+        } else {
+            bar.getSaveMethod().set(wrapper,bar,player,value);
         }
-        bar.getSaveMethod().set(wrapper,bar,player,value);
-        updateBar(bar,player);
     }
 
     /**
@@ -311,7 +317,7 @@ public class BarManager {
      * @param player Player
      * @return value of bar
      */
-    public double getValue(KBar bar, Player player) {
+    public double getValue(KBar bar, OfflinePlayer player) {
         return bar.getSaveMethod().get(wrapper,bar,player);
     }
 
