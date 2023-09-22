@@ -16,6 +16,7 @@
 
 package com.github.kpgtb.ktools.util.wrapper;
 
+import com.github.kpgtb.ktools.KTools;
 import com.github.kpgtb.ktools.manager.cache.CacheManager;
 import com.github.kpgtb.ktools.manager.data.DataManager;
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
@@ -34,6 +35,7 @@ import org.bukkit.plugin.java.JavaPlugin;
  * Wrapper with all necessary objects
  */
 public class ToolsObjectWrapper {
+    private final KTools kTools;
     private final CacheManager cacheManager;
     private final DebugManager debugManager;
     private final LanguageManager languageManager;
@@ -48,7 +50,7 @@ public class ToolsObjectWrapper {
     private final PackageUtil packageUtil;
     private final BarManager barManager;
 
-    public ToolsObjectWrapper(CacheManager cacheManager, DebugManager debugManager, LanguageManager languageManager, JavaPlugin plugin, BukkitAudiences adventure, ParamParserManager paramParserManager, DataManager dataManager, ResourcePackManager resourcepackManager, UiManager uiManager, ItemManager itemManager, boolean legacy, PackageUtil packageUtil, BarManager barManager) {
+    public ToolsObjectWrapper(CacheManager cacheManager, DebugManager debugManager, LanguageManager languageManager, JavaPlugin plugin, BukkitAudiences adventure, ParamParserManager paramParserManager, DataManager dataManager, ResourcePackManager resourcepackManager, UiManager uiManager, ItemManager itemManager, boolean legacy, PackageUtil packageUtil, BarManager barManager, KTools kTools) {
         this.cacheManager = cacheManager;
         this.debugManager = debugManager;
         this.languageManager = languageManager;
@@ -62,6 +64,7 @@ public class ToolsObjectWrapper {
         this.legacy = legacy;
         this.packageUtil = packageUtil;
         this.barManager = barManager;
+        this.kTools = kTools;
     }
 
     public ToolsObjectWrapper(GlobalManagersWrapper globalManagersWrapper, LanguageManager languageManager, JavaPlugin plugin, BukkitAudiences adventure, PackageUtil packageUtil) {
@@ -74,6 +77,7 @@ public class ToolsObjectWrapper {
         this.itemManager = globalManagersWrapper.getItemManager();
         this.legacy = globalManagersWrapper.isLegacy();
         this.barManager = globalManagersWrapper.getBarManager();
+        this.kTools = globalManagersWrapper.getKTools();
 
         this.languageManager = languageManager;
         this.plugin = plugin;
@@ -91,6 +95,7 @@ public class ToolsObjectWrapper {
         this.itemManager = initializer.getGlobalManagersWrapper().getItemManager();
         this.legacy = initializer.getGlobalManagersWrapper().isLegacy();
         this.barManager = initializer.getGlobalManagersWrapper().getBarManager();
+        this.kTools = initializer.getGlobalManagersWrapper().getKTools();
 
         this.languageManager = initializer.getLanguageManager();
         this.plugin = initializer.getPlugin();
@@ -158,4 +163,7 @@ public class ToolsObjectWrapper {
         return this.plugin.getConfig();
     }
 
+    public KTools getKTools() {
+        return kTools;
+    }
 }

@@ -37,6 +37,8 @@ public class KItemBuilder {
     private final String itemName;
     private final ItemStack itemStack;
 
+    private boolean dropBlock;
+
     private ItemBuilderAction<PlayerInteractEvent> onUseAction;
     private ItemBuilderBoolAction<InventoryClickEvent> onClickAction;
     private ItemBuilderAction<PlayerDropItemEvent> onDropAction;
@@ -55,6 +57,15 @@ public class KItemBuilder {
         this.pluginTag = pluginTag;
         this.itemName = itemName;
         this.itemStack = itemStack;
+        this.dropBlock = false;
+    }
+
+    public boolean isDropBlocked() {
+        return dropBlock;
+    }
+
+    public void setDropBlock(boolean dropBlock) {
+        this.dropBlock = dropBlock;
     }
 
     public String getPluginTag() {
@@ -260,6 +271,7 @@ public class KItemBuilder {
                 }
             }
         };
+        item.setDropBlock(dropBlock);
         wrapper.getItemManager().registerItem(wrapper,item);
         return item;
     }

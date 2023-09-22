@@ -25,7 +25,9 @@ import org.bukkit.Material;
 
 /**
  * Common used GuiItem - Turn Right Item
+ * @deprecated Use CommonGuiItem
  */
+@Deprecated
 public class RightItem {
     /**
      * Get this item

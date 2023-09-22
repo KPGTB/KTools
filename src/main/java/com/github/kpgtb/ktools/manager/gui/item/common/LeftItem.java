@@ -25,7 +25,9 @@ import org.bukkit.Material;
 
 /**
  * Common used GuiItem - Turn Left Item
+ * @deprecated Use CommonGuiItem
  */
+@Deprecated
 public class LeftItem {
     /**
      * Get this item

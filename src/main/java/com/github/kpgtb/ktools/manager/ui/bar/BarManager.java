@@ -281,7 +281,7 @@ public class BarManager {
             ui.append(fullIconChar);
         }
 
-        uiObj.update(NoShadow.disableShadow(ui.toString(), wrapper.getLanguageManager()));
+        uiObj.update(NoShadow.disableShadow(ui.toString(), wrapper));
     }
 
     /**

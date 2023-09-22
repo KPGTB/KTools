@@ -16,6 +16,7 @@
 
 package com.github.kpgtb.ktools.util.wrapper;
 
+import com.github.kpgtb.ktools.KTools;
 import com.github.kpgtb.ktools.manager.cache.CacheManager;
 import com.github.kpgtb.ktools.manager.command.parser.ParamParserManager;
 import com.github.kpgtb.ktools.manager.data.DataManager;
@@ -30,6 +31,7 @@ import com.github.kpgtb.ktools.manager.ui.bar.BarManager;
  * Wrapper with all objects that should have only one instance - from KTools
  */
 public class GlobalManagersWrapper {
+    private final KTools kTools;
     private final DebugManager debugManager;
     private final LanguageManager globalLanguageManager;
     private final CacheManager cacheManager;
@@ -41,7 +43,8 @@ public class GlobalManagersWrapper {
     private final BarManager barManager;
     private final boolean legacy;
 
-    public GlobalManagersWrapper(DebugManager debugManager, LanguageManager globalLanguageManager, CacheManager cacheManager, ParamParserManager paramParserManager, DataManager dataManager, UiManager uiManager, ResourcePackManager resourcepackManager, ItemManager itemManager, BarManager barManager, boolean legacy) {
+    public GlobalManagersWrapper(KTools kTools, DebugManager debugManager, LanguageManager globalLanguageManager, CacheManager cacheManager, ParamParserManager paramParserManager, DataManager dataManager, UiManager uiManager, ResourcePackManager resourcepackManager, ItemManager itemManager, BarManager barManager, boolean legacy) {
+        this.kTools = kTools;
         this.debugManager = debugManager;
         this.globalLanguageManager = globalLanguageManager;
         this.cacheManager = cacheManager;
@@ -92,5 +95,9 @@ public class GlobalManagersWrapper {
 
     public boolean isLegacy() {
         return legacy;
+    }
+
+    public KTools getKTools() {
+        return kTools;
     }
 }

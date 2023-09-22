@@ -11,6 +11,8 @@ cache:
 resourcepack: true
 # Refresh rate of checking if resource pack is correct
 resourcePackRefreshRate: "15m"
+# Disable shadows on action bar. It's used in custom bars
+fixShadowsOnActionBars: true
 # Data save info
 data:
   # Possible options: SQLITE or MYSQL

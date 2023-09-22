@@ -18,6 +18,8 @@ package com.github.kpgtb.ktools.util.ui;
 
 import com.github.kpgtb.ktools.manager.language.LanguageManager;
 import com.github.kpgtb.ktools.manager.updater.version.KVersion;
+import com.github.kpgtb.ktools.util.wrapper.ToolsInitializer;
+import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import org.bukkit.Bukkit;
 
 /**
@@ -29,18 +31,18 @@ public class NoShadow {
     /**
      * Disable shadow in string (Resourcepack must be enabled!)
      * @param str Text
-     * @param languageManager Instance of language manager
+     * @param wrapper Instance of ToolsObjectWrapper
      * @return String without shadow
      */
-    public static String disableShadow(String str, LanguageManager languageManager) {
+    public static String disableShadow(String str, ToolsObjectWrapper wrapper) {
         String version = Bukkit.getBukkitVersion()
                 .split("-")[0];
         KVersion mcVersion = new KVersion(version);
 
-        boolean fixShadow = mcVersion.isNewerThan(new KVersion("1.19.0"));
+        boolean fixShadow = mcVersion.isNewerThan(new KVersion("1.19.0")) && wrapper.getKTools().getConfig().getBoolean("fixShadowsOnActionBars");
 
         if(fixShadow) {
-            return languageManager.convertMmToString("<color:#4e5c24>" + str);
+            return wrapper.getLanguageManager().convertMmToString("<color:#4e5c24>" + str);
         } else {
             return str;
         }

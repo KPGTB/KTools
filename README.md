@@ -55,6 +55,7 @@ Wiki -> https://wiki.kpgtb.pl/
 - Resource packs are uploading to https://temp.sh/
 - To fix UI shadows, this plugin uses [NoShadow](https://github.com/PuckiSilver/NoShadow) License: [MIT](https://github.com/PuckiSilver/NoShadow/blob/main/LICENSE)
 - To make UI, this plugin uses [Negative Space Font](https://www.spigotmc.org/threads/negative-space-font-resource-pack.440952/) License: [CC 4.0](https://creativecommons.org/licenses/by/4.0/)
+- Some annotations are handled by [Project Lombok](https://projectlombok.org/) License: [MIT](https://opensource.org/license/mit/)
 
 ### License
 

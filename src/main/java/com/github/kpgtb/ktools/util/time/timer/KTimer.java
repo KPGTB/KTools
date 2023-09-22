@@ -87,7 +87,7 @@ public class KTimer {
 
         setTickMessage(languageManager.getSingleComponent(LanguageLevel.GLOBAL, "defaultTimer"));
         setEndMessage(languageManager.getSingleComponent(LanguageLevel.GLOBAL, "defaultEndTimer"));
-        setEndMessage(languageManager.getSingleComponent(LanguageLevel.GLOBAL, "defaultCancelTimer"));
+        setCancelMessage(languageManager.getSingleComponent(LanguageLevel.GLOBAL, "defaultCancelTimer"));
 
         end();
     }

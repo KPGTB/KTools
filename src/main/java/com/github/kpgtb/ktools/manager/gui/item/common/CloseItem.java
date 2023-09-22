@@ -25,7 +25,9 @@ import org.bukkit.Material;
 
 /**
  * Common used GuiItem - Close Inventory
+ * @deprecated Use CommonGuiItem
  */
+@Deprecated
 public class CloseItem {
     /**
      * Get this item

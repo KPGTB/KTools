@@ -31,9 +31,11 @@ import org.jetbrains.annotations.NotNull;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Some utils with items
@@ -46,7 +48,7 @@ public class ItemUtil {
      * @param ignore List of NamespacedKey to ignore
      * @return true if ItemStack are similar or false if items are null, items are AIR, items don't have meta, or items aren't similar
      */
-    public static boolean compareWithoutPDC(ItemStack is1, ItemStack is2, ArrayList<NamespacedKey> ignore) {
+    public static boolean compareWithoutPDC(ItemStack is1, ItemStack is2, List<NamespacedKey> ignore) {
         if(is1 == null || is2 == null) {
             return false;
         }
@@ -81,6 +83,18 @@ public class ItemUtil {
     }
 
     /**
+     * Compare ItemStacks ignoring some namespace keys
+     * @param is1 First ItemStack
+     * @param is2 Second ItemStack
+     * @param ignore List of NamespacedKey to ignore
+     * @return true if ItemStack are similar or false if items are null, items are AIR, items don't have meta, or items aren't similar
+     * @since 2.2.0
+     */
+    public static boolean compareWithoutPDC(ItemStack is1, ItemStack is2, NamespacedKey... ignore) {
+        return compareWithoutPDC(is1,is2, Arrays.stream(ignore).collect(Collectors.toList()));
+    }
+
+    /**
      * Give items to player and drop items that won't fit
      * @param player Player that should get items
      * @param is Items
@@ -95,6 +109,16 @@ public class ItemUtil {
         lostItems.values().forEach(item -> {
             loc.getWorld().dropItemNaturally(loc, item);
         });
+    }
+
+    /**
+     * Give items to player and drop items that won't fit
+     * @param player Player that should get items
+     * @param is Items
+     * @since 2.2.0
+     */
+    public static void giveItemToPlayer(@NotNull Player player, @NotNull List<ItemStack> is) {
+        giveItemToPlayer(player,is.toArray(new ItemStack[0]));
     }
 
     /**

@@ -17,9 +17,9 @@
 package com.github.kpgtb.ktools.manager.gui;
 
 import com.github.kpgtb.ktools.manager.gui.container.GuiContainer;
+import com.github.kpgtb.ktools.manager.gui.item.CommonGuiItem;
 import com.github.kpgtb.ktools.manager.gui.item.GuiItem;
 import com.github.kpgtb.ktools.manager.gui.item.GuiItemLocation;
-import com.github.kpgtb.ktools.manager.gui.item.common.CloseItem;
 import com.github.kpgtb.ktools.manager.gui.write.ICountResponse;
 import com.github.kpgtb.ktools.manager.language.LanguageLevel;
 import com.github.kpgtb.ktools.util.item.ItemBuilder;
@@ -143,8 +143,8 @@ public class KCountGui extends KGui{
             container.setItem(location.getX(),location.getY(),item);
         });
 
-        container.setItem(4,0, CloseItem.get(wrapper));
-        container.setItem(4,2, CloseItem.get(wrapper));
+        container.setItem(4,0, CommonGuiItem.getCloseItem(wrapper));
+        container.setItem(4,2, CommonGuiItem.getCloseItem(wrapper));
 
         addContainer(container);
     }

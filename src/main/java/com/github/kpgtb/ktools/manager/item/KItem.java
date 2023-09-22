@@ -17,6 +17,7 @@
 package com.github.kpgtb.ktools.manager.item;
 
 import com.github.kpgtb.ktools.util.item.ItemBuilder;
+import com.github.kpgtb.ktools.util.item.ItemUtil;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -28,15 +29,15 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Abstract class that handles process of preparing custom item
@@ -45,7 +46,9 @@ import java.util.List;
 public abstract class KItem implements Listener {
     private final ToolsObjectWrapper wrapper;
     private final String fullItemTag;
-    private final List<Player> deathPlayers;
+    private final List<UUID> deathPlayers;
+    private final Map<UUID, List<ItemStack>> toReturn;
+    private boolean dropBlock;
 
     /**
      * Constructor of Kitem
@@ -56,6 +59,8 @@ public abstract class KItem implements Listener {
         this.wrapper = wrapper;
         this.fullItemTag = fullItemTag;
         this.deathPlayers = new ArrayList<>();
+        this.toReturn = new HashMap<>();
+        this.dropBlock = false;
     }
 
     public final void generateItemInFile() {
@@ -129,6 +134,24 @@ public abstract class KItem implements Listener {
     public void onRespawn(PlayerRespawnEvent event) {}
     public void onSwap(PlayerSwapHandItemsEvent event, boolean toOff) {}
 
+    /**
+     * Check if item drop is blocked
+     * @return true if item can not be dropped
+     * @since 2.2.0
+     */
+    public boolean isDropBlocked() {
+        return dropBlock;
+    }
+
+    /**
+     * Set if player can drop item
+     * @param dropBlock true if player can't drop item
+     * @since 2.2.0
+     */
+    public void setDropBlock(boolean dropBlock) {
+        this.dropBlock = dropBlock;
+    }
+
     @EventHandler
     public final void onUseListener(PlayerInteractEvent event) {
         ItemStack is = event.getItem();
@@ -149,6 +172,10 @@ public abstract class KItem implements Listener {
         if(clicked != null && !clicked.getType().equals(Material.AIR)) {
             if(this.isSimilar(clicked)) {
                 this.onClick(event,false);
+
+                if(dropBlock && event.isShiftClick()) {
+                    event.setCancelled(true);
+                }
             }
         }
 
@@ -156,6 +183,11 @@ public abstract class KItem implements Listener {
         if(cursor != null && !cursor.getType().equals(Material.AIR)) {
             if(this.isSimilar(cursor)) {
                 this.onClick(event,true);
+
+                Inventory clickedInv = event.getClickedInventory();
+                if(dropBlock && (clickedInv == null || clickedInv.getType() != InventoryType.PLAYER)) {
+                    event.setCancelled(true);
+                }
             }
         }
     }
@@ -170,12 +202,17 @@ public abstract class KItem implements Listener {
 
         if(this.isSimilar(is)) {
             this.onDrop(event);
+
+            if(dropBlock) {
+                event.setCancelled(true);
+            }
         }
     }
 
     @EventHandler
     public final void onDeathListener(PlayerDeathEvent event) {
         List<ItemStack> drops = event.getDrops();
+        UUID uuid = event.getEntity().getUniqueId();
 
         for (ItemStack is : drops) {
             if(is == null || is.getType().equals(Material.AIR)) {
@@ -183,10 +220,27 @@ public abstract class KItem implements Listener {
             }
 
             if(this.isSimilar(is)) {
-                this.deathPlayers.add(event.getEntity());
+                this.deathPlayers.add(uuid);
                 this.onDeath(event);
                 break;
             }
+        }
+
+        if(dropBlock) {
+            drops.removeIf(is -> {
+                if(is == null || is.getType().equals(Material.AIR)) {
+                    return false;
+                }
+
+                if(this.isSimilar(is)) {
+                    if(!this.toReturn.containsKey(uuid)) {
+                        this.toReturn.put(uuid, new ArrayList<>());
+                    }
+                    this.toReturn.get(uuid).add(is);
+                    return true;
+                }
+                return false;
+            });
         }
     }
 
@@ -260,6 +314,10 @@ public abstract class KItem implements Listener {
 
             if(this.isSimilar(is)) {
                 this.onDrag(event);
+
+                if(this.dropBlock) {
+                    event.setCancelled(true);
+                }
                 break;
             }
         }
@@ -291,10 +349,14 @@ public abstract class KItem implements Listener {
 
     @EventHandler
     public final void onRespawnListener(PlayerRespawnEvent event) {
-        Player player = event.getPlayer();
-        if(this.deathPlayers.contains(player)) {
-            this.deathPlayers.remove(player);
+        UUID uuid = event.getPlayer().getUniqueId();
+        if(this.deathPlayers.contains(uuid)) {
+            this.deathPlayers.remove(uuid);
             this.onRespawn(event);
+        }
+        if(this.toReturn.containsKey(uuid)) {
+            ItemUtil.giveItemToPlayer(event.getPlayer(), this.toReturn.get(uuid));
+            this.toReturn.remove(uuid);
         }
     }
 

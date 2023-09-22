@@ -23,10 +23,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 
 /**
@@ -86,11 +88,11 @@ public abstract class KRecipe implements Listener {
             if(r instanceof ShapedRecipe || r instanceof ShapelessRecipe ||
             r instanceof CookingRecipe || r instanceof StonecuttingRecipe) {
                 try {
-                    NamespacedKey rKey = (NamespacedKey) r.getClass().getField("getKey").get(r);
+                    NamespacedKey rKey = (NamespacedKey) r.getClass().getMethod("getKey").invoke(r);
                     if(rKey.equals(this.recipeKey)) {
                         it.remove();
                     }
-                } catch (IllegalAccessException | NoSuchFieldException e) {
+                } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                     continue;
                 }
             }
@@ -116,8 +118,17 @@ public abstract class KRecipe implements Listener {
         if(!isRegistered) {
             return;
         }
-        if(event.getRecipe().equals(this.recipe)) {
-            onCraft(event);
+        Recipe r = event.getRecipe();
+        if(r instanceof ShapedRecipe || r instanceof ShapelessRecipe ||
+                r instanceof CookingRecipe || r instanceof StonecuttingRecipe) {
+            try {
+                NamespacedKey rKey = (NamespacedKey) r.getClass().getMethod("getKey").invoke(r);
+                if(rKey.equals(this.recipeKey)) {
+                    onCraft(event);
+                }
+            } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+                return;
+            }
         }
     }
 }

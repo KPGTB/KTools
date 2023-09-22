@@ -27,6 +27,7 @@ import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.manager.item.ItemManager;
 import com.github.kpgtb.ktools.manager.language.LanguageManager;
 import com.github.kpgtb.ktools.manager.listener.ListenerManager;
+import com.github.kpgtb.ktools.manager.recipe.RecipeManager;
 import com.github.kpgtb.ktools.manager.resourcepack.ResourcePackManager;
 import com.github.kpgtb.ktools.manager.ui.UiManager;
 import com.github.kpgtb.ktools.manager.ui.bar.BarManager;
@@ -101,6 +102,7 @@ public final class KTools extends JavaPlugin {
         ParamParserManager paramParserManager = new ParamParserManager(debug);
         paramParserManager.registerParsers(packageUtil.get("manager.command.parser"), getFile());
         debug.sendInfo(DebugType.START, "Loaded command param parsers.");
+
 
         debug.sendInfo(DebugType.START, "Loading database...");
         DataManager dataManager = new DataManager(debug,getConfig(),getDataFolder(), this);
@@ -226,7 +228,7 @@ public final class KTools extends JavaPlugin {
         debug.sendInfo(DebugType.START, "Loaded items.");
 
         debug.sendInfo(DebugType.START, "Loading tools object wrapper...");
-        this.toolsObjectWrapper = new ToolsObjectWrapper(cacheManager,debug,globalLanguageManager,this,adventure,paramParserManager, dataManager, resourcepackManager, uiManager, itemManager, legacy, packageUtil, barManager);
+        this.toolsObjectWrapper = new ToolsObjectWrapper(cacheManager,debug,globalLanguageManager,this,adventure,paramParserManager, dataManager, resourcepackManager, uiManager, itemManager, legacy, packageUtil, barManager, this);
         debug.sendInfo(DebugType.START, "Loaded tools object wrapper.");
 
         barManager.setWrapper(toolsObjectWrapper);
@@ -242,7 +244,7 @@ public final class KTools extends JavaPlugin {
         debug.sendInfo(DebugType.START, "Loaded listeners.");
 
         debug.sendInfo(DebugType.START, "Loading global managers wrapper...");
-        this.globalManagersWrapper = new GlobalManagersWrapper(debug, globalLanguageManager,cacheManager,paramParserManager,dataManager,uiManager,resourcepackManager, itemManager, barManager, legacy);
+        this.globalManagersWrapper = new GlobalManagersWrapper(this, debug, globalLanguageManager,cacheManager,paramParserManager,dataManager,uiManager,resourcepackManager, itemManager, barManager, legacy);
         debug.sendInfo(DebugType.START, "Loaded global managers wrapper.");
 
         debug.sendInfo(DebugType.START, "Checking updates...");
