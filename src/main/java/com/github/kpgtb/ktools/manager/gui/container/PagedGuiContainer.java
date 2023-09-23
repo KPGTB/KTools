@@ -137,6 +137,56 @@ public class PagedGuiContainer extends GuiContainer {
     }
 
     /**
+     * Fill items using patter
+     * @param items List of GuiItems
+     * @param pattern Array of lines. One string represents one line of container. Use space to disable slot. Use any other char to enable slot.
+     * @since 2.2.0
+     */
+    public void fillPatternWithItems(List<GuiItem> items, String... pattern) {
+        fillPatternWithItems(items,UNLIMITED_PAGES,pattern);
+    }
+
+    /**
+     * Fill items using patter
+     * @param items List of GuiItems
+     * @param pagesLimit Limit of pages
+     * @param pattern Array of lines. One string represents one line of container. Use space to disable slot. Use any other char to enable slot.
+     * @since 2.2.0
+     */
+    public void fillPatternWithItems(List<GuiItem> items, int pagesLimit, String... pattern) {
+        clearPages();
+        List<GuiContainer> newPages = new ArrayList<>();
+        newPages.add(new GuiContainer(this));
+
+        int x = -1;
+        int y = 0;
+
+        for (GuiItem item : items) {
+            do {
+                x++;
+                if(x >= this.getWidth() || x >= pattern[y].length()) {
+                    x = 0;
+                    y+=1;
+                }
+                if(y >= this.getHeight() || y >= pattern.length) {
+                    x = 0;
+                    y = 0;
+                    if(pagesLimit > newPages.size()) {
+                        newPages.add(new GuiContainer(this));
+                    } else {
+                        break;
+                    }
+                }
+            } while(pattern[y].charAt(x) == ' ');
+
+            GuiContainer lastPage = newPages.get(newPages.size() - 1);
+            lastPage.setItem(x,y,item);
+        }
+
+        newPages.forEach(this::addPage);
+    }
+
+    /**
      * Fill paged container with items
      * @param items List of GuiItems
      * @param pagesLimit Limit of pages
