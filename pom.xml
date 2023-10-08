@@ -15,17 +15,12 @@
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <profile.scope>compile</profile.scope>
+        <profile.jarName>KTools-1.8-1.15-${project.version}</profile.jarName>
     </properties>
     <url>kpgtb.github.io</url>
 
     <profiles>
-        <profile>
-            <id>Up to 1.15</id>
-            <properties>
-                <profile.scope>compile</profile.scope>
-                <profile.jarName>KTools-1.8-1.15-${project.version}</profile.jarName>
-            </properties>
-        </profile>
         <profile>
             <id>1.16+</id>
             <properties>
