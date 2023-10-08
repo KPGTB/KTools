@@ -6,3 +6,9 @@ description: An advanced, reloaded version of my tools to Spigot and Paper plugi
 website: kpgtb.github.io
 softdepend: [PlaceholderAPI, ProtocolLib]
 api-version: 1.13
+libraries:
+  - net.kyori:adventure-platform-bukkit:4.2.0
+  - net.kyori:adventure-text-minimessage:4.12.0
+  - net.kyori:adventure-text-serializer-legacy:4.12.0
+  - com.j256.ormlite:ormlite-jdbc:6.1
+  - org.projectlombok:lombok:1.18.30
