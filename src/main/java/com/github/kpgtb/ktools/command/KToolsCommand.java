@@ -84,19 +84,4 @@ public class KToolsCommand extends KCommand {
             ).forEach(audience::sendMessage);
         }
     }
-
-    public class Test {
-        public void timer(Player player) {
-            new KTimer(wrapper, TimerSendType.BOSSBAR, TimerTime.EVERY, 10)
-                    .addViewer(player)
-                    .setBossBarFinishOutput(TimerSendType.MESSAGE)
-                    .start();
-        }
-
-        public void timer2(Player player) {
-            new KTimer(wrapper, TimerSendType.ACTIONBAR, TimerTime.EVERY, 30)
-                    .addViewer(player)
-                    .start();
-        }
-    }
 }
