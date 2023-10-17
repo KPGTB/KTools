@@ -30,10 +30,10 @@ public class ModeChangeListener extends KListener {
     private final BarManager barManager;
     private final JavaPlugin plugin;
 
-    public ModeChangeListener(ToolsObjectWrapper toolsObjectWrapper) {
-        super(toolsObjectWrapper);
-        this.barManager = toolsObjectWrapper.getBarManager();
-        this.plugin = toolsObjectWrapper.getPlugin();
+    public ModeChangeListener(ToolsObjectWrapper wrapper) {
+        super(wrapper);
+        this.barManager = wrapper.getBarManager();
+        this.plugin = wrapper.getPlugin();
     }
 
     @EventHandler

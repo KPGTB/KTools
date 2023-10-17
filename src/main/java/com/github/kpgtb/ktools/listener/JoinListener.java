@@ -41,13 +41,13 @@ public class JoinListener extends KListener {
      *
      * @param toolsObjectWrapper ToolsObjectWrapper or object that extends it.
      */
-    public JoinListener(ToolsObjectWrapper toolsObjectWrapper) {
-        super(toolsObjectWrapper);
-        this.cacheManager = toolsObjectWrapper.getCacheManager();
-        this.resourcepackManager = toolsObjectWrapper.getResourcePackManager();
-        this.plugin = toolsObjectWrapper.getPlugin();
-        this.legacy = toolsObjectWrapper.isLegacy();
-        this.barManager = toolsObjectWrapper.getBarManager();
+    public JoinListener(ToolsObjectWrapper wrapper) {
+        super(wrapper);
+        this.cacheManager = wrapper.getCacheManager();
+        this.resourcepackManager = wrapper.getResourcePackManager();
+        this.plugin = wrapper.getPlugin();
+        this.legacy = wrapper.isLegacy();
+        this.barManager = wrapper.getBarManager();
     }
 
     @EventHandler

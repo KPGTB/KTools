@@ -24,9 +24,9 @@ import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 
 public class ResourcePackListener extends KListener {
     private final ToolsObjectWrapper wrapper;
-    public ResourcePackListener(ToolsObjectWrapper toolsObjectWrapper) {
-        super(toolsObjectWrapper);
-        this.wrapper = toolsObjectWrapper;
+    public ResourcePackListener(ToolsObjectWrapper wrapper) {
+        super(wrapper);
+        this.wrapper = wrapper;
     }
 
     @EventHandler

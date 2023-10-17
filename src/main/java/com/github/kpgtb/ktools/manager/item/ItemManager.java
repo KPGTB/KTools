@@ -50,15 +50,15 @@ public class ItemManager {
 
     /**
      * Register all items (Kitem) from package
-     * @param toolsObjectWrapper Instance of ToolsObjectWrapper
+     * @param wrapper Instance of ToolsObjectWrapper
      * @param jarFile File of plugin
      * @param pluginTag Tag of plugin
      * @param itemsPackage Package that should be scanned
      * @return List of items tag
      */
-    public ArrayList<String> registerItems(ToolsObjectWrapper toolsObjectWrapper, File jarFile, String pluginTag, String itemsPackage) {
+    public ArrayList<String> registerItems(ToolsObjectWrapper wrapper, File jarFile, String pluginTag, String itemsPackage) {
         PluginManager pluginManager = Bukkit.getPluginManager();
-        DebugManager debug = toolsObjectWrapper.getDebugManager();
+        DebugManager debug = wrapper.getDebugManager();
 
         ArrayList<String> tags = new ArrayList<>();
 
@@ -73,14 +73,14 @@ public class ItemManager {
                 );
 
                 KItem item = (KItem) clazz.getDeclaredConstructor(ToolsObjectWrapper.class, String.class)
-                        .newInstance(toolsObjectWrapper, itemName);
+                        .newInstance(wrapper, itemName);
 
                 ItemStack bukkitItem = item.getItem();
                 if(bukkitItem == null) {
                     debug.sendWarning(DebugType.ITEM, "Item is null! Cancelling!");
                     continue;
                 }
-                pluginManager.registerEvents(item, toolsObjectWrapper.getPlugin());
+                pluginManager.registerEvents(item, wrapper.getPlugin());
                 item.generateItemInFile();
 
                 this.customItems.put(itemName, item);
@@ -98,13 +98,13 @@ public class ItemManager {
 
     /**
      * Register item
-     * @param toolsObjectWrapper Instance of ToolsObjectWrapper
+     * @param wrapper Instance of ToolsObjectWrapper
      * @param item Instance of Kitem
      * @return tag of item
      */
-    public String registerItem(ToolsObjectWrapper toolsObjectWrapper, KItem item) {
+    public String registerItem(ToolsObjectWrapper wrapper, KItem item) {
         PluginManager pluginManager = Bukkit.getPluginManager();
-        DebugManager debug = toolsObjectWrapper.getDebugManager();
+        DebugManager debug = wrapper.getDebugManager();
 
         debug.sendInfo(DebugType.ITEM, "Registering item " + item.getFullItemTag());
         ItemStack bukkitItem = item.getItem();
@@ -112,7 +112,7 @@ public class ItemManager {
             debug.sendWarning(DebugType.ITEM, "Item is null! Cancelling!");
             return "";
         }
-        pluginManager.registerEvents(item, toolsObjectWrapper.getPlugin());
+        pluginManager.registerEvents(item, wrapper.getPlugin());
         item.generateItemInFile();
 
         this.customItems.put(item.getFullItemTag(), item);

@@ -36,12 +36,12 @@ public class QuitListener extends KListener {
     /**
      * Constructor of listener.
      *
-     * @param toolsObjectWrapper ToolsObjectWrapper or object that extends it.
+     * @param wrapper ToolsObjectWrapper or object that extends it.
      */
-    public QuitListener(ToolsObjectWrapper toolsObjectWrapper) {
-        super(toolsObjectWrapper);
-        this.uiManager = toolsObjectWrapper.getUiManager();
-        this.barManager = toolsObjectWrapper.getBarManager();
+    public QuitListener(ToolsObjectWrapper wrapper) {
+        super(wrapper);
+        this.uiManager = wrapper.getUiManager();
+        this.barManager = wrapper.getBarManager();
     }
 
     @EventHandler

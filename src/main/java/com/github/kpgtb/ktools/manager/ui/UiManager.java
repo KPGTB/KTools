@@ -19,6 +19,7 @@ package com.github.kpgtb.ktools.manager.ui;
 import com.comphenix.protocol.ProtocolManager;
 import com.github.kpgtb.ktools.util.ui.FontWidth;
 import com.google.gson.JsonParser;
+import lombok.Getter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -39,7 +40,9 @@ public class UiManager {
     private final HashMap<UUID, ArrayList<BaseUiObject>> ui;
     private final HashMap<UUID, ArrayList<String>> standardActionBars;
 
+    @Getter
     private boolean sending;
+    @Getter
     private boolean required;
     private final JavaPlugin plugin;
     private BukkitTask task;
@@ -58,14 +61,6 @@ public class UiManager {
         this.sending = false;
         this.required = false;
         this.protocolManager = protocolManager;
-    }
-
-    /**
-     * Check if UI is requires
-     * @return true if is requires
-     */
-    public boolean isRequired() {
-        return required;
     }
 
     /**
@@ -124,14 +119,6 @@ public class UiManager {
             return;
         }
         task.cancel();
-    }
-
-    /**
-     * Check if actionbaar is sending
-     * @return true if actionbar is sending
-     */
-    public boolean isSending() {
-        return sending;
     }
 
     /**

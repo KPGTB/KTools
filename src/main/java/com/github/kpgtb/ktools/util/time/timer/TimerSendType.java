@@ -21,5 +21,6 @@ package com.github.kpgtb.ktools.util.time.timer;
  */
 public enum TimerSendType {
     MESSAGE, // Send timer message as chat message
-    ACTIONBAR // Send timer message as action bar message
+    ACTIONBAR, // Send timer message as action bar message
+    BOSSBAR // Send timer message as boss bar
 }

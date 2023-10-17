@@ -31,7 +31,7 @@ import java.io.File;
  * RecipeManager handles all recipes in plugin
  */
 public class RecipeManager {
-    private final ToolsObjectWrapper toolsObjectWrapper;
+    private final ToolsObjectWrapper wrapper;
     private final File jarFile;
     private final String pluginTag;
 
@@ -39,16 +39,16 @@ public class RecipeManager {
 
     /**
      * Constructor of manager
-     * @param toolsObjectWrapper ToolsObjectWrapper or object that extends it.
+     * @param wrapper ToolsObjectWrapper or object that extends it.
      * @param jarFile JAR file of plugin
      * @param pluginTag Tag of plugin
      */
-    public RecipeManager(ToolsObjectWrapper toolsObjectWrapper, File jarFile, String pluginTag) {
-        this.toolsObjectWrapper = toolsObjectWrapper;
+    public RecipeManager(ToolsObjectWrapper wrapper, File jarFile, String pluginTag) {
+        this.wrapper = wrapper;
         this.jarFile = jarFile;
         this.pluginTag = pluginTag.toLowerCase();
 
-        this.debug = toolsObjectWrapper.getDebugManager();
+        this.debug = wrapper.getDebugManager();
     }
 
     /**
@@ -70,7 +70,7 @@ public class RecipeManager {
                 debug.sendInfo(DebugType.RECIPE, "Recipe namespace key: " + recipeKey.getNamespace() + ":" + recipeKey.getKey());
 
                 KRecipe recipe = (KRecipe) clazz.getDeclaredConstructor(NamespacedKey.class, ToolsObjectWrapper.class)
-                        .newInstance(recipeKey, toolsObjectWrapper);
+                        .newInstance(recipeKey, wrapper);
 
                 Recipe bukkitRecipe = recipe.getRecipe();
                 if(bukkitRecipe == null) {
@@ -78,7 +78,7 @@ public class RecipeManager {
                     continue;
                 }
                 recipe.register(bukkitRecipe);
-                pluginManager.registerEvents(recipe, toolsObjectWrapper.getPlugin());
+                pluginManager.registerEvents(recipe, wrapper.getPlugin());
                 if(recipe.autoDiscover()) {
                     debug.sendInfo(DebugType.RECIPE, "Auto discover enabled");
                 }

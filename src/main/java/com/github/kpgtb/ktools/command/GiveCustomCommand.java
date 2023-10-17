@@ -33,9 +33,9 @@ import org.bukkit.inventory.ItemStack;
 public class GiveCustomCommand extends KCommand {
     private final ToolsObjectWrapper wrapper;
 
-    public GiveCustomCommand(ToolsObjectWrapper toolsObjectWrapper, String groupPath) {
-        super(toolsObjectWrapper, groupPath);
-        this.wrapper = toolsObjectWrapper;
+    public GiveCustomCommand(ToolsObjectWrapper wrapper, String groupPath) {
+        super(wrapper, groupPath);
+        this.wrapper = wrapper;
     }
 
     @Description("Give custom item from plugins that supports KTools")

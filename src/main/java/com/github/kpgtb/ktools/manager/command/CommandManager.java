@@ -16,7 +16,6 @@
 
 package com.github.kpgtb.ktools.manager.command;
 
-import com.github.kpgtb.ktools.manager.command.KCommand;
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.util.file.ReflectionUtil;
@@ -32,7 +31,7 @@ import java.lang.reflect.Field;
  * CommandManager handles all commands in plugin
  */
 public class CommandManager {
-    private final ToolsObjectWrapper toolsObjectWrapper;
+    private final ToolsObjectWrapper wrapper;
     private final File jarFile;
     private final String pluginTag;
 
@@ -40,19 +39,19 @@ public class CommandManager {
 
     /**
      * Constructor of manager
-     * @param toolsObjectWrapper ToolsObjectWrapper or object that extends it.
+     * @param wrapper ToolsObjectWrapper or object that extends it.
      * @param jarFile JAR file of plugin
      * @param pluginTag Tag of plugin
      */
-    public CommandManager(ToolsObjectWrapper toolsObjectWrapper, File jarFile, String pluginTag) {
-        this.toolsObjectWrapper = toolsObjectWrapper;
+    public CommandManager(ToolsObjectWrapper wrapper, File jarFile, String pluginTag) {
+        this.wrapper = wrapper;
         this.jarFile = jarFile;
         this.pluginTag = pluginTag;
 
-        this.debug = toolsObjectWrapper.getDebugManager();
+        this.debug = this.wrapper.getDebugManager();
 
         debug.sendInfo(DebugType.COMMAND, "Loading command list file...");
-        File dataFolder = toolsObjectWrapper.getPlugin().getDataFolder();
+        File dataFolder = this.wrapper.getPlugin().getDataFolder();
         dataFolder.mkdirs();
         File commandsFile = new File(dataFolder, "commands.yml");
         if(commandsFile.exists()) {
@@ -99,7 +98,7 @@ public class CommandManager {
                 }
 
                 KCommand command = (KCommand) clazz.getDeclaredConstructor(ToolsObjectWrapper.class, String.class)
-                        .newInstance(toolsObjectWrapper, finalPath.toString());
+                        .newInstance(wrapper, finalPath.toString());
                 command.prepareCommand();
                 commandMap.register(pluginTag, command);
 

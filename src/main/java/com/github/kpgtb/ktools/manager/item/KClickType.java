@@ -14,10 +14,19 @@
  *    limitations under the License.
  */
 
-package com.github.kpgtb.ktools.manager.item.builder.action;
+package com.github.kpgtb.ktools.manager.item;
 
-import org.bukkit.event.Event;
-
-public interface ItemBuilderBoolAction<T extends Event> {
-    void onEvent(T event, boolean bool);
+public enum KClickType {
+    /**
+     * Clicked item InventoryClickEvent#getCurrentItem()
+     */
+    CURRENT,
+    /**
+     * Clicked item on cursor InventoryClickEvent#getCursor()
+     */
+    CURSOR,
+    /**
+     * Item clicked using 1-9 keys
+     */
+    HOTBAR
 }

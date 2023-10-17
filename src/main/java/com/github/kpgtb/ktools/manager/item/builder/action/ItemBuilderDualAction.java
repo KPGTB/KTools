@@ -14,19 +14,10 @@
  *    limitations under the License.
  */
 
-package com.github.kpgtb.ktools.manager.listener;
+package com.github.kpgtb.ktools.manager.item.builder.action;
 
-import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
-import org.bukkit.event.Listener;
+import org.bukkit.event.Event;
 
-/**
- * Abstract class that handles process of preparing listener
- */
-public abstract class KListener implements Listener {
-
-    /**
-     * Constructor of listener.
-     * @param wrapper ToolsObjectWrapper or object that extends it.
-     */
-    public KListener(ToolsObjectWrapper wrapper) {}
+public interface ItemBuilderDualAction<T extends Event, Z> {
+    void onEvent(T event, Z param);
 }

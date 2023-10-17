@@ -21,7 +21,9 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.reflect.StructureModifier;
 import com.comphenix.protocol.wrappers.EnumWrappers;
+import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.github.kpgtb.ktools.manager.updater.version.KVersion;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
@@ -57,10 +59,17 @@ public class PacketSendingListener {
         @Override
         public void onPacketSending(PacketEvent event) {
             if (event.isCancelled() || uiManager.isSending()) { return; }
-            if(event.getPacket().getChatComponents().size() == 0) {return;}
+            PacketContainer packet = event.getPacket();
+            StructureModifier<WrappedChatComponent> chatComponents = packet.getChatComponents();
+            if(chatComponents.size() == 0) {return;}
+            WrappedChatComponent component = chatComponents.read(0);
+            String text = "";
+            if(component != null) {
+                text = ComponentSerializer.parse(component.getJson())[0].toLegacyText();
+            }
            uiManager.addActionBar(
                     event.getPlayer().getUniqueId(),
-                    ComponentSerializer.parse(event.getPacket().getChatComponents().read(0).getJson())[0].toLegacyText(),
+                    text,
                     60
             );
 
@@ -80,10 +89,17 @@ public class PacketSendingListener {
             if (event.isCancelled() || uiManager.isSending()) { return; }
             PacketContainer packet = event.getPacket();
             if (!packet.getTitleActions().read(0).equals(EnumWrappers.TitleAction.ACTIONBAR)) { return; }
-            if(event.getPacket().getChatComponents().size() == 0) {return;}
-           uiManager.addActionBar(
+
+            StructureModifier<WrappedChatComponent> chatComponents = packet.getChatComponents();
+            if(chatComponents.size() == 0) {return;}
+            WrappedChatComponent component = chatComponents.read(0);
+            String text = "";
+            if(component != null) {
+                text = ComponentSerializer.parse(component.getJson())[0].toLegacyText();
+            }
+            uiManager.addActionBar(
                     event.getPlayer().getUniqueId(),
-                    ComponentSerializer.parse(event.getPacket().getChatComponents().read(0).getJson())[0].toLegacyText(),
+                    text,
                     60
             );
             event.setCancelled(true);

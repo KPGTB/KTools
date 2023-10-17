@@ -16,10 +16,13 @@
 
 package com.github.kpgtb.ktools.manager.item.builder;
 
+import com.github.kpgtb.ktools.manager.item.KClickType;
 import com.github.kpgtb.ktools.manager.item.KItem;
 import com.github.kpgtb.ktools.manager.item.builder.action.ItemBuilderAction;
-import com.github.kpgtb.ktools.manager.item.builder.action.ItemBuilderBoolAction;
+import com.github.kpgtb.ktools.manager.item.builder.action.ItemBuilderDualAction;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -28,9 +31,13 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.function.Predicate;
+
 /**
  * Builder of Kitem.
  */
+@Getter
+@Setter
 public class KItemBuilder {
     private final ToolsObjectWrapper wrapper;
     private final String pluginTag;
@@ -40,17 +47,18 @@ public class KItemBuilder {
     private boolean dropBlock;
 
     private ItemBuilderAction<PlayerInteractEvent> onUseAction;
-    private ItemBuilderBoolAction<InventoryClickEvent> onClickAction;
+    private ItemBuilderDualAction<InventoryClickEvent, KClickType> onClickAction;
     private ItemBuilderAction<PlayerDropItemEvent> onDropAction;
     private ItemBuilderAction<PlayerDeathEvent> onDeathAction;
     private ItemBuilderAction<PlayerItemBreakEvent> onBreakAction;
     private ItemBuilderAction<PlayerItemConsumeEvent> onConsumeAction;
-    private ItemBuilderBoolAction<PlayerItemHeldEvent> onHeldAction;
+    private ItemBuilderDualAction<PlayerItemHeldEvent, Boolean> onHeldAction;
     private ItemBuilderAction<EntityPickupItemEvent> onPickupAction;
     private ItemBuilderAction<InventoryDragEvent> onDragAction;
-    private ItemBuilderBoolAction<EntityDamageByEntityEvent> onDamageAction;
+    private ItemBuilderDualAction<EntityDamageByEntityEvent, Boolean> onDamageAction;
     private ItemBuilderAction<PlayerRespawnEvent> onRespawnAction;
-    private ItemBuilderBoolAction<PlayerSwapHandItemsEvent> onSwapAction;
+    private ItemBuilderDualAction<PlayerSwapHandItemsEvent, Boolean> onSwapAction;
+    private Predicate<ItemStack> isSimilarAction;
 
     public KItemBuilder(ToolsObjectWrapper wrapper, String pluginTag, String itemName, ItemStack itemStack) {
         this.wrapper = wrapper;
@@ -58,122 +66,6 @@ public class KItemBuilder {
         this.itemName = itemName;
         this.itemStack = itemStack;
         this.dropBlock = false;
-    }
-
-    public boolean isDropBlocked() {
-        return dropBlock;
-    }
-
-    public void setDropBlock(boolean dropBlock) {
-        this.dropBlock = dropBlock;
-    }
-
-    public String getPluginTag() {
-        return pluginTag;
-    }
-
-    public String getItemName() {
-        return itemName;
-    }
-
-    public ItemStack getItemStack() {
-        return itemStack;
-    }
-
-    public ItemBuilderBoolAction<PlayerItemHeldEvent> getOnHeldAction() {
-        return onHeldAction;
-    }
-
-    public void setOnHeldAction(ItemBuilderBoolAction<PlayerItemHeldEvent> onHeldAction) {
-        this.onHeldAction = onHeldAction;
-    }
-
-    public ItemBuilderAction<PlayerInteractEvent> getOnUseAction() {
-        return onUseAction;
-    }
-
-    public void setOnUseAction(ItemBuilderAction<PlayerInteractEvent> onUseAction) {
-        this.onUseAction = onUseAction;
-    }
-
-    public ItemBuilderBoolAction<InventoryClickEvent> getOnClickAction() {
-        return onClickAction;
-    }
-
-    public void setOnClickAction(ItemBuilderBoolAction<InventoryClickEvent> onClickAction) {
-        this.onClickAction = onClickAction;
-    }
-
-    public ItemBuilderAction<PlayerDropItemEvent> getOnDropAction() {
-        return onDropAction;
-    }
-
-    public void setOnDropAction(ItemBuilderAction<PlayerDropItemEvent> onDropAction) {
-        this.onDropAction = onDropAction;
-    }
-
-    public ItemBuilderAction<PlayerDeathEvent> getOnDeathAction() {
-        return onDeathAction;
-    }
-
-    public void setOnDeathAction(ItemBuilderAction<PlayerDeathEvent> onDeathAction) {
-        this.onDeathAction = onDeathAction;
-    }
-
-    public ItemBuilderAction<PlayerItemBreakEvent> getOnBreakAction() {
-        return onBreakAction;
-    }
-
-    public void setOnBreakAction(ItemBuilderAction<PlayerItemBreakEvent> onBreakAction) {
-        this.onBreakAction = onBreakAction;
-    }
-
-    public ItemBuilderAction<PlayerItemConsumeEvent> getOnConsumeAction() {
-        return onConsumeAction;
-    }
-
-    public void setOnConsumeAction(ItemBuilderAction<PlayerItemConsumeEvent> onConsumeAction) {
-        this.onConsumeAction = onConsumeAction;
-    }
-
-    public ItemBuilderAction<EntityPickupItemEvent> getOnPickupAction() {
-        return onPickupAction;
-    }
-
-    public void setOnPickupAction(ItemBuilderAction<EntityPickupItemEvent> onPickupAction) {
-        this.onPickupAction = onPickupAction;
-    }
-
-    public ItemBuilderAction<InventoryDragEvent> getOnDragAction() {
-        return onDragAction;
-    }
-
-    public void setOnDragAction(ItemBuilderAction<InventoryDragEvent> onDragAction) {
-        this.onDragAction = onDragAction;
-    }
-
-    public ItemBuilderBoolAction<EntityDamageByEntityEvent> getOnDamageAction() {
-        return onDamageAction;
-    }
-
-    public void setOnDamageAction(ItemBuilderBoolAction<EntityDamageByEntityEvent> onDamageAction) {
-        this.onDamageAction = onDamageAction;
-    }
-
-    public ItemBuilderAction<PlayerRespawnEvent> getOnRespawnAction() {
-        return onRespawnAction;
-    }
-
-    public void setOnRespawnAction(ItemBuilderAction<PlayerRespawnEvent> onRespawnAction) {
-        this.onRespawnAction = onRespawnAction;
-    }
-
-    public ItemBuilderBoolAction<PlayerSwapHandItemsEvent> getOnSwapAction() {
-        return onSwapAction;
-    }
-
-    public void setOnSwapAction(ItemBuilderBoolAction<PlayerSwapHandItemsEvent> onSwapAction) {
-        this.onSwapAction = onSwapAction;
     }
 
     /**
@@ -195,9 +87,9 @@ public class KItemBuilder {
             }
 
             @Override
-            public void onClick(InventoryClickEvent event, boolean cursor) {
+            public void onClick(InventoryClickEvent event, KClickType type) {
                 if(onClickAction != null) {
-                    onClickAction.onEvent(event,cursor);
+                    onClickAction.onEvent(event,type);
                 }
             }
 
@@ -269,6 +161,14 @@ public class KItemBuilder {
                 if(onSwapAction != null) {
                     onSwapAction.onEvent(event, toOff);
                 }
+            }
+
+            @Override
+            public boolean isSimilar(ItemStack is) {
+                if(isSimilarAction != null) {
+                    return isSimilarAction.test(is);
+                }
+                return super.isSimilar(is);
             }
         };
         item.setDropBlock(dropBlock);

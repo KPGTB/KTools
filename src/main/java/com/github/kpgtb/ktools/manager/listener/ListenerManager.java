@@ -29,20 +29,20 @@ import java.io.File;
  * ListenerManager handles all listeners in plugin
  */
 public class ListenerManager {
-    private final ToolsObjectWrapper toolsObjectWrapper;
+    private final ToolsObjectWrapper wrapper;
     private final File jarFile;
     private final DebugManager debug;
 
     /**
      * Constructor of manager
-     * @param toolsObjectWrapper ToolsObjectWrapper or object that extends it.
+     * @param wrapper ToolsObjectWrapper or object that extends it.
      * @param jarFile JAR file of plugin
      */
-    public ListenerManager(ToolsObjectWrapper toolsObjectWrapper, File jarFile) {
-        this.toolsObjectWrapper = toolsObjectWrapper;
+    public ListenerManager(ToolsObjectWrapper wrapper, File jarFile) {
+        this.wrapper = wrapper;
         this.jarFile = jarFile;
 
-        this.debug = toolsObjectWrapper.getDebugManager();
+        this.debug = wrapper.getDebugManager();
     }
 
     /**
@@ -56,8 +56,8 @@ public class ListenerManager {
             try {
 
                 KListener listener = (KListener) clazz.getDeclaredConstructor(ToolsObjectWrapper.class)
-                        .newInstance(toolsObjectWrapper);
-                pluginManager.registerEvents(listener, toolsObjectWrapper.getPlugin());
+                        .newInstance(wrapper);
+                pluginManager.registerEvents(listener, wrapper.getPlugin());
                 debug.sendInfo(DebugType.LISTENER, "Registered listener " + clazz.getSimpleName());
 
             } catch (Exception e) {

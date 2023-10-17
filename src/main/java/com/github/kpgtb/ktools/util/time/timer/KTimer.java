@@ -20,7 +20,10 @@ import com.github.kpgtb.ktools.manager.language.LanguageLevel;
 import com.github.kpgtb.ktools.manager.language.LanguageManager;
 import com.github.kpgtb.ktools.util.time.KTime;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
+import lombok.Getter;
+import lombok.Setter;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -65,6 +68,11 @@ public class KTimer {
     private BukkitTask timer;
     private boolean started;
     private boolean ended;
+
+    private BossBar bossBar;
+    @Setter @Getter private BossBar.Color bossBarColor;
+    @Setter @Getter private BossBar.Overlay bossBarOverlay;
+    @Setter @Getter private TimerSendType bossBarFinishOutput;
 
     /**
      * Constructor of timer
@@ -298,6 +306,17 @@ public class KTimer {
         }
 
         KTimer timerObj = this;
+        if(this.sendType == TimerSendType.BOSSBAR) {
+            if(this.bossBarColor == null) this.bossBarColor = BossBar.Color.BLUE;
+            if(this.bossBarOverlay == null) this.bossBarOverlay = BossBar.Overlay.NOTCHED_10;
+            this.bossBar = BossBar.bossBar(Component.empty(), 1f, bossBarColor, bossBarOverlay);
+
+            viewers.forEach(p -> {
+                if(p.isOnline()) {
+                    adventure.player(p).showBossBar(this.bossBar);
+                }
+            });
+        }
         timer = new BukkitRunnable() {
             @Override
             public void run() {
@@ -305,8 +324,8 @@ public class KTimer {
                     if(endAction != null) {
                         endAction.run(timerObj);
                     }
-                    sendMessageToViewers(endMessage);
                     end();
+                    sendMessageToViewers(endMessage);
                     return;
                 }
                 tick();
@@ -337,6 +356,17 @@ public class KTimer {
             tickAction.run(this);
         }
 
+        if(this.sendType == TimerSendType.BOSSBAR) {
+            float progress = (float) timeLeft / (float)time;
+            if(progress > 1f) {
+                progress = 1f;
+            }
+            if(progress < 0f) {
+                progress = 0f;
+            }
+            bossBar.progress(progress);
+        }
+
         if(timeType.contains(timeLeft) || timeType.contains(-1)) {
             KTime time = new KTime(timeLeft * 1000L);
             String timeStr = timeFormat == null || timeFormat.isEmpty() ? time.getText() : time.format(timeFormat, timeFormatHideZero, timeFormatSplitSeq, timeReplaceSplitSeq,timeEmptyReplace);
@@ -353,23 +383,40 @@ public class KTimer {
         started = false;
         ended = true;
         timeLeft = time;
+        viewers.forEach(p -> {
+            if(p.isOnline()) {
+                adventure.player(p).hideBossBar(bossBar);
+            }
+        });
+        bossBar = null;
         if(timer != null && !timer.isCancelled()) {
             timer.cancel();
         }
     }
 
     private void sendMessageToViewers(Component component) {
+        TimerSendType output;
+        if(this.sendType == TimerSendType.BOSSBAR && this.bossBar == null && this.bossBarFinishOutput != null) {
+            output = this.bossBarFinishOutput;
+        } else {
+            output = this.sendType;
+        }
         viewers.forEach(viewer -> {
             if(!viewer.isOnline()) {
                 return;
             }
             Audience audience = adventure.player(viewer);
-            switch (sendType) {
+            switch (output) {
                 case MESSAGE:
                     audience.sendMessage(component);
                     break;
                 case ACTIONBAR:
                     audience.sendActionBar(component);
+                    break;
+                case BOSSBAR:
+                    if(this.bossBar != null) {
+                        this.bossBar.name(component);
+                    }
                     break;
             }
         });

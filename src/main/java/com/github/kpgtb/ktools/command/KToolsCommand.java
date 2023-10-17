@@ -37,9 +37,9 @@ import java.util.List;
 public class KToolsCommand extends KCommand {
     private final ToolsObjectWrapper wrapper;
 
-    public KToolsCommand(ToolsObjectWrapper toolsObjectWrapper, String groupPath) {
-        super(toolsObjectWrapper, groupPath);
-        this.wrapper = toolsObjectWrapper;
+    public KToolsCommand(ToolsObjectWrapper wrapper, String groupPath) {
+        super(wrapper, groupPath);
+        this.wrapper = wrapper;
     }
 
     @MainCommand

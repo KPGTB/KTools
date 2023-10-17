@@ -27,6 +27,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -47,7 +48,7 @@ public abstract class KItem implements Listener {
     private final ToolsObjectWrapper wrapper;
     private final String fullItemTag;
     private final List<UUID> deathPlayers;
-    private final Map<UUID, List<ItemStack>> toReturn;
+    private final Map<UUID, Map<Integer, ItemStack>> toReturn;
     private boolean dropBlock;
 
     /**
@@ -122,7 +123,7 @@ public abstract class KItem implements Listener {
     }
 
     public void onUse(PlayerInteractEvent event) {}
-    public void onClick(InventoryClickEvent event, boolean cursor) {}
+    public void onClick(InventoryClickEvent event, KClickType type) {}
     public void onDrop(PlayerDropItemEvent event) {}
     public void onDeath(PlayerDeathEvent event) {}
     public void onBreak(PlayerItemBreakEvent event) {}
@@ -171,7 +172,7 @@ public abstract class KItem implements Listener {
 
         if(clicked != null && !clicked.getType().equals(Material.AIR)) {
             if(this.isSimilar(clicked)) {
-                this.onClick(event,false);
+                this.onClick(event,KClickType.CURRENT);
 
                 if(dropBlock && event.isShiftClick()) {
                     event.setCancelled(true);
@@ -179,14 +180,28 @@ public abstract class KItem implements Listener {
             }
         }
 
+        Inventory clickedInv = event.getClickedInventory();
         ItemStack cursor = event.getCursor();
         if(cursor != null && !cursor.getType().equals(Material.AIR)) {
             if(this.isSimilar(cursor)) {
-                this.onClick(event,true);
+                this.onClick(event,KClickType.CURSOR);
 
-                Inventory clickedInv = event.getClickedInventory();
                 if(dropBlock && (clickedInv == null || clickedInv.getType() != InventoryType.PLAYER)) {
                     event.setCancelled(true);
+                }
+            }
+        }
+
+        if(event.getClick() == ClickType.NUMBER_KEY) {
+            ItemStack hotbar = event.getWhoClicked().getInventory().getItem(event.getHotbarButton());
+
+            if(hotbar!= null && !hotbar.getType().equals(Material.AIR)) {
+                if(this.isSimilar(hotbar)) {
+                    this.onClick(event,KClickType.HOTBAR);
+
+                    if(dropBlock && (clickedInv == null || clickedInv.getType() != InventoryType.PLAYER)) {
+                        event.setCancelled(true);
+                    }
                 }
             }
         }
@@ -212,7 +227,8 @@ public abstract class KItem implements Listener {
     @EventHandler
     public final void onDeathListener(PlayerDeathEvent event) {
         List<ItemStack> drops = event.getDrops();
-        UUID uuid = event.getEntity().getUniqueId();
+        Player player = event.getEntity();
+        UUID uuid = player.getUniqueId();
 
         for (ItemStack is : drops) {
             if(is == null || is.getType().equals(Material.AIR)) {
@@ -227,20 +243,24 @@ public abstract class KItem implements Listener {
         }
 
         if(dropBlock) {
-            drops.removeIf(is -> {
+            PlayerInventory inv = player.getInventory();
+            ItemStack[] invContent = inv.getContents();
+
+            for (int i = 0; i < invContent.length; i++) {
+                ItemStack is = invContent[0];
                 if(is == null || is.getType().equals(Material.AIR)) {
-                    return false;
+                    continue;
                 }
 
                 if(this.isSimilar(is)) {
                     if(!this.toReturn.containsKey(uuid)) {
-                        this.toReturn.put(uuid, new ArrayList<>());
+                        this.toReturn.put(uuid, new HashMap<>());
                     }
-                    this.toReturn.get(uuid).add(is);
-                    return true;
+                    this.toReturn.get(uuid).put(i,is);
                 }
-                return false;
-            });
+            }
+
+            drops.removeIf(this::isSimilar);
         }
     }
 
@@ -349,13 +369,15 @@ public abstract class KItem implements Listener {
 
     @EventHandler
     public final void onRespawnListener(PlayerRespawnEvent event) {
-        UUID uuid = event.getPlayer().getUniqueId();
+        Player player = event.getPlayer();
+        UUID uuid = player.getUniqueId();
         if(this.deathPlayers.contains(uuid)) {
             this.deathPlayers.remove(uuid);
             this.onRespawn(event);
         }
         if(this.toReturn.containsKey(uuid)) {
-            ItemUtil.giveItemToPlayer(event.getPlayer(), this.toReturn.get(uuid));
+            PlayerInventory inv = player.getInventory();
+            this.toReturn.get(uuid).forEach(inv::setItem);
             this.toReturn.remove(uuid);
         }
     }
