@@ -25,7 +25,7 @@ count_gui:
   countInfoLore:
   - "<green><b>Click to accept"
 timer:
-  defaultTimer: "<green><timer> left"
+  defaultTimer: "<green><time> left"
   defaultEndTimer: "<green>Finished!"
   defaultCancelTimer: "<red>Cancelled!"
 resourcePackDeny:

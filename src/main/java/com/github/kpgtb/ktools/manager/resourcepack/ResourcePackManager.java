@@ -448,7 +448,8 @@ public class ResourcePackManager {
         try {
             String boundary = Long.toHexString(System.currentTimeMillis());
 
-            HttpURLConnection connection = (HttpURLConnection) new URL("https://temp.sh/"+fileToUpload.getName()).openConnection();
+            //HttpURLConnection connection = (HttpURLConnection) new URL("https://temp.sh/upload").openConnection();
+            HttpURLConnection connection = (HttpURLConnection) new URL("https://transfer.sh/"+fileToUpload.getName()).openConnection();
             connection.setRequestMethod("PUT");
             connection.setDoOutput(true);
             connection.setDoInput(true);

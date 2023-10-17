@@ -23,12 +23,16 @@ import com.github.kpgtb.ktools.manager.command.annotation.MainCommand;
 import com.github.kpgtb.ktools.manager.command.annotation.WithoutPermission;
 import com.github.kpgtb.ktools.manager.language.LanguageLevel;
 import com.github.kpgtb.ktools.manager.language.LanguageManager;
+import com.github.kpgtb.ktools.util.time.timer.KTimer;
+import com.github.kpgtb.ktools.util.time.timer.TimerSendType;
+import com.github.kpgtb.ktools.util.time.timer.TimerTime;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,6 +82,21 @@ public class KToolsCommand extends KCommand {
                     "reloadedMessages",
                     Placeholder.unparsed("plugins", String.valueOf(global.getHookedManagers().size() + 1))
             ).forEach(audience::sendMessage);
+        }
+    }
+
+    public class Test {
+        public void timer(Player player) {
+            new KTimer(wrapper, TimerSendType.BOSSBAR, TimerTime.EVERY, 10)
+                    .addViewer(player)
+                    .setBossBarFinishOutput(TimerSendType.MESSAGE)
+                    .start();
+        }
+
+        public void timer2(Player player) {
+            new KTimer(wrapper, TimerSendType.ACTIONBAR, TimerTime.EVERY, 30)
+                    .addViewer(player)
+                    .start();
         }
     }
 }

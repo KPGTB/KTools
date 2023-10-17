@@ -70,9 +70,12 @@ public class KTimer {
     private boolean ended;
 
     private BossBar bossBar;
-    @Setter @Getter private BossBar.Color bossBarColor;
-    @Setter @Getter private BossBar.Overlay bossBarOverlay;
-    @Setter @Getter private TimerSendType bossBarFinishOutput;
+    @Getter
+    private BossBar.Color bossBarColor;
+    @Getter
+    private BossBar.Overlay bossBarOverlay;
+    @Getter
+    private TimerSendType bossBarFinishOutput;
 
     /**
      * Constructor of timer
@@ -119,7 +122,7 @@ public class KTimer {
 
         setTickMessage(wrapper.getLanguageManager().getSingleComponent(LanguageLevel.GLOBAL, "defaultTimer"));
         setEndMessage(wrapper.getLanguageManager().getSingleComponent(LanguageLevel.GLOBAL, "defaultEndTimer"));
-        setEndMessage(wrapper.getLanguageManager().getSingleComponent(LanguageLevel.GLOBAL, "defaultCancelTimer"));
+        setCancelMessage(wrapper.getLanguageManager().getSingleComponent(LanguageLevel.GLOBAL, "defaultCancelTimer"));
 
         end();
     }
@@ -244,6 +247,21 @@ public class KTimer {
     }
     public int getTime() {
         return time;
+    }
+
+    public KTimer setBossBarColor(BossBar.Color bossBarColor) {
+        this.bossBarColor = bossBarColor;
+        return this;
+    }
+
+    public KTimer setBossBarOverlay(BossBar.Overlay bossBarOverlay) {
+        this.bossBarOverlay = bossBarOverlay;
+        return this;
+    }
+
+    public KTimer setBossBarFinishOutput(TimerSendType bossBarFinishOutput) {
+        this.bossBarFinishOutput = bossBarFinishOutput;
+        return this;
     }
 
     /**

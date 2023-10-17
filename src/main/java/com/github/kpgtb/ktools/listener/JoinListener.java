@@ -39,7 +39,7 @@ public class JoinListener extends KListener {
     /**
      * Constructor of listener.
      *
-     * @param toolsObjectWrapper ToolsObjectWrapper or object that extends it.
+     * @param wrapper ToolsObjectWrapper or object that extends it.
      */
     public JoinListener(ToolsObjectWrapper wrapper) {
         super(wrapper);
