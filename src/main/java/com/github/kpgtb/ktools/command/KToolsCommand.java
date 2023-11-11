@@ -23,6 +23,7 @@ import com.github.kpgtb.ktools.manager.command.annotation.MainCommand;
 import com.github.kpgtb.ktools.manager.command.annotation.WithoutPermission;
 import com.github.kpgtb.ktools.manager.language.LanguageLevel;
 import com.github.kpgtb.ktools.manager.language.LanguageManager;
+import com.github.kpgtb.ktools.manager.ui.bar.KBar;
 import com.github.kpgtb.ktools.util.time.timer.KTimer;
 import com.github.kpgtb.ktools.util.time.timer.TimerSendType;
 import com.github.kpgtb.ktools.util.time.timer.TimerTime;
@@ -31,6 +32,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -81,6 +83,27 @@ public class KToolsCommand extends KCommand {
                     LanguageLevel.GLOBAL,
                     "reloadedMessages",
                     Placeholder.unparsed("plugins", String.valueOf(global.getHookedManagers().size() + 1))
+            ).forEach(audience::sendMessage);
+        }
+    }
+
+    public class Bar {
+        @Description("Add custom bar value")
+        public void add(CommandSender sender, KBar bar, OfflinePlayer target, double value) {
+            double before = wrapper.getBarManager().getValue(bar,target);
+            set(sender,bar,target,before+value);
+        }
+
+        @Description("Set custom bar value")
+        public void set(CommandSender sender, KBar bar, OfflinePlayer target, double value) {
+            double before = wrapper.getBarManager().getValue(bar,target);
+            wrapper.getBarManager().setValue(bar, target,value);
+            Audience audience = wrapper.getAdventure().sender(sender);
+            wrapper.getLanguageManager().getComponent(
+                    LanguageLevel.GLOBAL,
+                    "barChanged",
+                    Placeholder.unparsed("before", String.valueOf(before)),
+                    Placeholder.unparsed("after", String.valueOf(value))
             ).forEach(audience::sendMessage);
         }
     }

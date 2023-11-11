@@ -188,6 +188,42 @@ public class ItemManager {
     }
 
     /**
+     * Get custom item
+     * @param fullItemName Name of registered item (plugin:item)
+     * @return KItem or null when not exists
+     */
+    @Nullable
+    public KItem getCustomItemObj(String fullItemName) {
+        return customItems.get(fullItemName);
+    }
+
+    /**
+     * Get custom item
+     * @param pluginTag Tag of plugin
+     * @param itemName Name of item
+     * @return KItem or null when not exists
+     */
+    @Nullable
+    public KItem getCustomItemObj(String pluginTag, String itemName) {
+        return customItems.get(pluginTag.toLowerCase() + ":" + itemName);
+    }
+
+    /**
+     * Get custom item
+     * @param pluginTag Tag of plugin
+     * @param itemClass Class that contains item
+     * @return KItem or null when not exists
+     */
+    @Nullable
+    public KItem getCustomItemObj(String pluginTag, Class<? extends KItem> itemClass) {
+        String itemName = pluginTag + ":" + camelToSnake(
+                itemClass.getSimpleName()
+                        .replace("Item", "")
+        );
+        return customItems.get(itemName);
+    }
+
+    /**
      * Get all registered items
      * @return HashMap of registered items
      */

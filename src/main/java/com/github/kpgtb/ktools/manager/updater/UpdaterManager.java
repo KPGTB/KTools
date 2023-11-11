@@ -47,19 +47,20 @@ public class UpdaterManager {
      */
     public boolean checkUpdate() {
         KVersion version;
+        String prefix = "[" + description.getName() + "] ";
         try {
             String versionName = description.getVersion();
             version = new KVersion(versionName.split("-")[0]);
         } catch (Exception e) {
-            this.debug.sendWarning(DebugType.UPDATER, "Error while checking plugin version");
+            this.debug.sendWarning(DebugType.UPDATER, prefix + "Error while checking plugin version");
             return false;
         }
         if(this.updater.hasUpdate(version)) {
             String url = this.updater.getDownloadLink();
-            this.debug.sendWarning(DebugType.UPDATER, "Detected new version of this plugin! Download it here -> " + url, true);
+            this.debug.sendWarning(DebugType.UPDATER, prefix + "Detected new version of this plugin! Download it here -> " + url);
             return true;
         }
-        this.debug.sendInfo(DebugType.UPDATER, "You have the newest version of this plugin");
+        this.debug.sendInfo(DebugType.UPDATER, prefix + "You have the newest version of this plugin");
         return false;
     }
 }

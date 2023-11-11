@@ -297,17 +297,17 @@ public class BarManager {
         if(value < 0.0) {
             value = 0.0;
         }
+
+        BarValueChangeEvent event = new BarValueChangeEvent(player, bar, getValue(bar, player), value);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            return;
+        }
+        bar.getSaveMethod().set(wrapper, bar, player, event.getNewValue());
+
         if(player.isOnline()) {
             Player online = player.getPlayer();
-            BarValueChangeEvent event = new BarValueChangeEvent(online, bar, getValue(bar, player), value);
-            Bukkit.getPluginManager().callEvent(event);
-            if (event.isCancelled()) {
-                return;
-            }
-            bar.getSaveMethod().set(wrapper, bar, player, event.getNewValue());
             updateBar(bar, online);
-        } else {
-            bar.getSaveMethod().set(wrapper,bar,player,value);
         }
     }
 

@@ -93,9 +93,11 @@ public class LanguageManager {
      * @param plugin Instance of plugin
      */
     public void saveDefaultLanguage(String path, JavaPlugin plugin) {
-        plugin.saveResource(path,false);
-
         File defaultLangFile = new File(dataFolder, path);
+        if(!defaultLangFile.exists()) {
+            plugin.saveResource(path,false);
+        }
+
         FileConfiguration langConfig = YamlConfiguration.loadConfiguration(defaultLangFile);
 
         FileConfiguration pluginLangConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(

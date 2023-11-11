@@ -28,6 +28,8 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
 import com.j256.ormlite.jdbc.db.MysqlDatabaseType;
 import com.j256.ormlite.jdbc.db.SqliteDatabaseType;
+import com.j256.ormlite.logger.LogBackendType;
+import com.j256.ormlite.logger.LoggerFactory;
 import com.j256.ormlite.table.DatabaseTable;
 import com.j256.ormlite.table.TableUtils;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -113,6 +115,10 @@ public class DataManager {
                 this.connectionSource = null;
                 this.debug.sendWarning(DebugType.DATA, "Wrong type of database. Correct: MYSQL SQLITE");
                 return;
+        }
+
+        if(!debug.isEnabled(DebugType.DATA)) {
+            LoggerFactory.setLogBackendFactory(LogBackendType.NULL);
         }
         this.debug.sendInfo(DebugType.DATA, "Connected to database");
     }

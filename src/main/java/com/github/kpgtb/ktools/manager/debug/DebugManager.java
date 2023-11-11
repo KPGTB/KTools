@@ -43,8 +43,13 @@ public class DebugManager {
      * @param type {@link com.github.kpgtb.ktools.manager.debug.DebugType} enum
      * @return true if this type is enabled in config.yml
      */
-    private boolean isEnabled(DebugType type) {
-        return config.getBoolean("debug.enable") && config.getBoolean(type.getConfigStr());
+    public boolean isEnabled(DebugType type) {
+        boolean typeEnabled =  config.getBoolean(type.getConfigStr());
+        if(!typeEnabled) {
+            return false;
+        }
+
+        return type == DebugType.UPDATER || config.getBoolean("debug.enable");
     }
 
     /**
