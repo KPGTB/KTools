@@ -19,18 +19,17 @@ package com.github.kpgtb.ktools.manager.resourcepack;
 import com.github.kpgtb.ktools.manager.cache.CacheManager;
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
+import com.github.kpgtb.ktools.manager.resourcepack.uploader.IUploader;
+import com.github.kpgtb.ktools.manager.resourcepack.uploader.OshiAtUploader;
+import com.github.kpgtb.ktools.manager.resourcepack.uploader.TransferShUploader;
 import com.github.kpgtb.ktools.util.ui.FontWidth;
 import com.google.gson.*;
 import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -55,6 +54,8 @@ public class ResourcePackManager {
     private final ArrayList<CustomFile> customFiles;
     private final ArrayList<String> plugins;
 
+    private IUploader uploader;
+
     /**
      * Constructor of ResourcepackManager
      * @param plugin Instance of plugin
@@ -72,6 +73,20 @@ public class ResourcePackManager {
         this.customModels = new ArrayList<>();
         this.customFiles = new ArrayList<>();
         this.plugins = new ArrayList<>();
+
+        List<IUploader> uploaders = new ArrayList<>();
+        uploaders.add(new TransferShUploader());
+        uploaders.add(new OshiAtUploader());
+
+        for (IUploader uploader : uploaders) {
+            if(uploader.test()) {
+                debug.sendInfo(DebugType.RESOURCEPACK, "Selected uploader -> " + uploader.getClass().getSimpleName());
+                this.uploader = uploader;
+                break;
+            }
+
+            debug.sendWarning(DebugType.RESOURCEPACK, "Uploader not works -> " + uploader.getClass().getSimpleName());
+        }
     }
 
     /**
@@ -207,14 +222,17 @@ public class ResourcePackManager {
         if(!versionTag.equalsIgnoreCase(getPluginsString())) {
             return false;
         }
-        return urlExists(urlString);
+        if(uploader == null) {
+            return false;
+        }
+        return uploader.testFile(urlString);
     }
 
     /**
      * Generate resourcepack
      */
-    public void prepareResourcepack() {
-        if(isResourcepackLatest() || !isEnabled()) {
+    public void prepareResourcepack(boolean force) {
+        if(!force && (isResourcepackLatest() || !isEnabled())) {
             return;
         }
 
@@ -445,67 +463,13 @@ public class ResourcePackManager {
     }
 
     private String uploadFile(File fileToUpload) {
-        try {
-            String boundary = Long.toHexString(System.currentTimeMillis());
-
-            //HttpURLConnection connection = (HttpURLConnection) new URL("https://temp.sh/upload").openConnection();
-            HttpURLConnection connection = (HttpURLConnection) new URL("https://transfer.sh/"+fileToUpload.getName()).openConnection();
-            connection.setRequestMethod("PUT");
-            connection.setDoOutput(true);
-            connection.setDoInput(true);
-            connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
-
-            OutputStream output = connection.getOutputStream();
-            FileInputStream inputStream = new FileInputStream(fileToUpload);
-
-            output.write(("--" + boundary + "\r\n").getBytes());
-            output.write(("Content-Disposition: form-data; name=\"file\"; filename=\"" + fileToUpload.getName() + "\"\r\n").getBytes());
-            output.write(("Content-Type: " + URLConnection.guessContentTypeFromName(fileToUpload.getName()) + "\r\n").getBytes());
-            output.write("\r\n".getBytes());
-
-            byte[] buffer = new byte[4096];
-            int bytesRead;
-
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                output.write(buffer, 0, bytesRead);
-            }
-
-            inputStream.close();
-
-            output.write(("\r\n--" + boundary + "--\r\n").getBytes());
-
-            int status = connection.getResponseCode();
-
-            if (status == HttpURLConnection.HTTP_OK) {
-
-                InputStream input = connection.getInputStream();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-
-                String response = reader.readLine();
-
-                response = response.replace("transfer.sh/", "transfer.sh/get/");
-                input.close();
-                return response;
-
-            } else {
-                throw new IOException("Server returned HTTP response code: " + status);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+        if(uploader == null) {
+            debug.sendWarning(DebugType.RESOURCEPACK, "None of uploaders works!", true);
+            return "";
         }
+        return uploader.uploadFile(fileToUpload);
     }
-    private boolean urlExists(String urlString) {
-        try {
-            URL url = new URL(urlString);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            int responseCode = connection.getResponseCode();
-            return responseCode == HttpURLConnection.HTTP_OK;
-        } catch (Exception e) {
-            return false;
-        }
-    }
+
     private File saveFile(InputStream stream, String fileName, String pluginName) {
         File folder = new File(this.texturesFolder, pluginName);
         if(!folder.exists()) {

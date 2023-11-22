@@ -10,6 +10,8 @@ util_command:
   getCustomItem: "<gray>>> <yellow>You get <gold><item><gray>x<gold><amount> <yellow>from <gold><player>"
   reloadedMessages: "<gray>>> <green>Reloaded all messages from <dark_green><plugins> <green>hooked plugin[s]!"
   barChanged: "<gray>>> <green>Bar value has been changed from <yellow><before> <green>to <yellow><after>"
+  uploadingResourcePack: "<gray>>> <yellow>Re-Uploading resource pack..."
+  uploadedResourcePack: "<gray>>> <green>Resource Pack has been uploaded!"
 gui:
   closeItem: "<red><b>CLOSE"
 pages_gui:

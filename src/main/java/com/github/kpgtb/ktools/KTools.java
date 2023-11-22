@@ -215,7 +215,7 @@ public final class KTools extends JavaPlugin {
                         new BukkitRunnable() {
                             @Override
                             public void run() {
-                                finalResourcepackManager.prepareResourcepack();
+                                finalResourcepackManager.prepareResourcepack(false);
                             }
                         }.runTaskTimerAsynchronously(plugin,1L,new KTime(getConfig().getString("resourcePackRefreshRate")).getTicks());
                     }

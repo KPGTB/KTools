@@ -71,6 +71,22 @@ public class KToolsCommand extends KCommand {
         messagesToSend.forEach(audience::sendMessage);
     }
 
+    public class ResourcePack {
+        @Description("Re-Upload resource pack")
+        public void refresh(CommandSender sender) {
+            Audience audience = wrapper.getAdventure().sender(sender);
+            wrapper.getLanguageManager().getComponent(
+                    LanguageLevel.GLOBAL,
+                    "uploadingResourcePack"
+            ).forEach(audience::sendMessage);
+            wrapper.getResourcePackManager().prepareResourcepack(true);
+            wrapper.getLanguageManager().getComponent(
+                    LanguageLevel.GLOBAL,
+                    "uploadedResourcePack"
+            ).forEach(audience::sendMessage);
+        }
+    }
+
     public class Messages {
         @Description("Reload all messages (Also in hooked plugins)")
         public void reload(CommandSender sender) {
