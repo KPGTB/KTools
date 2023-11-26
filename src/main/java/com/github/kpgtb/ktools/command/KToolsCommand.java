@@ -72,7 +72,7 @@ public class KToolsCommand extends KCommand {
     }
 
     public class ResourcePack {
-        @Description("Re-Upload resource pack")
+        @Description("Re-Upload resource pack | It can cause lags!")
         public void refresh(CommandSender sender) {
             Audience audience = wrapper.getAdventure().sender(sender);
             wrapper.getLanguageManager().getComponent(

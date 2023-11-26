@@ -16,6 +16,7 @@
 
 package com.github.kpgtb.ktools.manager.resourcepack;
 
+import lombok.Getter;
 import org.bukkit.Material;
 
 import java.io.File;
@@ -23,26 +24,17 @@ import java.io.File;
 /**
  * Object that contains information about custom model data
  */
+@Getter
 public class CustomModelData {
     private final File imageFile;
     private final Material material;
     private final int model;
+    private final boolean alwaysReplace;
 
-    public CustomModelData(File imageFile, Material material, int model) {
+    public CustomModelData(File imageFile, Material material, int model, boolean alwaysReplace) {
         this.imageFile = imageFile;
         this.material = material;
         this.model = model;
-    }
-
-    public File getImageFile() {
-        return imageFile;
-    }
-
-    public Material getMaterial() {
-        return material;
-    }
-
-    public int getModel() {
-        return model;
+        this.alwaysReplace = alwaysReplace;
     }
 }

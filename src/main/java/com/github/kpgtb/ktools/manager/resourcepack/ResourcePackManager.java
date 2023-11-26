@@ -138,13 +138,7 @@ public class ResourcePackManager {
      * @param width Width of char
      */
     public void registerCustomChar(String pluginName, String character, String imageName, InputStream image, int height, int ascent, double width) {
-        File imageFile = this.saveFile(image,imageName,pluginName);
-        if(imageFile == null) {
-            return;
-        }
-        CustomChar customChar = new CustomChar(pluginName,imageFile,character,height,ascent);
-        this.customChars.add(customChar);
-        FontWidth.registerCustomChar(character.charAt(0), width);
+        registerCustomChar(pluginName, character, imageName, image, height, ascent, width,false);
     }
 
     /**
@@ -156,20 +150,73 @@ public class ResourcePackManager {
      * @param material Material that will have custom model data
      */
     public void registerCustomModelData(String pluginName, int model, String imageName, InputStream image, Material material) {
-        File imageFile = this.saveFile(image,imageName,pluginName);
+        registerCustomModelData(pluginName, model, imageName, image, material,false);
+    }
+
+    /**
+     * Register custom file to resourcepack
+     * @param pluginName Name of plugin (and folder that will contain texture)
+     * @param destination Path to file
+     * @param fileName Name of file
+     * @param file InputStream with file
+     */
+    public void registerCustomFile(String pluginName, String destination, String fileName, InputStream file) {
+        registerCustomFile(pluginName,destination,fileName,file,false);
+    }
+
+    /**
+     * Register custom character to resourcepack
+     * @param pluginName Name of plugin (and folder that will contain texture)
+     * @param character Character represented as String
+     * @param imageName Name of image
+     * @param image InputStream with image
+     * @param height Height of char
+     * @param ascent Ascent of char
+     * @param width Width of char
+     * @param alwaysReplace True if texture should be always replaced
+     */
+    public void registerCustomChar(String pluginName, String character, String imageName, InputStream image, int height, int ascent, double width, boolean alwaysReplace) {
+        File imageFile = this.saveFile(image,imageName,pluginName,alwaysReplace);
         if(imageFile == null) {
             return;
         }
-        CustomModelData customModelData = new CustomModelData(imageFile,material,model);
+        CustomChar customChar = new CustomChar(pluginName,imageFile,character,height,ascent, alwaysReplace);
+        this.customChars.add(customChar);
+        FontWidth.registerCustomChar(character.charAt(0), width);
+    }
+
+    /**
+     * Register custom model data to resourcepack
+     * @param pluginName Name of plugin (and folder that will contain texture)
+     * @param model Custom model data
+     * @param imageName Name of image
+     * @param image InputStream with image
+     * @param material Material that will have custom model data
+     * @param alwaysReplace True if texture should be always replaced
+     */
+    public void registerCustomModelData(String pluginName, int model, String imageName, InputStream image, Material material, boolean alwaysReplace) {
+        File imageFile = this.saveFile(image,imageName,pluginName,alwaysReplace);
+        if(imageFile == null) {
+            return;
+        }
+        CustomModelData customModelData = new CustomModelData(imageFile,material,model, alwaysReplace);
         this.customModels.add(customModelData);
     }
 
-    public void registerCustomFile(String pluginName, String destination, String fileName, InputStream file) {
-        File cFile = this.saveFile(file, fileName, pluginName);
+    /**
+     * Register custom file to resourcepack
+     * @param pluginName Name of plugin (and folder that will contain texture)
+     * @param destination Path to file
+     * @param fileName Name of file
+     * @param file InputStream with file
+     * @param alwaysReplace True if texture should be always replaced
+     */
+    public void registerCustomFile(String pluginName, String destination, String fileName, InputStream file, boolean alwaysReplace) {
+        File cFile = this.saveFile(file, fileName, pluginName,alwaysReplace);
         if(cFile == null) {
             return;
         }
-        CustomFile customFile= new CustomFile(cFile, destination);
+        CustomFile customFile= new CustomFile(cFile, destination, alwaysReplace);
         this.customFiles.add(customFile);
     }
 
@@ -470,14 +517,17 @@ public class ResourcePackManager {
         return uploader.uploadFile(fileToUpload);
     }
 
-    private File saveFile(InputStream stream, String fileName, String pluginName) {
+    private File saveFile(InputStream stream, String fileName, String pluginName, boolean alawysRepalce) {
         File folder = new File(this.texturesFolder, pluginName);
         if(!folder.exists()) {
             folder.mkdirs();
         }
         File file = new File(folder, fileName);
         if(file.exists()) {
-            return file;
+            if(!alawysRepalce) {
+                return file;
+            }
+            file.delete();
         }
         try {
             file.createNewFile();

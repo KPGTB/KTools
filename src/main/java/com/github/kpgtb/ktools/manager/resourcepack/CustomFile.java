@@ -16,27 +16,22 @@
 
 package com.github.kpgtb.ktools.manager.resourcepack;
 
-import org.bukkit.Material;
+import lombok.Getter;
 
 import java.io.File;
 
 /**
  * Object that contains information about custom resourcepack files
  */
+@Getter
 public class CustomFile {
     private final File file;
     private final String destination;
+    private final boolean alwaysReplace;
 
-    public CustomFile(File file, String destination) {
+    public CustomFile(File file, String destination, boolean alwaysReplace) {
         this.file = file;
         this.destination = destination;
-    }
-
-    public File getFile() {
-        return file;
-    }
-
-    public String getDestination() {
-        return destination;
+        this.alwaysReplace = alwaysReplace;
     }
 }

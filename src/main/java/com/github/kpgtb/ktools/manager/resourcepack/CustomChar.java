@@ -16,43 +16,28 @@
 
 package com.github.kpgtb.ktools.manager.resourcepack;
 
+import lombok.Getter;
+
 import java.io.File;
 
 /**
  * Object that contains information about custom character
  */
+@Getter
 public class CustomChar {
     private final String pluginName;
     private final File imageFile;
     private final String character;
     private final int height;
     private final int ascent;
+    private final boolean alwaysReplace;
 
-    public CustomChar(String pluginName, File imageFile, String character, int height, int ascent) {
+    public CustomChar(String pluginName, File imageFile, String character, int height, int ascent, boolean alwaysReplace) {
         this.pluginName = pluginName;
         this.imageFile = imageFile;
         this.character = character;
         this.height = height;
         this.ascent = ascent;
-    }
-
-    public String getPluginName() {
-        return pluginName;
-    }
-
-    public File getImageFile() {
-        return imageFile;
-    }
-
-    public String getCharacter() {
-        return character;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public int getAscent() {
-        return ascent;
+        this.alwaysReplace = alwaysReplace;
     }
 }
