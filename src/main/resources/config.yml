@@ -16,6 +16,9 @@ resourcePackRefreshRate: "15m"
 resourcePackSelfHost:
   enabled: false
   port: 8008 # Change it if this port is required for other app, or you have only access to another ports
+  # true if port should be added to url (i.e. http://127.0.0.1:8008/test)
+  # false if not (i.e. http://127.0.0.1/test)
+  usePortInUrl: true
   # IP or domain of your server
   host: "http://127.0.0.1"
 # Disable shadows on action bar. It's used in custom bars

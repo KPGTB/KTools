@@ -31,10 +31,13 @@ public class SelfUploader implements IUploader{
 
     public SelfUploader(JavaPlugin plugin) {
         this.plugin = plugin;
-        String base = plugin.getConfig().getString("resourcePackSelfHost.host");
+        String host = plugin.getConfig().getString("resourcePackSelfHost.host");
         int port = plugin.getConfig().getInt("resourcePackSelfHost.port");
-        this.url = base + ":" + port + "/resourcepack.zip";
-        this.testUrl = base + ":" + port + "/test";
+        if(plugin.getConfig().getBoolean("resourcePackSelfHost.usePortInUrl")) {
+            host += ":" + port;
+        }
+        this.url = host + "/resourcepack.zip";
+        this.testUrl = host + "/test";
     }
 
     @Override
