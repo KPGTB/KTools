@@ -30,6 +30,8 @@ import com.github.kpgtb.ktools.manager.language.LanguageManager;
 import com.github.kpgtb.ktools.manager.listener.ListenerManager;
 import com.github.kpgtb.ktools.manager.recipe.RecipeManager;
 import com.github.kpgtb.ktools.manager.resourcepack.ResourcePackManager;
+import com.github.kpgtb.ktools.manager.resourcepack.ResourcePackServer;
+import com.github.kpgtb.ktools.manager.resourcepack.uploader.SelfUploader;
 import com.github.kpgtb.ktools.manager.ui.UiManager;
 import com.github.kpgtb.ktools.manager.ui.bar.BarManager;
 import com.github.kpgtb.ktools.manager.updater.SpigotUpdater;
@@ -48,6 +50,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Main class of plugin
@@ -56,6 +59,7 @@ public final class KTools extends JavaPlugin {
 
     private ToolsObjectWrapper toolsObjectWrapper;
     private GlobalManagersWrapper globalManagersWrapper;
+    private ResourcePackServer resourcePackServer;
 
     public static boolean HAS_UPDATE;
 
@@ -126,6 +130,18 @@ public final class KTools extends JavaPlugin {
         ResourcePackManager resourcepackManager = null;
         if(!legacy) {
             debug.sendInfo(DebugType.START, "Loading resourcepack...");
+            if(getConfig().getBoolean("resourcePackSelfHost.enabled")) {
+                debug.sendInfo(DebugType.START, "Starting resourcepack server...");
+                this.resourcePackServer = new ResourcePackServer(this);
+                try {
+                    this.resourcePackServer.start();
+                    debug.sendInfo(DebugType.START, "Started resourcepack server...");
+                } catch (IOException e) {
+                    debug.sendWarning(DebugType.START, "Error while starting resourcepack server...", true);
+                    e.printStackTrace();
+                }
+            }
+
             resourcepackManager = new ResourcePackManager(this, debug, cacheManager);
             ResourcePackManager finalResourcepackManager = resourcepackManager;
             UiManager finalUiManager = uiManager;
@@ -262,6 +278,9 @@ public final class KTools extends JavaPlugin {
         BukkitAudiences adventure = this.toolsObjectWrapper.getAdventure();
         if(adventure != null) {
             adventure.close();
+        }
+        if(this.resourcePackServer != null) {
+            this.resourcePackServer.stop();
         }
         this.toolsObjectWrapper.getDataManager().close();
     }

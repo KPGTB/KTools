@@ -21,6 +21,7 @@ import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.manager.resourcepack.uploader.IUploader;
 import com.github.kpgtb.ktools.manager.resourcepack.uploader.OshiAtUploader;
+import com.github.kpgtb.ktools.manager.resourcepack.uploader.SelfUploader;
 import com.github.kpgtb.ktools.manager.resourcepack.uploader.TransferShUploader;
 import com.github.kpgtb.ktools.util.ui.FontWidth;
 import com.google.gson.*;
@@ -75,6 +76,9 @@ public class ResourcePackManager {
         this.plugins = new ArrayList<>();
 
         List<IUploader> uploaders = new ArrayList<>();
+        if(plugin.getConfig().getBoolean("resourcePackSelfHost.enabled")) {
+            uploaders.add(new SelfUploader(plugin));
+        }
         uploaders.add(new TransferShUploader());
         uploaders.add(new OshiAtUploader());
 

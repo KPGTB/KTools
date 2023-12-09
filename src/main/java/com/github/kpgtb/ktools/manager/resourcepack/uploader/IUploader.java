@@ -17,6 +17,7 @@
 package com.github.kpgtb.ktools.manager.resourcepack.uploader;
 
 import java.io.File;
+import java.io.IOException;
 
 public interface IUploader {
     String uploadFile(File fileToUpload);

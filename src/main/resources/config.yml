@@ -11,6 +11,13 @@ cache:
 resourcepack: true
 # Refresh rate of checking if resource pack is correct
 resourcePackRefreshRate: "15m"
+# ! Experimental !
+# Host resource pack on own server (plugin will handle everything - if you can use other ports, please use this option)
+resourcePackSelfHost:
+  enabled: false
+  port: 8008 # Change it if this port is required for other app, or you have only access to another ports
+  # IP or domain of your server
+  host: "http://127.0.0.1"
 # Disable shadows on action bar. It's used in custom bars
 fixShadowsOnActionBars: true
 # Data save info
