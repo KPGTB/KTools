@@ -35,7 +35,7 @@ public class CommonGuiItem {
     public static GuiItem getCloseItem(ToolsObjectWrapper wrapper) {
         Material material = Material.BARRIER;
         try {
-            material = Material.valueOf(wrapper.getPlugin().getConfig().getString("gui.closeItem").toUpperCase());
+            material = Material.valueOf(wrapper.getKTools().getConfig().getString("gui.closeItem").toUpperCase());
         } catch (Exception e) {}
 
         GuiItem result = new GuiItem(
@@ -56,7 +56,7 @@ public class CommonGuiItem {
     public static GuiItem getPreviousPageItem(ToolsObjectWrapper wrapper, PagedGuiContainer pagedGuiContainer) {
         Material material = Material.ARROW;
         try {
-            material = Material.valueOf(wrapper.getPlugin().getConfig().getString("gui.pages.leftItem").toUpperCase());
+            material = Material.valueOf(wrapper.getKTools().getConfig().getString("gui.pages.leftItem").toUpperCase());
         } catch (Exception e) {}
 
         GuiItem result = new GuiItem(
@@ -77,7 +77,7 @@ public class CommonGuiItem {
     public static GuiItem getNextPageItem(ToolsObjectWrapper wrapper, PagedGuiContainer pagedGuiContainer) {
         Material material = Material.ARROW;
         try {
-            material = Material.valueOf(wrapper.getPlugin().getConfig().getString("gui.pages.rightItem").toUpperCase());
+            material = Material.valueOf(wrapper.getKTools().getConfig().getString("gui.pages.rightItem").toUpperCase());
         } catch (Exception e) {}
 
         GuiItem result = new GuiItem(
