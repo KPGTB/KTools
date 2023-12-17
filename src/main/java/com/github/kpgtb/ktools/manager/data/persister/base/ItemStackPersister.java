@@ -14,23 +14,21 @@
  *    limitations under the License.
  */
 
-package com.github.kpgtb.ktools.manager.data.persister;
+package com.github.kpgtb.ktools.manager.data.persister.base;
 
-import com.github.kpgtb.ktools.util.item.ItemUtil;
+import com.github.kpgtb.ktools.manager.data.GsonAdapterManager;
 import com.j256.ormlite.field.FieldType;
 import com.j256.ormlite.field.SqlType;
-import com.j256.ormlite.field.types.StringType;
-import org.bukkit.Material;
+import com.j256.ormlite.field.types.LongStringType;
 import org.bukkit.inventory.ItemStack;
 
-import java.io.IOException;
 import java.sql.SQLException;
 
-public class ItemStackPersister extends StringType {
+public class ItemStackPersister extends LongStringType {
     private static final ItemStackPersister SINGLETON = new ItemStackPersister();
 
     public ItemStackPersister() {
-        super(SqlType.STRING, new Class[]{ItemStack.class});
+        super(SqlType.LONG_STRING, new Class[]{ItemStack.class});
     }
 
     public static ItemStackPersister getSingleton() {
@@ -39,19 +37,15 @@ public class ItemStackPersister extends StringType {
 
     @Override
     public Object javaToSqlArg(FieldType fieldType, Object javaObject) throws SQLException {
-        try {
-            return ItemUtil.serializeItem((ItemStack) javaObject);
-        } catch (IOException e) {
-            return "";
-        }
+        return GsonAdapterManager.getInstance()
+                .getGson()
+                .toJson(javaObject);
     }
 
     @Override
     public Object sqlArgToJava(FieldType fieldType, Object sqlArg, int columnPos) throws SQLException {
-        try {
-            return ItemUtil.deserializeItem((String) sqlArg);
-        } catch (IOException | ClassNotFoundException e) {
-            return new ItemStack(Material.AIR);
-        }
+        return GsonAdapterManager.getInstance()
+                .getGson()
+                .fromJson((String) sqlArg, ItemStack.class);
     }
 }

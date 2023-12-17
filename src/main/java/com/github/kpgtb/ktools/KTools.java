@@ -22,6 +22,11 @@ import com.github.kpgtb.ktools.manager.cache.CacheManager;
 import com.github.kpgtb.ktools.manager.command.CommandManager;
 import com.github.kpgtb.ktools.manager.command.parser.ParamParserManager;
 import com.github.kpgtb.ktools.manager.data.DataManager;
+import com.github.kpgtb.ktools.manager.data.GsonAdapterManager;
+import com.github.kpgtb.ktools.manager.data.adapter.ItemStackAdapter;
+import com.github.kpgtb.ktools.manager.data.adapter.LocationAdapter;
+import com.github.kpgtb.ktools.manager.data.adapter.OfflinePlayerAdapter;
+import com.github.kpgtb.ktools.manager.data.adapter.WorldAdapter;
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
 import com.github.kpgtb.ktools.manager.item.ItemManager;
@@ -46,6 +51,10 @@ import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import com.google.gson.JsonParser;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -110,8 +119,14 @@ public final class KTools extends JavaPlugin {
 
 
         debug.sendInfo(DebugType.START, "Loading database...");
+        GsonAdapterManager.getInstance()
+                .registerAdapter(ItemStack.class, new ItemStackAdapter())
+                .registerAdapter(Location.class, new LocationAdapter())
+                .registerAdapter(OfflinePlayer.class, new OfflinePlayerAdapter())
+                .registerAdapter(World.class, new WorldAdapter());
+
         DataManager dataManager = new DataManager(debug,getConfig(),getDataFolder(), this);
-        dataManager.registerPersisters(packageUtil.get("manager.data.persister"), getFile());
+        dataManager.registerPersisters(packageUtil.get("manager.data.persister.base"), getFile());
         debug.sendInfo(DebugType.START, "Loaded database.");
 
         debug.sendInfo(DebugType.START, "Loading bars...");

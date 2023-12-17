@@ -14,17 +14,15 @@
  *    limitations under the License.
  */
 
-package com.github.kpgtb.ktools.manager.data.persister;
+package com.github.kpgtb.ktools.manager.data.persister.base;
 
+import com.github.kpgtb.ktools.manager.data.GsonAdapterManager;
 import com.j256.ormlite.field.FieldType;
 import com.j256.ormlite.field.SqlType;
 import com.j256.ormlite.field.types.StringType;
-import com.j256.ormlite.field.types.UuidType;
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
 import java.sql.SQLException;
-import java.util.UUID;
 
 public class OfflinePlayerPersister extends StringType {
     private static final OfflinePlayerPersister SINGLETON = new OfflinePlayerPersister();
@@ -38,12 +36,16 @@ public class OfflinePlayerPersister extends StringType {
     }
 
     @Override
-    public Object sqlArgToJava(FieldType fieldType, Object sqlArg, int columnPos) {
-        return Bukkit.getOfflinePlayer(UUID.fromString((String) sqlArg));
+    public Object javaToSqlArg(FieldType fieldType, Object javaObject) throws SQLException {
+        return GsonAdapterManager.getInstance()
+                .getGson()
+                .toJson(javaObject);
     }
 
     @Override
-    public Object javaToSqlArg(FieldType fieldType, Object obj) {
-        return ((OfflinePlayer) obj).getUniqueId().toString();
+    public Object sqlArgToJava(FieldType fieldType, Object sqlArg, int columnPos) throws SQLException {
+        return GsonAdapterManager.getInstance()
+                .getGson()
+                .fromJson((String) sqlArg, OfflinePlayer.class);
     }
 }

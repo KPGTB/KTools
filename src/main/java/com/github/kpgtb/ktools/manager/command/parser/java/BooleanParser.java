@@ -28,24 +28,26 @@ import java.util.stream.Collectors;
 public class BooleanParser implements IParamParser<Boolean> {
     @Override
     public Boolean convert(String param, ToolsObjectWrapper wrapper) {
-        return Boolean.parseBoolean(param);
+        return param.equalsIgnoreCase("true") || param.equalsIgnoreCase("yes");
     }
 
     @Override
     public boolean canConvert(String param, ToolsObjectWrapper wrapper) {
-        try {
-            convert(param, wrapper);
-        }catch (Exception e) {
-            return false;
-        }
-        return true;
+        return param != null && (
+            param.equalsIgnoreCase("true") ||
+            param.equalsIgnoreCase("yes") ||
+            param.equalsIgnoreCase("false") ||
+            param.equalsIgnoreCase("no")
+        );
     }
 
     @Override
     public @NotNull List<String> complete(String arg, CommandSender sender, ToolsObjectWrapper wrapper) {
         ArrayList<String> result = new ArrayList<>();
         result.add("true");
+        result.add("yes");
         result.add("false");
+        result.add("no");
         return result.stream().filter(m -> m.startsWith(arg)).collect(Collectors.toList());
     }
 }

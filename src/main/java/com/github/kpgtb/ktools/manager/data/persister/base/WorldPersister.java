@@ -14,12 +14,12 @@
  *    limitations under the License.
  */
 
-package com.github.kpgtb.ktools.manager.data.persister;
+package com.github.kpgtb.ktools.manager.data.persister.base;
 
+import com.github.kpgtb.ktools.manager.data.GsonAdapterManager;
 import com.j256.ormlite.field.FieldType;
 import com.j256.ormlite.field.SqlType;
 import com.j256.ormlite.field.types.StringType;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 
 import java.sql.SQLException;
@@ -37,11 +37,15 @@ public class WorldPersister extends StringType {
 
     @Override
     public Object javaToSqlArg(FieldType fieldType, Object javaObject) throws SQLException {
-        return ((World)javaObject).getName();
+        return GsonAdapterManager.getInstance()
+                .getGson()
+                .toJson(javaObject);
     }
 
     @Override
     public Object sqlArgToJava(FieldType fieldType, Object sqlArg, int columnPos) throws SQLException {
-        return Bukkit.getWorld((String) sqlArg);
+        return GsonAdapterManager.getInstance()
+                .getGson()
+                .fromJson((String) sqlArg, World.class);
     }
 }
