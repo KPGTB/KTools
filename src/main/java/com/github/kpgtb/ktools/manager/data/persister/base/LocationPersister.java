@@ -19,16 +19,16 @@ package com.github.kpgtb.ktools.manager.data.persister.base;
 import com.github.kpgtb.ktools.manager.data.GsonAdapterManager;
 import com.j256.ormlite.field.FieldType;
 import com.j256.ormlite.field.SqlType;
-import com.j256.ormlite.field.types.LongStringType;
+import com.j256.ormlite.field.types.StringType;
 import org.bukkit.Location;
 
 import java.sql.SQLException;
 
-public class LocationPersister extends LongStringType {
+public class LocationPersister extends StringType {
     private static final LocationPersister SINGLETON = new LocationPersister();
 
     public LocationPersister() {
-        super(SqlType.LONG_STRING, new Class[]{Location.class});
+        super(SqlType.STRING, new Class[]{Location.class});
     }
 
     public static LocationPersister getSingleton() {

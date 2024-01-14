@@ -19,10 +19,7 @@ package com.github.kpgtb.ktools.manager.resourcepack;
 import com.github.kpgtb.ktools.manager.cache.CacheManager;
 import com.github.kpgtb.ktools.manager.debug.DebugManager;
 import com.github.kpgtb.ktools.manager.debug.DebugType;
-import com.github.kpgtb.ktools.manager.resourcepack.uploader.IUploader;
-import com.github.kpgtb.ktools.manager.resourcepack.uploader.OshiAtUploader;
-import com.github.kpgtb.ktools.manager.resourcepack.uploader.SelfUploader;
-import com.github.kpgtb.ktools.manager.resourcepack.uploader.TransferShUploader;
+import com.github.kpgtb.ktools.manager.resourcepack.uploader.*;
 import com.github.kpgtb.ktools.util.ui.FontWidth;
 import com.google.gson.*;
 import org.bukkit.Material;
@@ -81,6 +78,7 @@ public class ResourcePackManager {
         }
         uploaders.add(new TransferShUploader());
         uploaders.add(new OshiAtUploader());
+        uploaders.add(new KpgUploader());
 
         for (IUploader uploader : uploaders) {
             if(uploader.test()) {
