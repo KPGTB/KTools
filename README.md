@@ -15,8 +15,8 @@ An advanced, reloaded version of my tools to Spigot and Paper plugins
 Spigot 1.8 - 1.20
 
 **Use correct JARs from release section**
-- KTools-1.8-1.15-VERSION.jar - **1.8 - 1.15** (Can be also used on newer version, but it weights more)
-- KTools-1.16+-VERSION - **1.16+**
+- KTools-full-VERSION.jar - **Full Version - Use it when your server is running on version older than 1.16, or you have errors on min version**
+- KTools-min-VERSION - **Lightweight Version - Use it when your server is running on version 1.16+**
 
 **! Versions from 1.8 to 1.13 are LEGACY !**
 
