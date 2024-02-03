@@ -106,12 +106,21 @@ public class PacketSendingListener {
                 return;
             }
 
-            StructureModifier<String> strings = packet.getStrings();
-            if(strings.size() == 0) {return;}
-            String json = strings.read(0);
             String text = "";
-            if(json != null) {
-                text = ComponentSerializer.parse(json)[0].toLegacyText();
+
+            StructureModifier<String> strings = packet.getStrings();
+            if(strings.size() != 0) {
+                String json = strings.read(0);
+                if(json != null) {
+                    text = ComponentSerializer.parse(json)[0].toLegacyText();
+                }
+            } else {
+                StructureModifier<WrappedChatComponent> chatComponents = packet.getChatComponents();
+                if(chatComponents.size() == 0) {return;}
+                WrappedChatComponent component = chatComponents.read(0);
+                if(component != null) {
+                    text = ComponentSerializer.parse(component.getJson())[0].toLegacyText();
+                }
             }
 
             uiManager.addActionBar(
