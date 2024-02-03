@@ -19,10 +19,7 @@ package com.github.kpgtb.ktools.manager.resourcepack;
 import com.sun.net.httpserver.HttpServer;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.InetSocketAddress;
 
 /**
@@ -48,7 +45,7 @@ public class ResourcePackServer {
             folder.mkdirs();
             File file = new File(folder, "resourcepack.zip").getCanonicalFile();
             if(file.exists()) {
-                httpExchange.sendResponseHeaders(200, 0);
+                httpExchange.sendResponseHeaders(200, file.length());
                 OutputStream os = httpExchange.getResponseBody();
                 FileInputStream fs = new FileInputStream(file);
                 final byte[] buffer = new byte[0x10000];
