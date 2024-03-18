@@ -26,6 +26,10 @@ import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -234,6 +238,14 @@ public class BarManager {
         int barPlace = 0;
         if(player.getRemainingAir() < player.getMaximumAir()) {
             barPlace++;
+        }
+
+        if(player.isInsideVehicle()) {
+            Entity vehicle = player.getVehicle();
+            if(vehicle instanceof LivingEntity) {
+                double maxHealth = ((LivingEntity) vehicle).getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() - 1.0;
+                barPlace += (int) Math.ceil(maxHealth / 20.0) - 1;
+            }
         }
 
         for (KBar b : this.uiObjects.get(player.getUniqueId()).keySet()) {
