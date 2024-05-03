@@ -115,7 +115,7 @@ public class BarManager {
 
          barsList.forEach(bar -> {
              bar.getIcons().forEach(icon -> {
-                 for (int i = 0; i < possiblePlaces; i++) {
+                 for (int i = -1; i < possiblePlaces; i++) {
                      String fullChar = Character.toString((char) this.nextChar);
                      icon.getFullChar().put(i,fullChar);
                      this.nextChar++;
