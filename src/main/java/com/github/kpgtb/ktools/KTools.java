@@ -39,6 +39,7 @@ import com.github.kpgtb.ktools.manager.resourcepack.ResourcePackServer;
 import com.github.kpgtb.ktools.manager.resourcepack.uploader.SelfUploader;
 import com.github.kpgtb.ktools.manager.ui.UiManager;
 import com.github.kpgtb.ktools.manager.ui.bar.BarManager;
+import com.github.kpgtb.ktools.manager.ui.bar.BarPlaceholders;
 import com.github.kpgtb.ktools.manager.updater.SpigotUpdater;
 import com.github.kpgtb.ktools.manager.updater.UpdaterManager;
 import com.github.kpgtb.ktools.manager.updater.version.KVersion;
@@ -239,7 +240,17 @@ public final class KTools extends JavaPlugin {
 
                     if(finalUiManager != null && finalUiManager.isRequired()) {
                         //Shader
-                        finalResourcepackManager.registerCustomFile("noShadow", "assets"+ File.separator+"minecraft"+ File.separator+"shaders"+ File.separator+"core" + File.separator, "rendertype_text.vsh", getResource("txt/rendertype_text.vsh"));
+                        if(getConfig().getBoolean("fixShadowsOnActionBars")) {
+                            if(new KVersion(
+                                    Bukkit.getBukkitVersion()
+                                            .split("-")[0]
+                            ).isNewerOrEquals("1.20.5")) {
+                                finalResourcepackManager.registerCustomFile("noShadow", "assets"+ File.separator+"minecraft"+ File.separator+"shaders"+ File.separator+"core" + File.separator, "rendertype_text.vsh", getResource("txt/rendertype_text2.vsh"));
+                                finalResourcepackManager.registerCustomFile("noShadow", "assets"+ File.separator+"minecraft"+ File.separator+"shaders"+ File.separator+"core" + File.separator, "rendertype_text_intensity.vsh", getResource("txt/rendertype_text_intensity.vsh"));
+                            } else {
+                                finalResourcepackManager.registerCustomFile("noShadow", "assets"+ File.separator+"minecraft"+ File.separator+"shaders"+ File.separator+"core" + File.separator, "rendertype_text.vsh", getResource("txt/rendertype_text.vsh"));
+                            }
+                        }
                     }
 
                     if(finalResourcepackManager.isEnabled()) {
@@ -284,6 +295,10 @@ public final class KTools extends JavaPlugin {
         HAS_UPDATE = updaterManager.checkUpdate();
 
         new Metrics(this, 18408);
+
+        if(Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            new BarPlaceholders(barManager).register();
+        }
 
         debug.sendInfo(DebugType.START, "Enabled plugin in " + (System.currentTimeMillis() - startMillis) + "ms.");
     }

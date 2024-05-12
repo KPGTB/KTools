@@ -111,7 +111,7 @@ public class BarManager {
 
          List<KBar> barsList = new ArrayList<>(this.bars.values());
          barsList.sort(Comparator.comparingInt(KBar::getUniqueID));
-         int possiblePlaces = barsList.size() + 1;
+         int possiblePlaces = 4;
 
          barsList.forEach(bar -> {
              bar.getIcons().forEach(icon -> {
@@ -128,7 +128,7 @@ public class BarManager {
 
                      int ascent = -16 + (i*(icon.getIconsHeight()+1));
                      if(ascent > icon.getIconsHeight()) {
-                         continue;
+                         ascent = icon.getIconsHeight();
                      }
 
                      resourcePack.registerCustomChar(wrapper.getTag(), fullChar, bar.getName()+"_"+String.valueOf(icon.getFrom()).replace(".", "_")+"_full.png", icon.getFullImage(),icon.getIconsHeight(),ascent,icon.getIconsWidth());
@@ -243,7 +243,7 @@ public class BarManager {
         if(player.isInsideVehicle()) {
             Entity vehicle = player.getVehicle();
             if(vehicle instanceof LivingEntity) {
-                double maxHealth = ((LivingEntity) vehicle).getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() - 1.0;
+                double maxHealth = ((LivingEntity) vehicle).getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() - 1.49;
                 barPlace += (int) Math.ceil(maxHealth / 20.0) - 1;
             }
         }
@@ -259,7 +259,14 @@ public class BarManager {
             uiObj.update("");
             return;
         }
+        if(barPlace < 0) {
+            barPlace = 0;
+        }
 
+        uiObj.update(NoShadow.disableShadow(getIconsForPosition(barPlace, bar,player), wrapper));
+    }
+
+    public String getIconsForPosition(int barPlace, KBar bar, OfflinePlayer player) {
         double value = this.getValue(bar,player);
         BarIcons icons = bar.getIconsFor(value);
         double fixedValue = value - Math.floor(icons.getFrom());
@@ -292,8 +299,7 @@ public class BarManager {
         for(int i = 0; i < fullIconsInUI; i++) {
             ui.append(fullIconChar);
         }
-
-        uiObj.update(NoShadow.disableShadow(ui.toString(), wrapper));
+        return ui.toString();
     }
 
     /**

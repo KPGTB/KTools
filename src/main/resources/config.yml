@@ -22,7 +22,9 @@ resourcePackSelfHost:
   # IP or domain of your server
   host: "http://127.0.0.1"
 # Disable shadows on action bar. It's used in custom bars
-fixShadowsOnActionBars: true
+# Disable this option, if your bar is green
+# IMPORTANT: Disable this option if you want to make your server compatible with version below and above 1.20.5
+fixShadowsOnActionBars: false
 # Data save info
 data:
   # Possible options: SQLITE or MYSQL
