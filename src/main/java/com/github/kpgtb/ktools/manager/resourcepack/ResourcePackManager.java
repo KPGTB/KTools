@@ -66,30 +66,12 @@ public class ResourcePackManager {
         this.cache = cache;
         this.required = false;
         this.spaces = false;
+        this.uploader = null;
 
         this.customChars = new ArrayList<>();
         this.customModels = new ArrayList<>();
         this.customFiles = new ArrayList<>();
         this.plugins = new ArrayList<>();
-
-        List<IUploader> uploaders = new ArrayList<>();
-        if(plugin.getConfig().getBoolean("resourcePackSelfHost.enabled")) {
-            uploaders.add(new SelfUploader(plugin));
-        }
-
-        uploaders.add(new KpgUploader());
-        uploaders.add(new TransferShUploader());
-        uploaders.add(new OshiAtUploader());
-
-        for (IUploader uploader : uploaders) {
-            if(uploader.test()) {
-                debug.sendInfo(DebugType.RESOURCEPACK, "Selected uploader -> " + uploader.getClass().getSimpleName());
-                this.uploader = uploader;
-                break;
-            }
-
-            debug.sendWarning(DebugType.RESOURCEPACK, "Uploader not works -> " + uploader.getClass().getSimpleName());
-        }
     }
 
     /**
@@ -282,6 +264,27 @@ public class ResourcePackManager {
      * Generate resourcepack
      */
     public void prepareResourcepack(boolean force) {
+        if(this.uploader == null) {
+            List<IUploader> uploaders = new ArrayList<>();
+            if(plugin.getConfig().getBoolean("resourcePackSelfHost.enabled")) {
+                uploaders.add(new SelfUploader(plugin));
+            }
+
+            uploaders.add(new KpgUploader());
+            uploaders.add(new TransferShUploader());
+            uploaders.add(new OshiAtUploader());
+
+            for (IUploader uploader : uploaders) {
+                if(uploader.test()) {
+                    debug.sendInfo(DebugType.RESOURCEPACK, "Selected uploader -> " + uploader.getClass().getSimpleName());
+                    this.uploader = uploader;
+                    break;
+                }
+
+                debug.sendWarning(DebugType.RESOURCEPACK, "Uploader not works -> " + uploader.getClass().getSimpleName());
+            }
+        }
+
         if(!force && (isResourcepackLatest() || !isEnabled())) {
             return;
         }
