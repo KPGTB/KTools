@@ -76,9 +76,10 @@ public class ResourcePackManager {
         if(plugin.getConfig().getBoolean("resourcePackSelfHost.enabled")) {
             uploaders.add(new SelfUploader(plugin));
         }
+
+        uploaders.add(new KpgUploader());
         uploaders.add(new TransferShUploader());
         uploaders.add(new OshiAtUploader());
-        uploaders.add(new KpgUploader());
 
         for (IUploader uploader : uploaders) {
             if(uploader.test()) {
