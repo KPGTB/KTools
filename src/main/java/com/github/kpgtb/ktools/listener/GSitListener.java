@@ -6,8 +6,6 @@ import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import dev.geco.gsit.api.event.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.vehicle.VehicleEnterEvent;
-import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -30,7 +28,7 @@ public class GSitListener extends KListener {
     }
 
     @EventHandler
-    public void on(EntityGetUpSitEvent event) {
+    public void on(EntityStopSitEvent event) {
         if(!(event.getEntity() instanceof Player)) {
             return;
         }
@@ -43,7 +41,7 @@ public class GSitListener extends KListener {
     }
 
     @EventHandler
-    public void on(PlayerGetUpPoseEvent event) {
+    public void on(PlayerStopPoseEvent event) {
         handle(event.getPlayer());
     }
 
@@ -53,7 +51,7 @@ public class GSitListener extends KListener {
     }
 
     @EventHandler
-    public void on(PlayerGetUpPlayerSitEvent event) {
+    public void on(PlayerStopPlayerSitEvent event) {
         handle(event.getPlayer());
     }
 
@@ -63,7 +61,7 @@ public class GSitListener extends KListener {
     }
 
     @EventHandler
-    public void on(PlayerGetUpCrawlEvent event) {
+    public void on(PlayerStopCrawlEvent event) {
         handle(event.getPlayer());
     }
 
