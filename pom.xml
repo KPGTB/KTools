@@ -6,14 +6,14 @@
 
     <groupId>com.github.kpgtb</groupId>
     <artifactId>KTools</artifactId>
-    <version>2.4.4-SNAPSHOT</version>
+    <version>2.4.4-xsky</version>
     <packaging>jar</packaging>
 
     <name>KTools</name>
 
     <description>An advanced, reloaded version of my tools to Spigot and Paper plugins</description>
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>16</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <profile.scope>compile</profile.scope>
         <profile.jarName>KTools-full-${project.version}</profile.jarName>
@@ -55,7 +55,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
+                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -63,8 +63,14 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <finalName>${profile.jarName}</finalName>
+                            <finalName>KTools-${project.version}</finalName>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <relocations>
+                                <relocation>
+                                    <pattern>net.kyori</pattern>
+                                    <shadedPattern>com.github.kpgtb.ktools.impl</shadedPattern>
+                                </relocation>
+                            </relocations>
                         </configuration>
                     </execution>
                 </executions>
@@ -141,19 +147,19 @@
             <groupId>net.kyori</groupId>
             <artifactId>adventure-platform-bukkit</artifactId>
             <version>4.2.0</version>
-            <scope>${profile.scope}</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-text-minimessage</artifactId>
             <version>4.12.0</version>
-            <scope>${profile.scope}</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-text-serializer-legacy</artifactId>
             <version>4.12.0</version>
-            <scope>${profile.scope}</scope>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
