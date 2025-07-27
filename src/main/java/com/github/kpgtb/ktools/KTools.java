@@ -241,15 +241,11 @@ public final class KTools extends JavaPlugin {
                     if(finalUiManager != null && finalUiManager.isRequired()) {
                         //Shader
                         if(getConfig().getBoolean("fixShadowsOnActionBars")) {
-                            if(new KVersion(
-                                    Bukkit.getBukkitVersion()
-                                            .split("-")[0]
-                            ).isNewerOrEquals("1.20.5")) {
-                                finalResourcepackManager.registerCustomFile("noShadow", "assets"+ File.separator+"minecraft"+ File.separator+"shaders"+ File.separator+"core" + File.separator, "rendertype_text.vsh", getResource("txt/rendertype_text2.vsh"));
-                                finalResourcepackManager.registerCustomFile("noShadow", "assets"+ File.separator+"minecraft"+ File.separator+"shaders"+ File.separator+"core" + File.separator, "rendertype_text_intensity.vsh", getResource("txt/rendertype_text_intensity.vsh"));
-                            } else {
-                                finalResourcepackManager.registerCustomFile("noShadow", "assets"+ File.separator+"minecraft"+ File.separator+"shaders"+ File.separator+"core" + File.separator, "rendertype_text.vsh", getResource("txt/rendertype_text.vsh"));
-                            }
+                            finalResourcepackManager.registerCustomFile("noShadow", "psns_16_24" + File.separator + "assets"+ File.separator+"minecraft"+ File.separator+"shaders"+ File.separator+"core" + File.separator, "rendertype_text.vsh", getResource("txt/legacyShadow/rendertype_text.vsh"));
+                            finalResourcepackManager.registerCustomFile("noShadow", "psns_16_24" + File.separator + "assets"+ File.separator+"minecraft"+ File.separator+"shaders"+ File.separator+"core" + File.separator, "rendertype_text_intensity.vsh", getResource("txt/legacyShadow/rendertype_text_intensity.vsh"));
+
+                            finalResourcepackManager.registerCustomFile("noShadow", "psns_25_42" + File.separator + "assets"+ File.separator+"minecraft"+ File.separator+"shaders"+ File.separator+"core" + File.separator, "rendertype_text.vsh", getResource("txt/newShadow/rendertype_text.vsh"));
+                            finalResourcepackManager.registerCustomFile("noShadow", "psns_25_42" + File.separator + "assets"+ File.separator+"minecraft"+ File.separator+"shaders"+ File.separator+"core" + File.separator, "rendertype_text_intensity.vsh", getResource("txt/newShadow/rendertype_text_intensity.vsh"));
                         }
                     }
 

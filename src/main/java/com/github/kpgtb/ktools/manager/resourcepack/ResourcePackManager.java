@@ -305,9 +305,35 @@ public class ResourcePackManager {
 
             JsonObject packObj2 = new JsonObject();
             packObj2.addProperty("pack_format", 4);
+            JsonArray supportedArray = new JsonArray();
+            supportedArray.add(4);
+            supportedArray.add(81);
+            packObj2.add("supported_formats", supportedArray);
             packObj2.addProperty("description", "Auto generated resourcepack that is a part of Ktools. It also support NegativeSpaceFont by AmberW");
 
+            JsonObject ov1 = new JsonObject();
+            JsonArray ov1Arr = new JsonArray();
+            ov1Arr.add(25);
+            ov1Arr.add(42);
+            ov1.add("formats", ov1Arr);
+            ov1.addProperty("directory", "psns_25_42");
+
+            JsonObject ov2 = new JsonObject();
+            JsonArray ov2Arr = new JsonArray();
+            ov2Arr.add(16);
+            ov2Arr.add(24);
+            ov2.add("formats", ov2Arr);
+            ov2.addProperty("directory", "psns_16_24");
+
+            JsonArray entriesArr = new JsonArray();
+            entriesArr.add(ov1);
+            entriesArr.add(ov2);
+
+            JsonObject overlays = new JsonObject();
+            overlays.add("entries", entriesArr);
+
             packObj.add("pack", packObj2);
+            packObj.add("overlays", overlays);
 
             FileWriter packWriter = new FileWriter(packPath);
             Gson gson = new GsonBuilder().setPrettyPrinting().create();

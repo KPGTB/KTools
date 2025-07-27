@@ -16,9 +16,7 @@
 
 package com.github.kpgtb.ktools.util.ui;
 
-import com.github.kpgtb.ktools.manager.language.LanguageManager;
 import com.github.kpgtb.ktools.manager.updater.version.KVersion;
-import com.github.kpgtb.ktools.util.wrapper.ToolsInitializer;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import org.bukkit.Bukkit;
 
@@ -39,10 +37,15 @@ public class NoShadow {
                 .split("-")[0];
         KVersion mcVersion = new KVersion(version);
 
-        boolean fixShadow = mcVersion.isNewerThan(new KVersion("1.19.0")) && wrapper.getKTools().getConfig().getBoolean("fixShadowsOnActionBars");
+        boolean shouldHandleShadow = mcVersion.isNewerThan(new KVersion("1.19.0"));
+        boolean minecraftShadowHandling = mcVersion.isNewerOrEquals(new KVersion("1.21.4"));
+
+        boolean fixShadow = shouldHandleShadow && !minecraftShadowHandling && wrapper.getKTools().getConfig().getBoolean("fixShadowsOnActionBars");
 
         if(fixShadow) {
             return wrapper.getLanguageManager().convertMmToString("<color:#4e5c24>" + str);
+        } else if(minecraftShadowHandling) {
+            return wrapper.getLanguageManager().convertMmToString("<!shadow>" + str);
         } else {
             return str;
         }
