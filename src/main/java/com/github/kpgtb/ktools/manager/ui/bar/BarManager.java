@@ -263,7 +263,7 @@ public class BarManager {
             barPlace = 0;
         }
 
-        uiObj.update(NoShadow.disableShadow(getIconsForPosition(barPlace, bar,player), wrapper));
+        uiObj.update(NoShadow.disableShadow(getIconsForPosition(barPlace, bar,player), wrapper, player));
     }
 
     public String getIconsForPosition(int barPlace, KBar bar, OfflinePlayer player) {

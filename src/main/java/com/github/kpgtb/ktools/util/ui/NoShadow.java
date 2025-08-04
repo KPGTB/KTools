@@ -18,7 +18,11 @@ package com.github.kpgtb.ktools.util.ui;
 
 import com.github.kpgtb.ktools.manager.updater.version.KVersion;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.ViaAPI;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 /**
  * Fix text to not show shadow
@@ -32,13 +36,23 @@ public class NoShadow {
      * @param wrapper Instance of ToolsObjectWrapper
      * @return String without shadow
      */
-    public static String disableShadow(String str, ToolsObjectWrapper wrapper) {
+    public static String disableShadow(String str, ToolsObjectWrapper wrapper, Player player) {
         String version = Bukkit.getBukkitVersion()
                 .split("-")[0];
+
         KVersion mcVersion = new KVersion(version);
 
         boolean shouldHandleShadow = mcVersion.isNewerThan(new KVersion("1.19.0"));
         boolean minecraftShadowHandling = mcVersion.isNewerOrEquals(new KVersion("1.21.4"));
+
+
+        if(Bukkit.getPluginManager().isPluginEnabled("ViaVersion")) {
+            ViaAPI api = Via.getAPI();
+            int protVer = api.getPlayerVersion(player);
+
+            shouldHandleShadow = protVer >= ProtocolVersion.v1_19.getVersion();
+            minecraftShadowHandling = protVer >= ProtocolVersion.v1_21_4.getVersion();
+        }
 
         boolean fixShadow = shouldHandleShadow && !minecraftShadowHandling && wrapper.getKTools().getConfig().getBoolean("fixShadowsOnActionBars");
 
