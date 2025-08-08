@@ -59,7 +59,8 @@ public class NoShadow {
         if(fixShadow) {
             return wrapper.getLanguageManager().convertMmToString("<color:#4e5c24>" + str);
         } else if(minecraftShadowHandling) {
-            return wrapper.getLanguageManager().convertMmToString("<!shadow>" + str);
+            //return wrapper.getLanguageManager().convertMmToString("<!shadow>" + str);
+            return str;
         } else {
             return str;
         }
