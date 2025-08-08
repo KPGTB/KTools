@@ -17,9 +17,12 @@
 package com.github.kpgtb.ktools.manager.ui;
 
 import com.comphenix.protocol.ProtocolManager;
+import com.github.kpgtb.ktools.KTools;
 import com.github.kpgtb.ktools.util.ui.FontWidth;
+import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import com.google.gson.JsonParser;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -44,7 +47,7 @@ public class UiManager {
     private boolean sending;
     @Getter
     private boolean required;
-    private final JavaPlugin plugin;
+    private final KTools plugin;
     private BukkitTask task;
     private PacketSendingListener packet;
     private final ProtocolManager protocolManager;
@@ -54,7 +57,7 @@ public class UiManager {
      * @param plugin Instance of plugin
      * @param protocolManager Instance of ProtocolManager (ProtocolLib)
      */
-    public UiManager(JavaPlugin plugin, ProtocolManager protocolManager) {
+    public UiManager(KTools plugin, ProtocolManager protocolManager) {
         this.plugin = plugin;
         this.ui = new HashMap<>();
         this.standardActionBars = new HashMap<>();
@@ -83,11 +86,11 @@ public class UiManager {
             @Override
             public void run() {
                 for(Player player : Bukkit.getOnlinePlayers()) {
-                    StringBuilder actionBarText = new StringBuilder();
+                    Component component = Component.text("");
 
                     if(ui.containsKey(player.getUniqueId())) {
-                        for(BaseUiObject BaseUiObject : ui.get(player.getUniqueId())) {
-                            actionBarText.append(BaseUiObject.getTextToShow());
+                        for(BaseUiObject obj : ui.get(player.getUniqueId())) {
+                            component = component.append(obj.getComponentToShow());
                         }
                     }
 
@@ -97,13 +100,14 @@ public class UiManager {
                             text = s;
                         }
 
-                        BaseUiObject BaseUiObject = new BaseUiObject(text, Alignment.CENTER, 0);
-                        actionBarText.append(BaseUiObject.getTextToShow());
+                        BaseUiObject obj = new BaseUiObject(plugin.getToolsObjectWrapper().getLanguageManager()
+                            .convertLegacyStringToComponent(text), Alignment.CENTER, 0,plugin.getToolsObjectWrapper());
+                        component.append(obj.getComponentToShow());
                     }
 
-                    if(!actionBarText.toString().equalsIgnoreCase("")) {
+                    if(!plugin.getToolsObjectWrapper().getLanguageManager().convertComponentToString(component).isEmpty()) {
                         sending = true;
-                        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(actionBarText.toString()));
+                        plugin.getToolsObjectWrapper().getAdventure().player(player).sendActionBar(component);
                         sending = false;
                     }
                 }

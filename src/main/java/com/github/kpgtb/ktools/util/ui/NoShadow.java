@@ -21,6 +21,8 @@ import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -36,7 +38,7 @@ public class NoShadow {
      * @param wrapper Instance of ToolsObjectWrapper
      * @return String without shadow
      */
-    public static String disableShadow(String str, ToolsObjectWrapper wrapper, Player player) {
+    public static Component disableShadow(String str, ToolsObjectWrapper wrapper, Player player) {
         String version = Bukkit.getBukkitVersion()
                 .split("-")[0];
 
@@ -44,6 +46,7 @@ public class NoShadow {
 
         boolean shouldHandleShadow = mcVersion.isNewerThan(new KVersion("1.19.0"));
         boolean minecraftShadowHandling = mcVersion.isNewerOrEquals(new KVersion("1.21.4"));
+        boolean clientShadowHandling = minecraftShadowHandling;
 
 
         if(Bukkit.getPluginManager().isPluginEnabled("ViaVersion")) {
@@ -51,18 +54,20 @@ public class NoShadow {
             int protVer = api.getPlayerVersion(player);
 
             shouldHandleShadow = protVer >= ProtocolVersion.v1_19.getVersion();
-            minecraftShadowHandling = protVer >= ProtocolVersion.v1_21_4.getVersion();
+            clientShadowHandling = protVer >= ProtocolVersion.v1_21_4.getVersion();
         }
 
-        boolean fixShadow = shouldHandleShadow && !minecraftShadowHandling && wrapper.getKTools().getConfig().getBoolean("fixShadowsOnActionBars");
+        boolean fixShadow = shouldHandleShadow && !clientShadowHandling && wrapper.getKTools().getConfig().getBoolean("fixShadowsOnActionBars");
 
         if(fixShadow) {
-            return wrapper.getLanguageManager().convertMmToString("<color:#4e5c24>" + str);
-        } else if(minecraftShadowHandling) {
-            //return wrapper.getLanguageManager().convertMmToString("<!shadow>" + str);
-            return str;
+            return MiniMessage.miniMessage()
+                .deserialize("<color:#4e5c24>" + str);
+        } else if(clientShadowHandling && minecraftShadowHandling) {
+            return MiniMessage.miniMessage()
+                .deserialize("<shadow:yellow:0.1>" + str);
         } else {
-            return str;
+            return MiniMessage.miniMessage()
+                .deserialize(str);
         }
     }
 }

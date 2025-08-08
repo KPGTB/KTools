@@ -50,6 +50,7 @@ import com.github.kpgtb.ktools.util.ui.FontWidth;
 import com.github.kpgtb.ktools.util.wrapper.GlobalManagersWrapper;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import com.google.gson.JsonParser;
+import lombok.Getter;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -67,6 +68,7 @@ import java.io.IOException;
  */
 public final class KTools extends JavaPlugin {
 
+    @Getter
     private ToolsObjectWrapper toolsObjectWrapper;
     private GlobalManagersWrapper globalManagersWrapper;
     private ResourcePackServer resourcePackServer;

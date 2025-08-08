@@ -23,6 +23,7 @@ import com.github.kpgtb.ktools.manager.ui.UiManager;
 import com.github.kpgtb.ktools.manager.ui.bar.event.BarValueChangeEvent;
 import com.github.kpgtb.ktools.util.ui.NoShadow;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
@@ -149,7 +150,7 @@ public class BarManager {
         if(isBarShowed(bar,player)) {
             return;
         }
-        BaseUiObject uiObj = new BaseUiObject("", Alignment.LEFT, 10);
+        BaseUiObject uiObj = new BaseUiObject(Component.text(""), Alignment.LEFT, 10,wrapper);
         wrapper.getUiManager().addUI(uuid,uiObj);
         this.uiObjects.get(uuid).put(bar,uiObj);
         updateBars(player);
@@ -231,7 +232,7 @@ public class BarManager {
 
         if((mode.equals(GameMode.CREATIVE) && bar.isHideInCreative()) ||
                 (mode.equals(GameMode.SPECTATOR) && bar.isHideInSpectator())) {
-            uiObj.update("");
+            uiObj.update(Component.text(""));
             return;
         }
 
@@ -256,7 +257,7 @@ public class BarManager {
         }
 
         if(barPlace > 2) {
-            uiObj.update("");
+            uiObj.update(Component.text(""));
             return;
         }
         if(barPlace < 0) {

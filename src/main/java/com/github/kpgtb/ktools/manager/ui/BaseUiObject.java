@@ -16,8 +16,13 @@
 
 package com.github.kpgtb.ktools.manager.ui;
 
+import com.github.kpgtb.ktools.KTools;
 import com.github.kpgtb.ktools.util.ui.FontWidth;
+import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
+import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,17 +31,20 @@ import java.util.regex.Pattern;
  * This object contains information about UI objects
  */
 public class BaseUiObject {
-    private String text;
+    private Component component;
+    private ToolsObjectWrapper wrapper;
     private final Alignment alignment;
     private final int offset;
 
-    private String textToShow;
+    @Getter
+    private Component componentToShow;
 
 
-    public BaseUiObject(String text, Alignment alignment, int offset) {
-        this.text = text;
+    public BaseUiObject(Component component, Alignment alignment, int offset, ToolsObjectWrapper wrapper) {
+        this.component = component;
         this.alignment = alignment;
         this.offset = offset;
+        this.wrapper =wrapper;
 
         build();
     }
@@ -44,15 +52,15 @@ public class BaseUiObject {
     private void build() {
         Integer[] pixels = getLeftAndRightPixels();
 
-        textToShow = FontWidth.getSpaces(pixels[0]) + text + FontWidth.getSpaces(pixels[1]);
+        this.componentToShow = Component.text(FontWidth.getSpaces(pixels[0])).append(this.component).append(Component.text(FontWidth.getSpaces(pixels[1])));
     }
 
     /**
-     * Update text
-     * @param text
+     * Update component
+     * @param component
      */
-    public void update(String text) {
-        this.text = text;
+    public void update(Component component) {
+        this.component = component;
         build();
     }
 
@@ -72,7 +80,9 @@ public class BaseUiObject {
     private Integer[] getLeftAndRightPixels() {
         double width = 0;
 
-        for(Character character : fixString(text).toCharArray()) {
+        for(Character character : fixString(
+            this.wrapper.getLanguageManager().convertComponentToString(this.component)
+        ).toCharArray()) {
             width += FontWidth.getWidth(character);
         }
 
@@ -94,8 +104,5 @@ public class BaseUiObject {
         }
 
         return pixels;
-    }
-    public String getTextToShow() {
-        return textToShow;
     }
 }
