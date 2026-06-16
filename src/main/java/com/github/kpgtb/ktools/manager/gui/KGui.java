@@ -25,6 +25,7 @@ import com.github.kpgtb.ktools.manager.gui.action.DragAction;
 import com.github.kpgtb.ktools.manager.gui.container.GuiContainer;
 import com.github.kpgtb.ktools.manager.gui.item.GuiItem;
 import com.github.kpgtb.ktools.manager.gui.item.GuiItemLocation;
+import com.github.kpgtb.ktools.manager.gui.listener.MenuListener;
 import com.github.kpgtb.ktools.util.wrapper.ToolsObjectWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -47,7 +48,7 @@ import java.util.ArrayList;
 /**
  * KGui handles gui making process in plugin
  */
-public abstract class KGui implements Listener {
+public abstract class KGui {
     private final String name;
     private final int rows;
     private final ArrayList<GuiContainer> containers;
@@ -83,7 +84,6 @@ public abstract class KGui implements Listener {
         }
 
         this.bukkitInventory = Bukkit.createInventory(null, (rows * 9), name);
-        Bukkit.getPluginManager().registerEvents(this,tools.getPlugin());
     }
 
     /**
@@ -153,6 +153,8 @@ public abstract class KGui implements Listener {
     public void open(Player player) {
         prepareGui();
         player.openInventory(bukkitInventory);
+        MenuListener.getInstance(this.plugin)
+            .addViewer(player, this);
     }
 
     /**
@@ -262,119 +264,5 @@ public abstract class KGui implements Listener {
      */
     public void setCloseAction(CloseAction closeAction) {
         this.closeAction = closeAction;
-    }
-
-    @EventHandler
-    public void onGlobalClick(InventoryClickEvent event) {
-        Inventory inv = event.getInventory();
-        Inventory clickedInv = event.getClickedInventory();
-        if(!inv.equals(this.bukkitInventory)) {
-            return;
-        }
-
-        if(this.getGlobalClickAction() != null) {
-            ClickLocation clickLocation = clickedInv == null ? ClickLocation.OUTSIDE : clickedInv.equals(this.bukkitInventory) ? ClickLocation.TOP : ClickLocation.BOTTOM;
-            this.getGlobalClickAction().run(event,clickLocation);
-        }
-    }
-
-    @EventHandler
-    public void onClick(InventoryClickEvent event) {
-        Inventory inv = event.getClickedInventory();
-
-        if(inv != this.bukkitInventory) {
-            return;
-        }
-
-        int slot = event.getSlot();
-        GuiContainer container = this.getContainerAt(slot);
-
-        if(container == null) {
-            return;
-        }
-
-        GuiItem item = container.getItem(container.getContainerLocFromGuiLoc(slot));
-
-        if(item == null) {
-            return;
-        }
-
-        if(item.getClickAction() != null) {
-            item.getClickAction().run(event, ClickLocation.TOP);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onUpdate(InventoryClickEvent event) {
-        if(event.isCancelled()) {
-            return;
-        }
-        if(!this.updateItems) {
-            return;
-        }
-
-        Inventory inv = event.getInventory();
-        if(!inv.equals(this.bukkitInventory)) {
-            return;
-        }
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < inv.getContents().length; i++) {
-                    ItemStack realIS = inv.getItem(i);
-                    GuiContainer container = getContainerAt(i);
-                    if(container == null) {
-                        continue;
-                    }
-                    GuiItemLocation loc = container.getContainerLocFromGuiLoc(i);
-                    GuiItem guiItem = container.getItem(loc);
-
-                    if(guiItem == null) {
-                        if(realIS != null && !realIS.getType().equals(Material.AIR)) {
-                            container.setItem(loc.getX(), loc.getY(), new GuiItem(realIS));
-                        }
-                        continue;
-                    }
-
-                    if(realIS == null || realIS.getType().equals(Material.AIR)) {
-                        container.removeItem(loc.getX(),loc.getY());
-                        continue;
-                    }
-
-                    if(guiItem.getItemStack().isSimilar(realIS)) {
-                        continue;
-                    }
-
-                    guiItem.setItemStack(realIS);
-                }
-            }
-        }.runTaskLater(plugin,3);
-    }
-
-    @EventHandler
-    public void onDrag(InventoryDragEvent event) {
-        Inventory inv = event.getInventory();
-
-        if(inv != this.bukkitInventory) {
-            return;
-        }
-
-        if(this.getGlobalDragAction() != null) {
-            this.getGlobalDragAction().run(event);
-        }
-    }
-
-    @EventHandler
-    public void onClose(InventoryCloseEvent event) {
-        Inventory inv = event.getInventory();
-
-        if(inv != this.bukkitInventory) {
-            return;
-        }
-
-        if(this.getCloseAction() != null) {
-            this.getCloseAction().run(event);
-        }
     }
 }

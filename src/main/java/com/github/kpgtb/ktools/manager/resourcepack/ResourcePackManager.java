@@ -81,13 +81,16 @@ public class ResourcePackManager {
         uploaders.add(new KpgUploader());
 
         for (IUploader uploader : uploaders) {
-            if(uploader.test()) {
+            this.uploader = uploader;
+            break;
+
+      /*      if(uploader.test()) {
                 debug.sendInfo(DebugType.RESOURCEPACK, "Selected uploader -> " + uploader.getClass().getSimpleName());
                 this.uploader = uploader;
                 break;
             }
-
-            debug.sendWarning(DebugType.RESOURCEPACK, "Uploader not works -> " + uploader.getClass().getSimpleName());
+*/
+            //debug.sendWarning(DebugType.RESOURCEPACK, "Uploader not works -> " + uploader.getClass().getSimpleName());
         }
     }
 
